@@ -1,0 +1,14 @@
+{
+  "apps": [
+    { "id": "ghost", "name": "Ghost Blog", "image": "ghost:5-alpine", "port": "2368" },
+    { "id": "wordpress", "name": "WordPress", "image": "wordpress:latest", "port": "80" }
+  ],
+  "databases": [
+    { "id": "mysql", "name": "MySQL", "image": "mysql:8.0" },
+    { "id": "postgres", "name": "PostgreSQL", "image": "postgres:15-alpine" }
+  ],
+  "proxies": [
+    { "id": "nginx", "name": "Nginx", "image": "nginx:alpine" },
+    { "id": "caddy", "name": "Caddy", "image": "caddy:2-alpine" }
+  ]
+}

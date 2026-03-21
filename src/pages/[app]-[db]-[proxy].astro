@@ -1,0 +1,70 @@
+---
+// src/pages/[app]-[db]-[proxy].astro
+import services from '../data/services.json';
+
+// getStaticPaths 是 Astro 的核心，它会在构建时运行
+// 我们在这里进行数据的“乘法”，把所有的组合算出来
+export function getStaticPaths() {
+  const paths = [];
+  
+  services.apps.forEach(app => {
+    services.databases.forEach(db => {
+      services.proxies.forEach(proxy => {
+        // 每一种组合，生成一个 URL 路径，并把数据作为 props 传给页面
+        paths.push({
+          params: { app: app.id, db: db.id, proxy: proxy.id },
+          props: { app, db, proxy }
+        });
+      });
+    });
+  });
+  
+  return paths;
+}
+
+// 接收 getStaticPaths 传过来的单个页面数据
+const { app, db, proxy } = Astro.props;
+
+// 利用模板字符串自动生成 Docker Compose 配置
+// 注意这里对齐了 YAML 的缩进
+const composeYml = `
+version: '3.8'
+services:
+  ${app.id}:
+    image: ${app.image}
+    ports:
+      - "${app.port}:${app.port}"
+    restart: always
+
+  ${db.id}:
+    image: ${db.image}
+    restart: always
+
+  ${proxy.id}:
+    image: ${proxy.image}
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+`.trim();
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Docker Compose for {app.name}, {db.name} and {proxy.name}</title>
+    <meta name="description" content={`Generate a complete docker-compose.yml file for ${app.name} with ${db.name} and ${proxy.name} reverse proxy.`} />
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
+      pre { background: #1e1e1e; color: #d4d4d4; padding: 1.5rem; border-radius: 8px; overflow-x: auto; }
+      h1 { color: #333; }
+    </style>
+  </head>
+  <body>
+    <h1>Deploy {app.name} + {db.name} + {proxy.name}</h1>
+    <p>Copy the following <code>docker-compose.yml</code> file to your server to easily deploy <strong>{app.name}</strong> using <strong>{db.name}</strong> as the database and <strong>{proxy.name}</strong> as the reverse proxy.</p>
+    
+    <pre><code>{composeYml}</code></pre>
+  </body>
+</html>
