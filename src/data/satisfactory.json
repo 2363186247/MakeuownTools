@@ -1055,6 +1055,9 @@
           "ingredients": [
             { "name": "Alumina Solution", "item_id": "alumina-solution", "amount_per_min": 120 },
             { "name": "Coal", "item_id": "coal", "amount_per_min": 40 }
+          ],
+          "byproducts": [
+            { "name": "Water", "item_id": "water", "amount_per_min": 60 }
           ]
         }
       ]

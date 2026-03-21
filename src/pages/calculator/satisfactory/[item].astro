@@ -14,6 +14,7 @@ type Recipe = {
   machine: string;
   output_per_min: number;
   ingredients: Ingredient[];
+  byproducts?: Ingredient[];
 };
 
 type ItemData = {
@@ -145,7 +146,7 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
               value="100"
               class="w-24 rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm font-mono text-white outline-none focus:border-amber-500/50"
             />
-            <span class="text-xs text-zinc-400">% (Power uses $clock^{1.6}$ approximation)</span>
+                <span class="text-xs text-zinc-400">% (Linear power scaling in 1.0)</span>
           </div>
         </div>
 
@@ -209,8 +210,13 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
         </div>
 
         <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
-          <p class="mb-4 text-xs uppercase tracking-widest text-zinc-400">Dependency Tree (expand/collapse)</p>
-          <ul id="treeRoot" class="space-y-2"></ul>
+          <p class="mb-4 text-xs uppercase tracking-widest text-zinc-400">Byproducts / Recycle Credits</p>
+          <ul id="byproductTotalsList" class="space-y-3"></ul>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8 overflow-x-auto">
+          <p class="mb-4 text-xs uppercase tracking-widest text-zinc-400 whitespace-nowrap">Dependency Tree (expand/collapse)</p>
+          <ul id="treeRoot" class="space-y-2 min-w-[500px]"></ul>
         </div>
       </section>
     </div>
@@ -236,6 +242,7 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
     const directInputsList = document.getElementById('directInputsList');
     const machineTotalsList = document.getElementById('machineTotalsList');
     const rawTotalsList = document.getElementById('rawTotalsList');
+    const byproductTotalsList = document.getElementById('byproductTotalsList');
     const treeRoot = document.getElementById('treeRoot');
 
     if (
@@ -254,6 +261,7 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
       !(directInputsList instanceof HTMLElement) ||
       !(machineTotalsList instanceof HTMLElement) ||
       !(rawTotalsList instanceof HTMLElement) ||
+      !(byproductTotalsList instanceof HTMLElement) ||
       !(treeRoot instanceof HTMLElement)
     ) {
       throw new Error('Satisfactory calculator UI is missing required elements.');
@@ -271,7 +279,8 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
         label: 'Default',
         machine: entry.machine,
         output_per_min: Number(entry.base_output_per_min) || 1,
-        ingredients: Array.isArray(entry.ingredients) ? entry.ingredients : []
+        ingredients: Array.isArray(entry.ingredients) ? entry.ingredients : [],
+        byproducts: []
       }];
     }
 
@@ -285,7 +294,7 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
     }
 
     function powerAtClock(basePower, clockFactor) {
-      return basePower * Math.pow(clockFactor, 1.6);
+      return basePower * clockFactor;
     }
 
     function renderList(target, entries, unit) {
@@ -337,6 +346,19 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
         `;
       }
 
+      if (node.type === 'cycle') {
+        return `
+          <li class="relative pl-4 before:absolute before:left-0 before:top-4 before:h-px before:w-3 before:bg-rose-300/40">
+            <div class="rounded-xl border border-rose-300/25 bg-rose-500/10 p-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-rose-100">Cycle detected: ${node.itemName}</span>
+                <span class="font-mono text-xs text-rose-200/80">${node.rate.toFixed(2)}/min unresolved</span>
+              </div>
+            </div>
+          </li>
+        `;
+      }
+
       const childrenHtml = node.children.length
         ? `<ul class="mt-2 ml-4 space-y-2 border-l border-white/10 pl-4">${node.children.map((c) => renderTreeNode(c)).join('')}</ul>`
         : '';
@@ -359,12 +381,46 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
     function calculateFactoryPlan(targetPerMin, rootRecipeId, clockFactor) {
       const machineTotals = {};
       const rawTotals = {};
+      const byproductProduced = {};
+      const byproductConsumed = {};
+      const byproductBank = {};
       let totalPowerMw = 0;
 
-      function walk(itemId, targetRate, depth) {
+      function byproductKey(ing) {
+        return ing?.item_id || ing?.name || 'unknown';
+      }
+
+      function addByproduct(ing, amount) {
+        const key = byproductKey(ing);
+        byproductProduced[key] = (byproductProduced[key] || 0) + amount;
+        byproductBank[key] = (byproductBank[key] || 0) + amount;
+      }
+
+      function consumeByproduct(ing, required) {
+        const key = byproductKey(ing);
+        const available = byproductBank[key] || 0;
+        if (available <= 0 || required <= 0) {
+          return { consumed: 0, remaining: required };
+        }
+
+        const consumed = Math.min(available, required);
+        byproductBank[key] = available - consumed;
+        byproductConsumed[key] = (byproductConsumed[key] || 0) + consumed;
+        return { consumed, remaining: required - consumed };
+      }
+
+      function walk(itemId, targetRate, depth, activePath = new Set()) {
         const current = itemMap.get(itemId);
         if (!current || targetRate <= 0) {
           return null;
+        }
+
+        if (activePath.has(itemId)) {
+          return {
+            type: 'cycle',
+            itemName: current.name,
+            rate: targetRate
+          };
         }
 
         const recipes = getRecipes(current);
@@ -390,14 +446,38 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
           children: []
         };
 
+        const nextPath = new Set(activePath);
+        nextPath.add(itemId);
+
+        const recipeByproducts = Array.isArray(selectedRecipe.byproducts) ? selectedRecipe.byproducts : [];
+        recipeByproducts.forEach((bp) => {
+          const producedPerMin = (Number(bp.amount_per_min) || 0) * machineCount * clockFactor;
+          if (producedPerMin > 0) {
+            addByproduct(bp, producedPerMin);
+          }
+        });
+
         const ingredients = Array.isArray(selectedRecipe.ingredients) ? selectedRecipe.ingredients : [];
         ingredients.forEach((ingredient) => {
-          const requiredPerMin = (Number(ingredient.amount_per_min) || 0) * machineCount * clockFactor;
+          const grossRequiredPerMin = (Number(ingredient.amount_per_min) || 0) * machineCount * clockFactor;
+          const { consumed, remaining } = consumeByproduct(ingredient, grossRequiredPerMin);
+
+          if (consumed > 0) {
+            node.children.push({
+              type: 'raw',
+              name: `${ingredient.name || ingredient.item_id || 'Unknown'} (recycled)`,
+              rate: consumed
+            });
+          }
+
+          const requiredPerMin = remaining;
+          if (requiredPerMin <= 0) return;
+
           const childId = ingredient.item_id;
           const child = childId ? itemMap.get(childId) : null;
 
           if (child && !child.is_raw_resource) {
-            const childNode = walk(childId, requiredPerMin, depth + 1);
+            const childNode = walk(childId, requiredPerMin, depth + 1, nextPath);
             if (childNode) node.children.push(childNode);
             return;
           }
@@ -410,8 +490,19 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
         return node;
       }
 
-      const rootNode = walk(rootItemId, targetPerMin, 0);
-      return { machineTotals, rawTotals, totalPowerMw, rootNode };
+      const rootNode = walk(rootItemId, targetPerMin, 0, new Set());
+
+      const byproductNet = {};
+      Object.keys(byproductProduced).forEach((key) => {
+        byproductNet[key] = (byproductProduced[key] || 0) - (byproductConsumed[key] || 0);
+      });
+      Object.keys(byproductConsumed).forEach((key) => {
+        if (!(key in byproductNet)) {
+          byproductNet[key] = 0 - byproductConsumed[key];
+        }
+      });
+
+      return { machineTotals, rawTotals, byproductProduced, byproductConsumed, byproductNet, totalPowerMw, rootNode };
     }
 
     function applyQueryParams() {
@@ -489,8 +580,12 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
 
       const machineEntries = Object.entries(plan.machineTotals).sort((a, b) => b[1] - a[1]);
       const rawEntries = Object.entries(plan.rawTotals).sort((a, b) => b[1] - a[1]);
+      const byproductEntries = Object.entries(plan.byproductNet)
+        .filter(([, value]) => Math.abs(value) > 0.0001)
+        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
       renderList(machineTotalsList, machineEntries, 'machines');
       renderList(rawTotalsList, rawEntries, '/min');
+      renderList(byproductTotalsList, byproductEntries, '/min net');
 
       if (plan.rootNode) {
         treeRoot.innerHTML = renderTreeNode(plan.rootNode, true);
