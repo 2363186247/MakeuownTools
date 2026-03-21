@@ -1,5 +1,5 @@
 ---
-import '../../styles/global.css';
+import Layout from '../../layouts/Layout.astro';
 import filaments from '../../data/filaments.json';
 
 type TempRange = { min: number; max: number; recommended: number };
@@ -61,23 +61,11 @@ const densityText = `${material.density} ${data.units.density}`;
 const diameterText = `${diameter.value} ${data.units.diameter}`;
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{material.name} {diameter.name} Filament Length Calculator</title>
-    <meta
-      name="description"
-      content={`Calculate exact filament length for ${material.name} (${diameter.name}) by spool weight with recommended printing settings.`}
-    />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-  </head>
-
-  <body class="min-h-screen text-zinc-100 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
-    <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_85%_18%,rgba(245,158,11,0.16),transparent_35%),radial-gradient(circle_at_52%_88%,rgba(236,72,153,0.14),transparent_35%),linear-gradient(145deg,#09090b,#111827)]"></div>
-    <div class="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:34px_34px] [mask-image:radial-gradient(circle_at_center,black_45%,transparent_100%)]"></div>
-
-    <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+<Layout
+  title={`${material.name} ${diameter.name} Filament Length Calculator`}
+  description={`Calculate exact filament length for ${material.name} (${diameter.name}) by spool weight with recommended printing settings.`}
+>
+  <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
       <a
         href="/calculator/"
         class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-200 transition hover:border-white/30 hover:bg-white/10"
@@ -216,9 +204,9 @@ const diameterText = `${diameter.value} ${data.units.diameter}`;
           </div>
         </aside>
       </section>
-    </main>
+  </main>
 
-    <script define:vars={{ density: material.density, diameterMm: diameter.value }}>
+  <script define:vars={{ density: material.density, diameterMm: diameter.value }}>
       const weightInput = document.getElementById('weightInput');
       const fullSpoolInput = document.getElementById('fullSpoolInput');
       const resultLength = document.getElementById('resultLength');
@@ -246,6 +234,29 @@ const diameterText = `${diameter.value} ${data.units.diameter}`;
         return lengthCm / 100;
       }
 
+      function applyQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        const weightParam = Number(params.get('weight'));
+        const fullParam = Number(params.get('full'));
+
+        if (!Number.isNaN(weightParam) && weightParam >= 0) {
+          weightInput.value = String(weightParam);
+        }
+
+        if (!Number.isNaN(fullParam) && fullParam > 0) {
+          fullSpoolInput.value = String(fullParam);
+        }
+      }
+
+      function syncQueryParams(weight, fullSpool) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('weight', String(Math.round(weight * 100) / 100));
+        params.set('full', String(Math.round(fullSpool * 100) / 100));
+        const query = params.toString();
+        const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+        history.replaceState(null, '', nextUrl);
+      }
+
       function update() {
         const weight = Number(weightInput.value);
         const fullSpool = Number(fullSpoolInput.value);
@@ -264,11 +275,12 @@ const diameterText = `${diameter.value} ${data.units.diameter}`;
 
         resultLength.textContent = lengthM.toFixed(2);
         spoolPercent.textContent = `${percentage.toFixed(1)}% of full spool`;
+        syncQueryParams(weight, fullSpool);
       }
 
       weightInput.addEventListener('input', update);
       fullSpoolInput.addEventListener('input', update);
+      applyQueryParams();
       update();
-    </script>
-  </body>
-</html>
+  </script>
+</Layout>

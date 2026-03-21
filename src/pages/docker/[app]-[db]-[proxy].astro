@@ -1,6 +1,6 @@
 ---
 // src/pages/docker/[app]-[db]-[proxy].astro
-import '../../styles/global.css';
+import Layout from '../../layouts/Layout.astro';
 import services from '../../data/services.json';
 
 type App = (typeof services.apps)[number];
@@ -115,17 +115,11 @@ volumes:
 `.trim();
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{app.name} + {db.name} + {proxy.name} • Docker Compose</title>
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <meta name="description" content={`Production-ready docker-compose.yml for ${app.name}, ${db.name}, and ${proxy.name}.`} />
-    <meta name="google-site-verification" content="xxGFCr12kZ-UHYt3HzhmkN4lqPvZRTMc91ftmIXsXik" />
-  </head>
-  <body class="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-zinc-50 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
-    <main class="mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20">
+<Layout
+  title={`${app.name} + ${db.name} + ${proxy.name} • Docker Compose`}
+  description={`Production-ready docker-compose.yml for ${app.name}, ${db.name}, and ${proxy.name}.`}
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20">
       <!-- Header -->
       <div class="mb-12 flex flex-col items-start gap-2">
         <a href="/docker/" class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-400 hover:text-zinc-200 transition">← Back</a>
@@ -224,9 +218,9 @@ volumes:
       <div class="mt-8 pt-8 border-t border-zinc-700/30 text-center text-sm text-zinc-400">
         <p>Customize <span class="font-mono text-zinc-300">APP_DB_*</span> and <span class="font-mono text-zinc-300">DB_*</span> variables in your <span class="font-mono text-zinc-300">.env</span> file.</p>
       </div>
-    </main>
+  </main>
 
-    <script>
+  <script>
       const copyButton = document.getElementById('copyButton');
       const downloadButton = document.getElementById('downloadButton');
       const composeCode = document.getElementById('composeCode');
@@ -266,6 +260,5 @@ volumes:
           URL.revokeObjectURL(link.href);
         });
       }
-    </script>
-  </body>
-</html>
+  </script>
+</Layout>

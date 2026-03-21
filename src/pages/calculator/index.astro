@@ -1,5 +1,5 @@
 ---
-import '../../styles/global.css';
+import Layout from '../../layouts/Layout.astro';
 import filaments from '../../data/filaments.json';
 
 type Material = { id: string; name: string };
@@ -16,23 +16,11 @@ data.materials.forEach(m => {
 });
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>3D Printing Calculators | Make Your Own Tools</title>
-    <meta
-      name="description"
-      content="Browse all material and diameter combinations for the 3D printing filament length calculator."
-    />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-  </head>
-
-  <body class="min-h-screen text-zinc-100 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
-    <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_16%_18%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_84%_18%,rgba(251,191,36,0.14),transparent_34%),radial-gradient(circle_at_50%_84%,rgba(168,85,247,0.14),transparent_36%),linear-gradient(130deg,#07090f,#0f172a,#111827)]"></div>
-    <div class="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(circle_at_center,black_45%,transparent_100%)]"></div>
-
-    <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+<Layout
+  title="3D Printing Calculators | Make Your Own Tools"
+  description="Browse all material and diameter combinations for the 3D printing filament length calculator."
+>
+  <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
       <a
         href="/"
         class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-200 transition hover:border-white/30 hover:bg-white/10"
@@ -73,6 +61,5 @@ data.materials.forEach(m => {
           </a>
         ))}
       </section>
-    </main>
-  </body>
-</html>
+  </main>
+</Layout>
