@@ -1,43 +1,44 @@
-# Astro Starter Kit: Minimal
+# Docker Compose Generator
 
-```sh
-npm create astro@latest -- --template minimal
+Generate production-friendly docker-compose presets for popular self-hosted apps.
+
+## Commands
+
+| Command | Action |
+| :-- | :-- |
+| npm install | Install dependencies |
+| npm run dev | Start local dev server |
+| npm run build | Build static site |
+| node scripts/update_data.js | Refresh Docker image tags in data source |
+
+## Data Source
+
+Service combinations are defined in [src/data/services.json](src/data/services.json).
+
+- apps: application image, exposed port, supported databases, and app DB env key mapping
+- databases: database image, default port, data volume path, and init env key mapping
+- proxies: proxy image and exposed HTTP/HTTPS ports
+
+## Generated Compose ENV Template
+
+Generated YAML uses environment-variable references so you can connect a .env file directly in production.
+
+Recommended .env example:
+
+```env
+APP_DB_HOST=db
+APP_DB_USER=app_user
+APP_DB_PASSWORD=change_me_app_password
+APP_DB_NAME=app_db
+DB_ROOT_PASSWORD=change_me_root_password
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Notes:
 
-## 🚀 Project Structure
+- APP_DB_HOST defaults to the selected database service name if omitted.
+- APP_DB_USER, APP_DB_PASSWORD, APP_DB_NAME are reused for both app connection and DB initialization.
+- DB_ROOT_PASSWORD is only used when the chosen database image supports a root password variable.
 
-Inside of your Astro project, you'll see the following folders and files:
+## Automation
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The workflow in [.github/workflows/auto-update.yml](.github/workflows/auto-update.yml) runs weekly and updates [src/data/services.json](src/data/services.json) automatically.

@@ -1,14 +1,236 @@
 {
   "apps": [
-    { "id": "ghost", "name": "Ghost Blog", "image": "ghost:5-alpine", "port": "2368" },
-    { "id": "wordpress", "name": "WordPress", "image": "wordpress:latest", "port": "80" }
+    {
+      "id": "ghost",
+      "name": "Ghost",
+      "image": "ghost:latest",
+      "port": "2368",
+      "supported_dbs": ["mysql"],
+      "db_env_mapping": {
+        "host": "database__connection__host",
+        "user": "database__connection__user",
+        "password": "database__connection__password",
+        "name": "database__connection__database"
+      }
+    },
+    {
+      "id": "wordpress",
+      "name": "WordPress",
+      "image": "wordpress:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "WORDPRESS_DB_HOST",
+        "user": "WORDPRESS_DB_USER",
+        "password": "WORDPRESS_DB_PASSWORD",
+        "name": "WORDPRESS_DB_NAME"
+      }
+    },
+    {
+      "id": "nextcloud",
+      "name": "Nextcloud",
+      "image": "nextcloud:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "MYSQL_HOST",
+        "user": "MYSQL_USER",
+        "password": "MYSQL_PASSWORD",
+        "name": "MYSQL_DATABASE"
+      }
+    },
+    {
+      "id": "gitea",
+      "name": "Gitea",
+      "image": "gitea/gitea:latest",
+      "port": "3000",
+      "supported_dbs": ["mysql", "postgres", "mariadb"],
+      "db_env_mapping": {
+        "host": "GITEA__database__HOST",
+        "user": "GITEA__database__USER",
+        "password": "GITEA__database__PASSWD",
+        "name": "GITEA__database__NAME"
+      }
+    },
+    {
+      "id": "metabase",
+      "name": "Metabase",
+      "image": "metabase/metabase:latest",
+      "port": "3000",
+      "supported_dbs": ["postgres", "mysql"],
+      "db_env_mapping": {
+        "host": "MB_DB_HOST",
+        "user": "MB_DB_USER",
+        "password": "MB_DB_PASS",
+        "name": "MB_DB_DBNAME"
+      }
+    },
+    {
+      "id": "wikijs",
+      "name": "Wiki.js",
+      "image": "requarks/wiki:latest",
+      "port": "3000",
+      "supported_dbs": ["postgres", "mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "DB_HOST",
+        "user": "DB_USER",
+        "password": "DB_PASS",
+        "name": "DB_NAME"
+      }
+    },
+    {
+      "id": "directus",
+      "name": "Directus",
+      "image": "directus/directus:latest",
+      "port": "8055",
+      "supported_dbs": ["postgres", "mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "DB_HOST",
+        "user": "DB_USER",
+        "password": "DB_PASSWORD",
+        "name": "DB_DATABASE"
+      }
+    },
+    {
+      "id": "bookstack",
+      "name": "BookStack",
+      "image": "lscr.io/linuxserver/bookstack:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "DB_HOST",
+        "user": "DB_USERNAME",
+        "password": "DB_PASSWORD",
+        "name": "DB_DATABASE"
+      }
+    },
+    {
+      "id": "matomo",
+      "name": "Matomo",
+      "image": "matomo:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "MATOMO_DATABASE_HOST",
+        "user": "MATOMO_DATABASE_USERNAME",
+        "password": "MATOMO_DATABASE_PASSWORD",
+        "name": "MATOMO_DATABASE_DBNAME"
+      }
+    },
+    {
+      "id": "snipeit",
+      "name": "Snipe-IT",
+      "image": "snipe/snipe-it:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "DB_HOST",
+        "user": "DB_USERNAME",
+        "password": "DB_PASSWORD",
+        "name": "DB_DATABASE"
+      }
+    },
+    {
+      "id": "drupal",
+      "name": "Drupal",
+      "image": "drupal:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "DRUPAL_DB_HOST",
+        "user": "DRUPAL_DB_USER",
+        "password": "DRUPAL_DB_PASSWORD",
+        "name": "DRUPAL_DB_NAME"
+      }
+    },
+    {
+      "id": "joomla",
+      "name": "Joomla",
+      "image": "joomla:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb"],
+      "db_env_mapping": {
+        "host": "JOOMLA_DB_HOST",
+        "user": "JOOMLA_DB_USER",
+        "password": "JOOMLA_DB_PASSWORD",
+        "name": "JOOMLA_DB_NAME"
+      }
+    },
+    {
+      "id": "mediawiki",
+      "name": "MediaWiki",
+      "image": "mediawiki:latest",
+      "port": "80",
+      "supported_dbs": ["mysql", "mariadb", "postgres"],
+      "db_env_mapping": {
+        "host": "MEDIAWIKI_DB_HOST",
+        "user": "MEDIAWIKI_DB_USER",
+        "password": "MEDIAWIKI_DB_PASSWORD",
+        "name": "MEDIAWIKI_DB_NAME"
+      }
+    }
   ],
   "databases": [
-    { "id": "mysql", "name": "MySQL", "image": "mysql:8.0" },
-    { "id": "postgres", "name": "PostgreSQL", "image": "postgres:15-alpine" }
+    {
+      "id": "mysql",
+      "name": "MySQL",
+      "image": "mysql:latest",
+      "port": "3306",
+      "volume_path": "/var/lib/mysql",
+      "init_env_mapping": {
+        "root_password": "MYSQL_ROOT_PASSWORD",
+        "user": "MYSQL_USER",
+        "password": "MYSQL_PASSWORD",
+        "name": "MYSQL_DATABASE"
+      }
+    },
+    {
+      "id": "mariadb",
+      "name": "MariaDB",
+      "image": "mariadb:latest",
+      "port": "3306",
+      "volume_path": "/var/lib/mysql",
+      "init_env_mapping": {
+        "root_password": "MARIADB_ROOT_PASSWORD",
+        "user": "MARIADB_USER",
+        "password": "MARIADB_PASSWORD",
+        "name": "MARIADB_DATABASE"
+      }
+    },
+    {
+      "id": "postgres",
+      "name": "PostgreSQL",
+      "image": "postgres:latest",
+      "port": "5432",
+      "volume_path": "/var/lib/postgresql/data",
+      "init_env_mapping": {
+        "user": "POSTGRES_USER",
+        "password": "POSTGRES_PASSWORD",
+        "name": "POSTGRES_DB"
+      }
+    }
   ],
   "proxies": [
-    { "id": "nginx", "name": "Nginx", "image": "nginx:alpine" },
-    { "id": "caddy", "name": "Caddy", "image": "caddy:2-alpine" }
+    {
+      "id": "nginx",
+      "name": "Nginx",
+      "image": "nginx:latest",
+      "http_port": "80",
+      "https_port": "443"
+    },
+    {
+      "id": "caddy",
+      "name": "Caddy",
+      "image": "caddy:latest",
+      "http_port": "80",
+      "https_port": "443"
+    },
+    {
+      "id": "traefik",
+      "name": "Traefik",
+      "image": "traefik:latest",
+      "http_port": "80",
+      "https_port": "443"
+    }
   ]
 }

@@ -2,13 +2,24 @@
 // src/pages/[app]-[db]-[proxy].astro
 import services from '../data/services.json';
 
+type App = (typeof services.apps)[number];
+type Database = (typeof services.databases)[number];
+type Proxy = (typeof services.proxies)[number];
+
+type StaticPathItem = {
+  params: { app: string; db: string; proxy: string };
+  props: { app: App; db: Database; proxy: Proxy };
+};
+
 // getStaticPaths 是 Astro 的核心，它会在构建时运行
 // 我们在这里进行数据的“乘法”，把所有的组合算出来
 export function getStaticPaths() {
-  const paths = [];
+  const paths: StaticPathItem[] = [];
   
   services.apps.forEach(app => {
     services.databases.forEach(db => {
+      if (!Array.isArray(app.supported_dbs) || !app.supported_dbs.includes(db.id)) return;
+
       services.proxies.forEach(proxy => {
         // 每一种组合，生成一个 URL 路径，并把数据作为 props 传给页面
         paths.push({
@@ -23,7 +34,47 @@ export function getStaticPaths() {
 }
 
 // 接收 getStaticPaths 传过来的单个页面数据
-const { app, db, proxy } = Astro.props;
+const { app, db, proxy } = Astro.props as { app: App; db: Database; proxy: Proxy };
+
+const appDbMapping = app.db_env_mapping ?? {};
+const dbInitMapping = db.init_env_mapping ?? {};
+
+const sharedDbValues = {
+  host: `\${APP_DB_HOST:-${db.id}}`,
+  user: `\${APP_DB_USER:-app_user}`,
+  password: `\${APP_DB_PASSWORD:-change_me_app_password}`,
+  name: `\${APP_DB_NAME:-${app.id}_db}`
+};
+
+const appDbEnvEntries = [
+  [appDbMapping.host, sharedDbValues.host],
+  [appDbMapping.user, sharedDbValues.user],
+  [appDbMapping.password, sharedDbValues.password],
+  [appDbMapping.name, sharedDbValues.name]
+].filter(([key]) => Boolean(key));
+
+const dbInitEnvEntries = [
+  [dbInitMapping.root_password, `\${DB_ROOT_PASSWORD:-change_me_root_password}`],
+  [dbInitMapping.user, sharedDbValues.user],
+  [dbInitMapping.password, sharedDbValues.password],
+  [dbInitMapping.name, sharedDbValues.name]
+].filter(([key]) => Boolean(key));
+
+const appEnvBlock = appDbEnvEntries.length
+  ? `\n    environment:\n${appDbEnvEntries.map(([key, value]) => `      ${key}: ${value}`).join('\n')}`
+  : '';
+
+const dbEnvBlock = dbInitEnvEntries.length
+  ? `\n    environment:\n${dbInitEnvEntries.map(([key, value]) => `      ${key}: ${value}`).join('\n')}`
+  : '';
+
+const proxyHttpPort = proxy.http_port ?? '80';
+const proxyHttpsPort = proxy.https_port ?? '443';
+const dbVolumePath = db.volume_path ?? '/var/lib/data';
+
+const proxyExtraBlock = proxy.id === 'traefik'
+  ? `\n    command:\n      - --providers.docker=true\n      - --entrypoints.web.address=:80\n      - --entrypoints.websecure.address=:443\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock:ro`
+  : '';
 
 // 利用模板字符串自动生成 Docker Compose 配置
 // 注意这里对齐了 YAML 的缩进
@@ -34,18 +85,32 @@ services:
     image: ${app.image}
     ports:
       - "${app.port}:${app.port}"
+    depends_on:
+      - ${db.id}
+${appEnvBlock}
     restart: always
 
   ${db.id}:
     image: ${db.image}
+    ports:
+      - "${db.port}:${db.port}"
+${dbEnvBlock}
+    volumes:
+      - ${db.id}_data:${dbVolumePath}
     restart: always
 
   ${proxy.id}:
     image: ${proxy.image}
     ports:
-      - "80:80"
-      - "443:443"
+      - "${proxyHttpPort}:80"
+      - "${proxyHttpsPort}:443"
+    depends_on:
+      - ${app.id}
+${proxyExtraBlock}
     restart: always
+
+volumes:
+  ${db.id}_data:
 `.trim();
 ---
 

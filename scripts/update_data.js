@@ -9,8 +9,22 @@ const SERVICES_PATH = path.resolve(__dirname, '../src/data/services.json');
 const GROUPS = ['apps', 'databases', 'proxies'];
 
 function parseImage(image) {
-  const [repository, tag = 'latest'] = image.split(':');
+  const slashIndex = image.indexOf('/');
+  const tagIndex = image.lastIndexOf(':');
+  const hasTag = tagIndex > -1 && (slashIndex === -1 || tagIndex > slashIndex);
+
+  if (!hasTag) {
+    return { repository: image, tag: 'latest' };
+  }
+
+  const repository = image.slice(0, tagIndex);
+  const tag = image.slice(tagIndex + 1) || 'latest';
   return { repository, tag };
+}
+
+function isDockerHubRepository(repository) {
+  const firstSegment = repository.split('/')[0];
+  return !firstSegment.includes('.') && !firstSegment.includes(':');
 }
 
 function parseTagParts(tag) {
@@ -109,6 +123,14 @@ function pickTag(currentTag, allTags) {
 
 async function updateServiceItem(item) {
   const { repository, tag } = parseImage(item.image);
+
+  if (!isDockerHubRepository(repository)) {
+    return {
+      ...item,
+      _changed: false,
+    };
+  }
+
   const allTags = await fetchDockerHubTags(repository);
   const nextTag = pickTag(tag, allTags);
   const updatedImage = `${repository}:${nextTag}`;
