@@ -119,104 +119,149 @@ volumes:
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Docker Compose for {app.name}, {db.name} and {proxy.name}</title>
-    <meta name="description" content={`Generate a complete docker-compose.yml file for ${app.name} with ${db.name} and ${proxy.name} reverse proxy.`} />
+    <title>{app.name} + {db.name} + {proxy.name} • Docker Compose</title>
+    <meta name="description" content={`Production-ready docker-compose.yml for ${app.name}, ${db.name}, and ${proxy.name}.`} />
   </head>
-  <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
-    <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
-      <section class="mb-8 rounded-2xl border border-zinc-200 bg-white/95 p-6 shadow-sm md:p-8">
-        <p class="mb-3 inline-flex items-center rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-zinc-600">
-          Docker Compose Generator
-        </p>
-        <h1 class="text-3xl font-semibold tracking-tight text-zinc-900 md:text-5xl">
-          Build {app.name} + {db.name} + {proxy.name} in seconds
+  <body class="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-zinc-50 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
+    <main class="mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20">
+      <!-- Header -->
+      <div class="mb-12 flex flex-col items-start gap-2">
+        <a href="/" class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-400 hover:text-zinc-200 transition">← Back</a>
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">
+          Your Stack
         </h1>
-        <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-600 md:text-base">
-          A minimal, production-friendly preset for your stack. Review the selected app, database, and proxy, then copy the generated
-          <span class="font-mono text-zinc-800">docker-compose.yml</span>
-          and deploy.
-        </p>
-      </section>
+      </div>
 
-      <section class="grid gap-6 lg:grid-cols-5">
-        <aside class="space-y-4 lg:col-span-2">
-          <article class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
-              <p class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">App</p>
-              <span class="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white">
-                {app.image.includes(':') ? app.image.split(':').pop() : 'latest'}
-              </span>
+      <!-- Stack Overview (Inline Badges) -->
+      <div class="mb-12 flex flex-wrap items-center gap-3">
+        <!-- App Badge -->
+        <div class="flex items-center gap-2 px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800/50 backdrop-blur-sm hover:border-zinc-600 transition">
+          <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+          <span class="font-mono text-xs font-semibold text-zinc-300">App:</span>
+          <span class="font-medium text-white">{app.name}</span>
+          <span class="px-2 py-0.5 rounded-md bg-zinc-700/50 font-mono text-[11px] text-zinc-400 ml-1">
+            {app.image.includes(':') ? app.image.split(':').pop() : 'latest'}
+          </span>
+        </div>
+
+        <!-- Connector -->
+        <div class="hidden sm:block text-zinc-600 select-none">→</div>
+
+        <!-- Database Badge -->
+        <div class="flex items-center gap-2 px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800/50 backdrop-blur-sm hover:border-zinc-600 transition">
+          <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+          <span class="font-mono text-xs font-semibold text-zinc-300">DB:</span>
+          <span class="font-medium text-white">{db.name}</span>
+          <span class="px-2 py-0.5 rounded-md bg-zinc-700/50 font-mono text-[11px] text-zinc-400 ml-1">
+            {db.image.includes(':') ? db.image.split(':').pop() : 'latest'}
+          </span>
+        </div>
+
+        <!-- Connector -->
+        <div class="hidden sm:block text-zinc-600 select-none">→</div>
+
+        <!-- Proxy Badge -->
+        <div class="flex items-center gap-2 px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-800/50 backdrop-blur-sm hover:border-zinc-600 transition">
+          <div class="w-2 h-2 rounded-full bg-purple-400"></div>
+          <span class="font-mono text-xs font-semibold text-zinc-300">Proxy:</span>
+          <span class="font-medium text-white">{proxy.name}</span>
+          <span class="px-2 py-0.5 rounded-md bg-zinc-700/50 font-mono text-[11px] text-zinc-400 ml-1">
+            {proxy.image.includes(':') ? proxy.image.split(':').pop() : 'latest'}
+          </span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <p class="mb-8 text-lg text-zinc-300 md:text-base leading-relaxed max-w-2xl">
+        Production-ready <span class="font-mono text-zinc-200">docker-compose.yml</span> for your stack.
+        Copy it, customize variables in <span class="font-mono text-zinc-200">.env</span>, and deploy.
+      </p>
+
+      <!-- Code Block -->
+      <div class="relative group">
+        <!-- Glow Effect -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+
+        <!-- Code Container -->
+        <section class="relative overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-900/80 backdrop-blur-xl shadow-2xl">
+          <!-- Header -->
+          <header class="flex items-center justify-between border-b border-zinc-700/50 px-5 py-4 md:px-6">
+            <div class="flex items-center gap-3">
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
+                <div class="w-3 h-3 rounded-full bg-amber-500/70"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+              </div>
+              <span class="font-mono text-xs font-semibold text-zinc-400">docker-compose.yml</span>
             </div>
-            <h2 class="text-lg font-semibold text-zinc-900">{app.name}</h2>
-            <p class="mt-2 font-mono text-xs text-zinc-500">{app.image}</p>
-          </article>
-
-          <article class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
-              <p class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">Database</p>
-              <span class="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white">
-                {db.image.includes(':') ? db.image.split(':').pop() : 'latest'}
-              </span>
-            </div>
-            <h2 class="text-lg font-semibold text-zinc-900">{db.name}</h2>
-            <p class="mt-2 font-mono text-xs text-zinc-500">{db.image}</p>
-          </article>
-
-          <article class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
-              <p class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">Proxy</p>
-              <span class="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white">
-                {proxy.image.includes(':') ? proxy.image.split(':').pop() : 'latest'}
-              </span>
-            </div>
-            <h2 class="text-lg font-semibold text-zinc-900">{proxy.name}</h2>
-            <p class="mt-2 font-mono text-xs text-zinc-500">{proxy.image}</p>
-          </article>
-        </aside>
-
-        <section class="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-950 shadow-sm lg:col-span-3">
-          <header class="flex items-center justify-between border-b border-zinc-800 px-4 py-3 md:px-5">
             <div class="flex items-center gap-2">
-              <span class="h-2.5 w-2.5 rounded-full bg-zinc-600"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-zinc-500"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-zinc-400"></span>
-              <p class="ml-2 font-mono text-xs text-zinc-300">docker-compose.yml</p>
+              <button
+                id="downloadButton"
+                type="button"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-600 bg-zinc-800/50 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700/50 hover:text-zinc-100 transition"
+                title="Download as file"
+              >
+                ↓ Download
+              </button>
+              <button
+                id="copyButton"
+                type="button"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg border border-blue-500/50 bg-blue-500/10 text-blue-300 hover:border-blue-400 hover:bg-blue-500/20 hover:text-blue-100 transition"
+              >
+                📋 Copy
+              </button>
             </div>
-            <button
-              id="copyButton"
-              type="button"
-              class="rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-200 transition hover:border-zinc-500 hover:text-white"
-            >
-              Copy
-            </button>
           </header>
 
-          <pre class="max-h-[65vh] overflow-auto p-4 text-sm leading-7 text-zinc-200 md:p-5"><code id="composeCode">{composeYml}</code></pre>
+          <!-- Code -->
+          <pre class="max-h-[70vh] overflow-auto p-5 md:p-6 text-sm leading-relaxed text-zinc-200 font-mono"><code id="composeCode">{composeYml}</code></pre>
         </section>
-      </section>
+      </div>
+
+      <!-- Footer Note -->
+      <div class="mt-8 pt-8 border-t border-zinc-700/30 text-center text-sm text-zinc-400">
+        <p>Customize <span class="font-mono text-zinc-300">APP_DB_*</span> and <span class="font-mono text-zinc-300">DB_*</span> variables in your <span class="font-mono text-zinc-300">.env</span> file.</p>
+      </div>
     </main>
 
     <script>
       const copyButton = document.getElementById('copyButton');
+      const downloadButton = document.getElementById('downloadButton');
       const composeCode = document.getElementById('composeCode');
 
       if (copyButton && composeCode) {
         copyButton.addEventListener('click', async () => {
           const originalText = copyButton.textContent;
-
           try {
             await navigator.clipboard.writeText(composeCode.textContent || '');
-            copyButton.textContent = 'Copied';
-            copyButton.classList.add('border-emerald-500', 'text-emerald-300');
-          } catch {
-            copyButton.textContent = 'Failed';
-            copyButton.classList.add('border-rose-500', 'text-rose-300');
+            copyButton.textContent = '✓ Copied!';
+            copyButton.classList.add('border-emerald-500/50', 'bg-emerald-500/20', 'text-emerald-300');
+            copyButton.classList.remove('border-blue-500/50', 'bg-blue-500/10', 'text-blue-300');
+            setTimeout(() => {
+              copyButton.textContent = originalText;
+              copyButton.classList.remove('border-emerald-500/50', 'bg-emerald-500/20', 'text-emerald-300');
+              copyButton.classList.add('border-blue-500/50', 'bg-blue-500/10', 'text-blue-300');
+            }, 2000);
+          } catch (err) {
+            copyButton.textContent = '✗ Failed';
+            copyButton.classList.add('border-rose-500/50', 'bg-rose-500/20', 'text-rose-300');
+            setTimeout(() => {
+              copyButton.textContent = originalText;
+              copyButton.classList.remove('border-rose-500/50', 'bg-rose-500/20', 'text-rose-300');
+            }, 2000);
           }
+        });
+      }
 
-          setTimeout(() => {
-            copyButton.textContent = originalText;
-            copyButton.classList.remove('border-emerald-500', 'text-emerald-300', 'border-rose-500', 'text-rose-300');
-          }, 1600);
+      if (downloadButton && composeCode) {
+        downloadButton.addEventListener('click', () => {
+          const content = composeCode.textContent || '';
+          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'docker-compose.yml';
+          link.click();
+          URL.revokeObjectURL(link.href);
         });
       }
     </script>
