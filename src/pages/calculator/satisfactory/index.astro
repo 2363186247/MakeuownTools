@@ -1,0 +1,96 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import satisfactoryData from '../../../data/satisfactory.json';
+
+type SatisfactoryItem = {
+  id: string;
+  name: string;
+  category: string;
+  tier: number;
+  machine: string;
+};
+
+const items = (satisfactoryData.items as SatisfactoryItem[])
+  .slice()
+  .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name));
+
+const categoryCounts = items.reduce<Record<string, number>>((acc, item) => {
+  acc[item.category] = (acc[item.category] ?? 0) + 1;
+  return acc;
+}, {});
+
+const categoryEntries = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
+const tierMax = Math.max(...items.map((item) => item.tier));
+---
+
+<Layout
+  title="Satisfactory Production Calculators | Make Your Own Tools"
+  description="Reverse calculate factory layouts, power requirements, and raw materials for Satisfactory."
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-14 md:px-8 md:py-20">
+    <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>←</span>
+      <span>All Calculators</span>
+    </a>
+
+    <section class="relative mb-10 overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-7 md:p-9">
+      <div class="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-amber-400/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-orange-400/15 blur-3xl"></div>
+
+      <div class="relative grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div>
+          <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-amber-200">
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+            Factory Game Tools
+          </div>
+          <h1 class="text-4xl font-bold tracking-tight text-white md:text-5xl mb-4">Satisfactory Calculators</h1>
+          <p class="text-zinc-300 max-w-3xl text-sm leading-7 md:text-base">
+            按目标物品反推整条产线，快速得到机器配置、功耗和基础原料消耗。覆盖从基础零件到终局项目组件的多级链路。
+          </p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <div class="rounded-2xl border border-white/15 bg-black/30 p-4">
+            <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Items</p>
+            <p class="mt-1 text-3xl font-semibold text-white">{items.length}</p>
+          </div>
+          <div class="rounded-2xl border border-white/15 bg-black/30 p-4">
+            <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Categories</p>
+            <p class="mt-1 text-3xl font-semibold text-white">{categoryEntries.length}</p>
+          </div>
+          <div class="rounded-2xl border border-white/15 bg-black/30 p-4">
+            <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Tier Range</p>
+            <p class="mt-1 text-3xl font-semibold text-white">0-{tierMax}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-8 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+      <p class="mb-3 text-xs uppercase tracking-[0.16em] text-zinc-400">Category Distribution</p>
+      <div class="flex flex-wrap gap-2">
+        {categoryEntries.map(([name, count]) => (
+          <span class="rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs text-zinc-200">
+            {name}: {count}
+          </span>
+        ))}
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {items.map(item => (
+        <a href={`/calculator/satisfactory/${item.id}`} class="group p-5 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/[0.08] hover:border-amber-500/30 transition duration-300 relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/10 group-hover:to-orange-500/5 transition duration-500"></div>
+          <div class="relative flex justify-between items-start mb-2">
+            <h2 class="font-semibold text-zinc-100 text-lg">{item.name}</h2>
+            <span class="px-2 py-1 text-[10px] uppercase tracking-wider bg-black/50 text-zinc-400 rounded-md border border-white/10">{item.category}</span>
+          </div>
+          <div class="relative mt-3 flex items-center justify-between text-sm">
+            <p class="text-zinc-500 font-mono">Made in: <span class="text-amber-200/70">{item.machine}</span></p>
+            <span class="rounded border border-white/10 bg-black/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-300">T{item.tier}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>

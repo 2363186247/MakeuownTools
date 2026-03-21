@@ -1,0 +1,1651 @@
+{
+  "game": "Satisfactory",
+  "dataset_version": 2,
+  "game_version": "1.0",
+  "units": {
+    "rate": "items_per_min",
+    "power": "mw"
+  },
+  "notes": {
+    "mvp_scope": "Target production reverse calculator",
+    "default_recipe_selection": "standard",
+    "clock_speed_assumption": 1
+  },
+  "machines": {
+    "Miner Mk.1": {
+      "id": "miner-mk1",
+      "name": "Miner Mk.1",
+      "category": "extraction",
+      "power_mw": 5,
+      "supports_overclock": true
+    },
+    "Smelter": {
+      "id": "smelter",
+      "name": "Smelter",
+      "category": "refinement",
+      "power_mw": 4,
+      "supports_overclock": true
+    },
+    "Constructor": {
+      "id": "constructor",
+      "name": "Constructor",
+      "category": "manufacturing",
+      "power_mw": 4,
+      "supports_overclock": true
+    },
+    "Assembler": {
+      "id": "assembler",
+      "name": "Assembler",
+      "category": "manufacturing",
+      "power_mw": 15,
+      "supports_overclock": true
+    },
+    "Foundry": {
+      "id": "foundry",
+      "name": "Foundry",
+      "category": "refinement",
+      "power_mw": 16,
+      "supports_overclock": true
+    },
+    "Refinery": {
+      "id": "refinery",
+      "name": "Refinery",
+      "category": "refinement",
+      "power_mw": 30,
+      "supports_overclock": true
+    },
+    "Manufacturer": {
+      "id": "manufacturer",
+      "name": "Manufacturer",
+      "category": "manufacturing",
+      "power_mw": 55,
+      "supports_overclock": true
+    },
+    "Blender": {
+      "id": "blender",
+      "name": "Blender",
+      "category": "refinement",
+      "power_mw": 75,
+      "supports_overclock": true
+    },
+    "Packager": {
+      "id": "packager",
+      "name": "Packager",
+      "category": "refinement",
+      "power_mw": 10,
+      "supports_overclock": true
+    }
+  },
+  "items": [
+    {
+      "id": "iron-ore",
+      "name": "Iron Ore",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-iron-ore",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "copper-ore",
+      "name": "Copper Ore",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-copper-ore",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "limestone",
+      "name": "Limestone",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-limestone",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "coal",
+      "name": "Coal",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-coal",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "caterium-ore",
+      "name": "Caterium Ore",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-caterium-ore",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "raw-quartz",
+      "name": "Raw Quartz",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-raw-quartz",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "crude-oil",
+      "name": "Crude Oil",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "extract-crude-oil",
+          "label": "Extraction",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "iron-ingot",
+      "name": "Iron Ingot",
+      "category": "Ingots",
+      "tier": 0,
+      "machine": "Smelter",
+      "base_output_per_min": 30,
+      "ingredients": [
+        { "name": "Iron Ore", "item_id": "iron-ore", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "iron-ingot-standard",
+          "label": "Standard",
+          "machine": "Smelter",
+          "output_per_min": 30,
+          "ingredients": [
+            { "name": "Iron Ore", "item_id": "iron-ore", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "copper-ingot",
+      "name": "Copper Ingot",
+      "category": "Ingots",
+      "tier": 0,
+      "machine": "Smelter",
+      "base_output_per_min": 30,
+      "ingredients": [
+        { "name": "Copper Ore", "item_id": "copper-ore", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "copper-ingot-standard",
+          "label": "Standard",
+          "machine": "Smelter",
+          "output_per_min": 30,
+          "ingredients": [
+            { "name": "Copper Ore", "item_id": "copper-ore", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "steel-ingot",
+      "name": "Steel Ingot",
+      "category": "Ingots",
+      "tier": 1,
+      "machine": "Foundry",
+      "base_output_per_min": 45,
+      "ingredients": [
+        { "name": "Iron Ore", "item_id": "iron-ore", "amount_per_min": 45 },
+        { "name": "Coal", "item_id": "coal", "amount_per_min": 45 }
+      ],
+      "recipes": [
+        {
+          "id": "steel-ingot-standard",
+          "label": "Standard",
+          "machine": "Foundry",
+          "output_per_min": 45,
+          "ingredients": [
+            { "name": "Iron Ore", "item_id": "iron-ore", "amount_per_min": 45 },
+            { "name": "Coal", "item_id": "coal", "amount_per_min": 45 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "caterium-ingot",
+      "name": "Caterium Ingot",
+      "category": "Ingots",
+      "tier": 1,
+      "machine": "Smelter",
+      "base_output_per_min": 15,
+      "ingredients": [
+        { "name": "Caterium Ore", "item_id": "caterium-ore", "amount_per_min": 45 }
+      ],
+      "recipes": [
+        {
+          "id": "caterium-ingot-standard",
+          "label": "Standard",
+          "machine": "Smelter",
+          "output_per_min": 15,
+          "ingredients": [
+            { "name": "Caterium Ore", "item_id": "caterium-ore", "amount_per_min": 45 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron-plate",
+      "name": "Iron Plate",
+      "category": "Basic Parts",
+      "tier": 1,
+      "machine": "Constructor",
+      "base_output_per_min": 20,
+      "ingredients": [
+        { "name": "Iron Ingot", "item_id": "iron-ingot", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "iron-plate-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 20,
+          "ingredients": [
+            { "name": "Iron Ingot", "item_id": "iron-ingot", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron-rod",
+      "name": "Iron Rod",
+      "category": "Basic Parts",
+      "tier": 1,
+      "machine": "Constructor",
+      "base_output_per_min": 15,
+      "ingredients": [
+        { "name": "Iron Ingot", "item_id": "iron-ingot", "amount_per_min": 15 }
+      ],
+      "recipes": [
+        {
+          "id": "iron-rod-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 15,
+          "ingredients": [
+            { "name": "Iron Ingot", "item_id": "iron-ingot", "amount_per_min": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wire",
+      "name": "Wire",
+      "category": "Basic Parts",
+      "tier": 1,
+      "machine": "Constructor",
+      "base_output_per_min": 30,
+      "ingredients": [
+        { "name": "Copper Ingot", "item_id": "copper-ingot", "amount_per_min": 15 }
+      ],
+      "recipes": [
+        {
+          "id": "wire-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 30,
+          "ingredients": [
+            { "name": "Copper Ingot", "item_id": "copper-ingot", "amount_per_min": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cable",
+      "name": "Cable",
+      "category": "Basic Parts",
+      "tier": 1,
+      "machine": "Constructor",
+      "base_output_per_min": 30,
+      "ingredients": [
+        { "name": "Wire", "item_id": "wire", "amount_per_min": 60 }
+      ],
+      "recipes": [
+        {
+          "id": "cable-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 30,
+          "ingredients": [
+            { "name": "Wire", "item_id": "wire", "amount_per_min": 60 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "concrete",
+      "name": "Concrete",
+      "category": "Basic Parts",
+      "tier": 1,
+      "machine": "Constructor",
+      "base_output_per_min": 15,
+      "ingredients": [
+        { "name": "Limestone", "item_id": "limestone", "amount_per_min": 45 }
+      ],
+      "recipes": [
+        {
+          "id": "concrete-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 15,
+          "ingredients": [
+            { "name": "Limestone", "item_id": "limestone", "amount_per_min": 45 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "steel-beam",
+      "name": "Steel Beam",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 15,
+      "ingredients": [
+        { "name": "Steel Ingot", "item_id": "steel-ingot", "amount_per_min": 60 }
+      ],
+      "recipes": [
+        {
+          "id": "steel-beam-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 15,
+          "ingredients": [
+            { "name": "Steel Ingot", "item_id": "steel-ingot", "amount_per_min": 60 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "steel-pipe",
+      "name": "Steel Pipe",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 20,
+      "ingredients": [
+        { "name": "Steel Ingot", "item_id": "steel-ingot", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "steel-pipe-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 20,
+          "ingredients": [
+            { "name": "Steel Ingot", "item_id": "steel-ingot", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "copper-sheet",
+      "name": "Copper Sheet",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 10,
+      "ingredients": [
+        { "name": "Copper Ingot", "item_id": "copper-ingot", "amount_per_min": 20 }
+      ],
+      "recipes": [
+        {
+          "id": "copper-sheet-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 10,
+          "ingredients": [
+            { "name": "Copper Ingot", "item_id": "copper-ingot", "amount_per_min": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quickwire",
+      "name": "Quickwire",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 60,
+      "ingredients": [
+        { "name": "Caterium Ingot", "item_id": "caterium-ingot", "amount_per_min": 12 }
+      ],
+      "recipes": [
+        {
+          "id": "quickwire-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 60,
+          "ingredients": [
+            { "name": "Caterium Ingot", "item_id": "caterium-ingot", "amount_per_min": 12 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "silica",
+      "name": "Silica",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 37.5,
+      "ingredients": [
+        { "name": "Raw Quartz", "item_id": "raw-quartz", "amount_per_min": 22.5 }
+      ],
+      "recipes": [
+        {
+          "id": "silica-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 37.5,
+          "ingredients": [
+            { "name": "Raw Quartz", "item_id": "raw-quartz", "amount_per_min": 22.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quartz-crystal",
+      "name": "Quartz Crystal",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 22.5,
+      "ingredients": [
+        { "name": "Raw Quartz", "item_id": "raw-quartz", "amount_per_min": 37.5 }
+      ],
+      "recipes": [
+        {
+          "id": "quartz-crystal-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 22.5,
+          "ingredients": [
+            { "name": "Raw Quartz", "item_id": "raw-quartz", "amount_per_min": 37.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screw",
+      "name": "Screw",
+      "category": "Basic Parts",
+      "tier": 1,
+      "machine": "Constructor",
+      "base_output_per_min": 40,
+      "ingredients": [
+        { "name": "Iron Rod", "item_id": "iron-rod", "amount_per_min": 10 }
+      ],
+      "recipes": [
+        {
+          "id": "screw-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 40,
+          "ingredients": [
+            { "name": "Iron Rod", "item_id": "iron-rod", "amount_per_min": 10 }
+          ]
+        },
+        {
+          "id": "screw-cast",
+          "label": "Cast Screw (Alt)",
+          "machine": "Constructor",
+          "output_per_min": 50,
+          "ingredients": [
+            { "name": "Iron Ingot", "item_id": "iron-ingot", "amount_per_min": 12.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reinforced-iron-plate",
+      "name": "Reinforced Iron Plate",
+      "category": "Standard Parts",
+      "tier": 2,
+      "machine": "Assembler",
+      "base_output_per_min": 5,
+      "ingredients": [
+        { "name": "Iron Plate", "item_id": "iron-plate", "amount_per_min": 30 },
+        { "name": "Screw", "item_id": "screw", "amount_per_min": 60 }
+      ],
+      "recipes": [
+        {
+          "id": "reinforced-iron-plate-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 5,
+          "ingredients": [
+            { "name": "Iron Plate", "item_id": "iron-plate", "amount_per_min": 30 },
+            { "name": "Screw", "item_id": "screw", "amount_per_min": 60 }
+          ]
+        },
+        {
+          "id": "reinforced-iron-plate-bolted",
+          "label": "Bolted (Alt)",
+          "machine": "Assembler",
+          "output_per_min": 15,
+          "ingredients": [
+            { "name": "Iron Plate", "item_id": "iron-plate", "amount_per_min": 90 },
+            { "name": "Screw", "item_id": "screw", "amount_per_min": 250 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rotor",
+      "name": "Rotor",
+      "category": "Standard Parts",
+      "tier": 2,
+      "machine": "Assembler",
+      "base_output_per_min": 4,
+      "ingredients": [
+        { "name": "Iron Rod", "item_id": "iron-rod", "amount_per_min": 20 },
+        { "name": "Screw", "item_id": "screw", "amount_per_min": 100 }
+      ],
+      "recipes": [
+        {
+          "id": "rotor-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 4,
+          "ingredients": [
+            { "name": "Iron Rod", "item_id": "iron-rod", "amount_per_min": 20 },
+            { "name": "Screw", "item_id": "screw", "amount_per_min": 100 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stator",
+      "name": "Stator",
+      "category": "Standard Parts",
+      "tier": 3,
+      "machine": "Assembler",
+      "base_output_per_min": 5,
+      "ingredients": [
+        { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 15 },
+        { "name": "Wire", "item_id": "wire", "amount_per_min": 40 }
+      ],
+      "recipes": [
+        {
+          "id": "stator-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 5,
+          "ingredients": [
+            { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 15 },
+            { "name": "Wire", "item_id": "wire", "amount_per_min": 40 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "motor",
+      "name": "Motor",
+      "category": "Standard Parts",
+      "tier": 3,
+      "machine": "Assembler",
+      "base_output_per_min": 5,
+      "ingredients": [
+        { "name": "Rotor", "item_id": "rotor", "amount_per_min": 10 },
+        { "name": "Stator", "item_id": "stator", "amount_per_min": 10 }
+      ],
+      "recipes": [
+        {
+          "id": "motor-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 5,
+          "ingredients": [
+            { "name": "Rotor", "item_id": "rotor", "amount_per_min": 10 },
+            { "name": "Stator", "item_id": "stator", "amount_per_min": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "encased-industrial-beam",
+      "name": "Encased Industrial Beam",
+      "category": "Standard Parts",
+      "tier": 3,
+      "machine": "Assembler",
+      "base_output_per_min": 6,
+      "ingredients": [
+        { "name": "Steel Beam", "item_id": "steel-beam", "amount_per_min": 24 },
+        { "name": "Concrete", "item_id": "concrete", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "encased-industrial-beam-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 6,
+          "ingredients": [
+            { "name": "Steel Beam", "item_id": "steel-beam", "amount_per_min": 24 },
+            { "name": "Concrete", "item_id": "concrete", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smart-plating",
+      "name": "Smart Plating",
+      "category": "Project Parts",
+      "tier": 2,
+      "machine": "Assembler",
+      "base_output_per_min": 2,
+      "ingredients": [
+        { "name": "Reinforced Iron Plate", "item_id": "reinforced-iron-plate", "amount_per_min": 2 },
+        { "name": "Rotor", "item_id": "rotor", "amount_per_min": 2 }
+      ],
+      "recipes": [
+        {
+          "id": "smart-plating-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 2,
+          "ingredients": [
+            { "name": "Reinforced Iron Plate", "item_id": "reinforced-iron-plate", "amount_per_min": 2 },
+            { "name": "Rotor", "item_id": "rotor", "amount_per_min": 2 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "versatile-framework",
+      "name": "Versatile Framework",
+      "category": "Project Parts",
+      "tier": 3,
+      "machine": "Assembler",
+      "base_output_per_min": 5,
+      "ingredients": [
+        { "name": "Modular Frame", "item_id": "modular-frame", "amount_per_min": 2.5 },
+        { "name": "Steel Beam", "item_id": "steel-beam", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "versatile-framework-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 5,
+          "ingredients": [
+            { "name": "Modular Frame", "item_id": "modular-frame", "amount_per_min": 2.5 },
+            { "name": "Steel Beam", "item_id": "steel-beam", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automated-wiring",
+      "name": "Automated Wiring",
+      "category": "Project Parts",
+      "tier": 3,
+      "machine": "Assembler",
+      "base_output_per_min": 2.5,
+      "ingredients": [
+        { "name": "Stator", "item_id": "stator", "amount_per_min": 2.5 },
+        { "name": "Cable", "item_id": "cable", "amount_per_min": 50 }
+      ],
+      "recipes": [
+        {
+          "id": "automated-wiring-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 2.5,
+          "ingredients": [
+            { "name": "Stator", "item_id": "stator", "amount_per_min": 2.5 },
+            { "name": "Cable", "item_id": "cable", "amount_per_min": 50 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plastic",
+      "name": "Plastic",
+      "category": "Oil Products",
+      "tier": 3,
+      "machine": "Refinery",
+      "base_output_per_min": 20,
+      "ingredients": [
+        { "name": "Crude Oil", "item_id": "crude-oil", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "plastic-standard",
+          "label": "Standard",
+          "machine": "Refinery",
+          "output_per_min": 20,
+          "ingredients": [
+            { "name": "Crude Oil", "item_id": "crude-oil", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rubber",
+      "name": "Rubber",
+      "category": "Oil Products",
+      "tier": 3,
+      "machine": "Refinery",
+      "base_output_per_min": 20,
+      "ingredients": [
+        { "name": "Crude Oil", "item_id": "crude-oil", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "rubber-standard",
+          "label": "Standard",
+          "machine": "Refinery",
+          "output_per_min": 20,
+          "ingredients": [
+            { "name": "Crude Oil", "item_id": "crude-oil", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "circuit-board",
+      "name": "Circuit Board",
+      "category": "Advanced Parts",
+      "tier": 4,
+      "machine": "Assembler",
+      "base_output_per_min": 7.5,
+      "ingredients": [
+        { "name": "Copper Sheet", "item_id": "copper-sheet", "amount_per_min": 15 },
+        { "name": "Plastic", "item_id": "plastic", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "circuit-board-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 7.5,
+          "ingredients": [
+            { "name": "Copper Sheet", "item_id": "copper-sheet", "amount_per_min": 15 },
+            { "name": "Plastic", "item_id": "plastic", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-limiter",
+      "name": "AI Limiter",
+      "category": "Advanced Parts",
+      "tier": 4,
+      "machine": "Assembler",
+      "base_output_per_min": 5,
+      "ingredients": [
+        { "name": "Copper Sheet", "item_id": "copper-sheet", "amount_per_min": 25 },
+        { "name": "Quickwire", "item_id": "quickwire", "amount_per_min": 100 }
+      ],
+      "recipes": [
+        {
+          "id": "ai-limiter-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 5,
+          "ingredients": [
+            { "name": "Copper Sheet", "item_id": "copper-sheet", "amount_per_min": 25 },
+            { "name": "Quickwire", "item_id": "quickwire", "amount_per_min": 100 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "high-speed-connector",
+      "name": "High-Speed Connector",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 3.75,
+      "ingredients": [
+        { "name": "Quickwire", "item_id": "quickwire", "amount_per_min": 210 },
+        { "name": "Cable", "item_id": "cable", "amount_per_min": 37.5 },
+        { "name": "Circuit Board", "item_id": "circuit-board", "amount_per_min": 3.75 }
+      ],
+      "recipes": [
+        {
+          "id": "high-speed-connector-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 3.75,
+          "ingredients": [
+            { "name": "Quickwire", "item_id": "quickwire", "amount_per_min": 210 },
+            { "name": "Cable", "item_id": "cable", "amount_per_min": 37.5 },
+            { "name": "Circuit Board", "item_id": "circuit-board", "amount_per_min": 3.75 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "computer",
+      "name": "Computer",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 2.5,
+      "ingredients": [
+        { "name": "Circuit Board", "item_id": "circuit-board", "amount_per_min": 10 },
+        { "name": "Cable", "item_id": "cable", "amount_per_min": 18 },
+        { "name": "Plastic", "item_id": "plastic", "amount_per_min": 45 },
+        { "name": "Screw", "item_id": "screw", "amount_per_min": 130 }
+      ],
+      "recipes": [
+        {
+          "id": "computer-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 2.5,
+          "ingredients": [
+            { "name": "Circuit Board", "item_id": "circuit-board", "amount_per_min": 10 },
+            { "name": "Cable", "item_id": "cable", "amount_per_min": 18 },
+            { "name": "Plastic", "item_id": "plastic", "amount_per_min": 45 },
+            { "name": "Screw", "item_id": "screw", "amount_per_min": 130 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "heavy-modular-frame",
+      "name": "Heavy Modular Frame",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 2,
+      "ingredients": [
+        { "name": "Modular Frame", "item_id": "modular-frame", "amount_per_min": 10 },
+        { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 30 },
+        { "name": "Encased Industrial Beam", "item_id": "encased-industrial-beam", "amount_per_min": 10 },
+        { "name": "Screw", "item_id": "screw", "amount_per_min": 240 }
+      ],
+      "recipes": [
+        {
+          "id": "heavy-modular-frame-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 2,
+          "ingredients": [
+            { "name": "Modular Frame", "item_id": "modular-frame", "amount_per_min": 10 },
+            { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 30 },
+            { "name": "Encased Industrial Beam", "item_id": "encased-industrial-beam", "amount_per_min": 10 },
+            { "name": "Screw", "item_id": "screw", "amount_per_min": 240 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modular-frame",
+      "name": "Modular Frame",
+      "category": "Standard Parts",
+      "tier": 2,
+      "machine": "Assembler",
+      "base_output_per_min": 2,
+      "ingredients": [
+        { "name": "Reinforced Iron Plate", "item_id": "reinforced-iron-plate", "amount_per_min": 3 },
+        { "name": "Iron Rod", "item_id": "iron-rod", "amount_per_min": 12 }
+      ],
+      "recipes": [
+        {
+          "id": "modular-frame-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 2,
+          "ingredients": [
+            { "name": "Reinforced Iron Plate", "item_id": "reinforced-iron-plate", "amount_per_min": 3 },
+            { "name": "Iron Rod", "item_id": "iron-rod", "amount_per_min": 12 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bauxite-ore",
+      "name": "Bauxite Ore",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-bauxite-ore",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "alumina-solution",
+      "name": "Alumina Solution",
+      "category": "Oil Products",
+      "tier": 3,
+      "machine": "Refinery",
+      "base_output_per_min": 120,
+      "ingredients": [
+        { "name": "Bauxite Ore", "item_id": "bauxite-ore", "amount_per_min": 90 },
+        { "name": "Water", "item_id": "water", "amount_per_min": 150 }
+      ],
+      "recipes": [
+        {
+          "id": "alumina-solution-standard",
+          "label": "Dissolution",
+          "machine": "Refinery",
+          "output_per_min": 120,
+          "ingredients": [
+            { "name": "Bauxite Ore", "item_id": "bauxite-ore", "amount_per_min": 90 },
+            { "name": "Water", "item_id": "water", "amount_per_min": 150 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 120,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "extract-water",
+          "label": "Extraction",
+          "machine": "Miner Mk.1",
+          "output_per_min": 120,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "aluminum-ingot",
+      "name": "Aluminum Ingot",
+      "category": "Ingots",
+      "tier": 2,
+      "machine": "Refinery",
+      "base_output_per_min": 60,
+      "ingredients": [
+        { "name": "Alumina Solution", "item_id": "alumina-solution", "amount_per_min": 120 },
+        { "name": "Coal", "item_id": "coal", "amount_per_min": 40 }
+      ],
+      "recipes": [
+        {
+          "id": "aluminum-ingot-standard",
+          "label": "Hall-Heroult",
+          "machine": "Refinery",
+          "output_per_min": 60,
+          "ingredients": [
+            { "name": "Alumina Solution", "item_id": "alumina-solution", "amount_per_min": 120 },
+            { "name": "Coal", "item_id": "coal", "amount_per_min": 40 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aluminum-sheet",
+      "name": "Aluminum Sheet",
+      "category": "Basic Parts",
+      "tier": 3,
+      "machine": "Constructor",
+      "base_output_per_min": 30,
+      "ingredients": [
+        { "name": "Aluminum Ingot", "item_id": "aluminum-ingot", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "aluminum-sheet-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 30,
+          "ingredients": [
+            { "name": "Aluminum Ingot", "item_id": "aluminum-ingot", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aluminum-casing",
+      "name": "Aluminum Casing",
+      "category": "Basic Parts",
+      "tier": 3,
+      "machine": "Constructor",
+      "base_output_per_min": 60,
+      "ingredients": [
+        { "name": "Aluminum Sheet", "item_id": "aluminum-sheet", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "aluminum-casing-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 60,
+          "ingredients": [
+            { "name": "Aluminum Sheet", "item_id": "aluminum-sheet", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "turbomotor",
+      "name": "Turbomotor",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 2,
+      "ingredients": [
+        { "name": "Motor", "item_id": "motor", "amount_per_min": 4 },
+        { "name": "Rubber", "item_id": "rubber", "amount_per_min": 24 },
+        { "name": "Aluminum Sheet", "item_id": "aluminum-sheet", "amount_per_min": 32 },
+        { "name": "Plastic", "item_id": "plastic", "amount_per_min": 16 }
+      ],
+      "recipes": [
+        {
+          "id": "turbomotor-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 2,
+          "ingredients": [
+            { "name": "Motor", "item_id": "motor", "amount_per_min": 4 },
+            { "name": "Rubber", "item_id": "rubber", "amount_per_min": 24 },
+            { "name": "Aluminum Sheet", "item_id": "aluminum-sheet", "amount_per_min": 32 },
+            { "name": "Plastic", "item_id": "plastic", "amount_per_min": 16 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cooling-system",
+      "name": "Cooling System",
+      "category": "Advanced Parts",
+      "tier": 4,
+      "machine": "Assembler",
+      "base_output_per_min": 6,
+      "ingredients": [
+        { "name": "Motor", "item_id": "motor", "amount_per_min": 2 },
+        { "name": "Aluminum Sheet", "item_id": "aluminum-sheet", "amount_per_min": 20 },
+        { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 15 }
+      ],
+      "recipes": [
+        {
+          "id": "cooling-system-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 6,
+          "ingredients": [
+            { "name": "Motor", "item_id": "motor", "amount_per_min": 2 },
+            { "name": "Aluminum Sheet", "item_id": "aluminum-sheet", "amount_per_min": 20 },
+            { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "battery",
+      "name": "Battery",
+      "category": "Advanced Parts",
+      "tier": 4,
+      "machine": "Assembler",
+      "base_output_per_min": 10,
+      "ingredients": [
+        { "name": "Sulfuric Acid", "item_id": "sulfuric-acid", "amount_per_min": 20 },
+        { "name": "Alumina Solution", "item_id": "alumina-solution", "amount_per_min": 25 },
+        { "name": "Wire", "item_id": "wire", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "battery-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 10,
+          "ingredients": [
+            { "name": "Sulfuric Acid", "item_id": "sulfuric-acid", "amount_per_min": 20 },
+            { "name": "Alumina Solution", "item_id": "alumina-solution", "amount_per_min": 25 },
+            { "name": "Wire", "item_id": "wire", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sulfuric-acid",
+      "name": "Sulfuric Acid",
+      "category": "Oil Products",
+      "tier": 3,
+      "machine": "Blender",
+      "base_output_per_min": 50,
+      "ingredients": [
+        { "name": "Sulfur", "item_id": "sulfur", "amount_per_min": 50 },
+        { "name": "Water", "item_id": "water", "amount_per_min": 100 },
+        { "name": "Iron Ore", "item_id": "iron-ore", "amount_per_min": 25 }
+      ],
+      "recipes": [
+        {
+          "id": "sulfuric-acid-standard",
+          "label": "Standard",
+          "machine": "Blender",
+          "output_per_min": 50,
+          "ingredients": [
+            { "name": "Sulfur", "item_id": "sulfur", "amount_per_min": 50 },
+            { "name": "Water", "item_id": "water", "amount_per_min": 100 },
+            { "name": "Iron Ore", "item_id": "iron-ore", "amount_per_min": 25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sulfur",
+      "name": "Sulfur",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "mine-sulfur",
+          "label": "Mining",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "radio-control-unit",
+      "name": "Radio Control Unit",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 2.5,
+      "ingredients": [
+        { "name": "AI Limiter", "item_id": "ai-limiter", "amount_per_min": 2 },
+        { "name": "Aluminum Casing", "item_id": "aluminum-casing", "amount_per_min": 45 },
+        { "name": "Crystalized Intelligence", "item_id": "crystalized-intelligence", "amount_per_min": 5 }
+      ],
+      "recipes": [
+        {
+          "id": "radio-control-unit-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 2.5,
+          "ingredients": [
+            { "name": "AI Limiter", "item_id": "ai-limiter", "amount_per_min": 2 },
+            { "name": "Aluminum Casing", "item_id": "aluminum-casing", "amount_per_min": 45 },
+            { "name": "Crystalized Intelligence", "item_id": "crystalized-intelligence", "amount_per_min": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crystalized-intelligence",
+      "name": "Crystalized Intelligence",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Assembler",
+      "base_output_per_min": 12,
+      "ingredients": [
+        { "name": "Quartz Crystal", "item_id": "quartz-crystal", "amount_per_min": 36 },
+        { "name": "Computer", "item_id": "computer", "amount_per_min": 1 }
+      ],
+      "recipes": [
+        {
+          "id": "crystalized-intelligence-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 12,
+          "ingredients": [
+            { "name": "Quartz Crystal", "item_id": "quartz-crystal", "amount_per_min": 36 },
+            { "name": "Computer", "item_id": "computer", "amount_per_min": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supercomputer",
+      "name": "Supercomputer",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 1.5,
+      "ingredients": [
+        { "name": "Computer", "item_id": "computer", "amount_per_min": 3 },
+        { "name": "AI Limiter", "item_id": "ai-limiter", "amount_per_min": 2.5 },
+        { "name": "High-Speed Connector", "item_id": "high-speed-connector", "amount_per_min": 5 },
+        { "name": "Plastic", "item_id": "plastic", "amount_per_min": 28 }
+      ],
+      "recipes": [
+        {
+          "id": "supercomputer-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 1.5,
+          "ingredients": [
+            { "name": "Computer", "item_id": "computer", "amount_per_min": 3 },
+            { "name": "AI Limiter", "item_id": "ai-limiter", "amount_per_min": 2.5 },
+            { "name": "High-Speed Connector", "item_id": "high-speed-connector", "amount_per_min": 5 },
+            { "name": "Plastic", "item_id": "plastic", "amount_per_min": 28 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "adaptive-control-unit",
+      "name": "Adaptive Control Unit",
+      "category": "Endgame",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 1,
+      "ingredients": [
+        { "name": "Supercomputer", "item_id": "supercomputer", "amount_per_min": 1 },
+        { "name": "Radio Control Unit", "item_id": "radio-control-unit", "amount_per_min": 1 },
+        { "name": "Aluminum Casing", "item_id": "aluminum-casing", "amount_per_min": 26 }
+      ],
+      "recipes": [
+        {
+          "id": "adaptive-control-unit-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 1,
+          "ingredients": [
+            { "name": "Supercomputer", "item_id": "supercomputer", "amount_per_min": 1 },
+            { "name": "Radio Control Unit", "item_id": "radio-control-unit", "amount_per_min": 1 },
+            { "name": "Aluminum Casing", "item_id": "aluminum-casing", "amount_per_min": 26 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "assembly-director-system",
+      "name": "Assembly Director System",
+      "category": "Endgame",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 0.75,
+      "ingredients": [
+        { "name": "Adaptive Control Unit", "item_id": "adaptive-control-unit", "amount_per_min": 1 },
+        { "name": "Supercomputer", "item_id": "supercomputer", "amount_per_min": 1.5 },
+        { "name": "Heavy Modular Frame", "item_id": "heavy-modular-frame", "amount_per_min": 2 }
+      ],
+      "recipes": [
+        {
+          "id": "assembly-director-system-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 0.75,
+          "ingredients": [
+            { "name": "Adaptive Control Unit", "item_id": "adaptive-control-unit", "amount_per_min": 1 },
+            { "name": "Supercomputer", "item_id": "supercomputer", "amount_per_min": 1.5 },
+            { "name": "Heavy Modular Frame", "item_id": "heavy-modular-frame", "amount_per_min": 2 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gas-filter",
+      "name": "Gas Filter",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 20,
+      "ingredients": [
+        { "name": "Rubber", "item_id": "rubber", "amount_per_min": 20 },
+        { "name": "Fabric", "item_id": "fabric", "amount_per_min": 30 }
+      ],
+      "recipes": [
+        {
+          "id": "gas-filter-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 20,
+          "ingredients": [
+            { "name": "Rubber", "item_id": "rubber", "amount_per_min": 20 },
+            { "name": "Fabric", "item_id": "fabric", "amount_per_min": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fabric",
+      "name": "Fabric",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 15,
+      "ingredients": [
+        { "name": "Mycelia", "item_id": "mycelia", "amount_per_min": 15 }
+      ],
+      "recipes": [
+        {
+          "id": "fabric-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 15,
+          "ingredients": [
+            { "name": "Mycelia", "item_id": "mycelia", "amount_per_min": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mycelia",
+      "name": "Mycelia",
+      "category": "Raw Resources",
+      "tier": 0,
+      "machine": "Miner Mk.1",
+      "base_output_per_min": 60,
+      "ingredients": [],
+      "is_raw_resource": true,
+      "recipes": [
+        {
+          "id": "harvest-mycelia",
+          "label": "Harvesting",
+          "machine": "Miner Mk.1",
+          "output_per_min": 60,
+          "ingredients": []
+        }
+      ]
+    },
+    {
+      "id": "nobelisk",
+      "name": "Nobelisk",
+      "category": "Advanced Parts",
+      "tier": 4,
+      "machine": "Assembler",
+      "base_output_per_min": 5,
+      "ingredients": [
+        { "name": "Smokeless Powder", "item_id": "smokeless-powder", "amount_per_min": 25 },
+        { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 20 }
+      ],
+      "recipes": [
+        {
+          "id": "nobelisk-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 5,
+          "ingredients": [
+            { "name": "Smokeless Powder", "item_id": "smokeless-powder", "amount_per_min": 25 },
+            { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smokeless-powder",
+      "name": "Smokeless Powder",
+      "category": "Basic Parts",
+      "tier": 2,
+      "machine": "Constructor",
+      "base_output_per_min": 25,
+      "ingredients": [
+        { "name": "Sulfur", "item_id": "sulfur", "amount_per_min": 15 },
+        { "name": "Coal", "item_id": "coal", "amount_per_min": 15 }
+      ],
+      "recipes": [
+        {
+          "id": "smokeless-powder-standard",
+          "label": "Standard",
+          "machine": "Constructor",
+          "output_per_min": 25,
+          "ingredients": [
+            { "name": "Sulfur", "item_id": "sulfur", "amount_per_min": 15 },
+            { "name": "Coal", "item_id": "coal", "amount_per_min": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thermal-propellant-rocket",
+      "name": "Thermal Propellant Rocket",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Manufacturer",
+      "base_output_per_min": 1.25,
+      "ingredients": [
+        { "name": "Smokeless Powder", "item_id": "smokeless-powder", "amount_per_min": 20 },
+        { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 10 },
+        { "name": "Copper Sheet", "item_id": "copper-sheet", "amount_per_min": 20 },
+        { "name": "Crystal Oscillator", "item_id": "crystal-oscillator", "amount_per_min": 2.5 }
+      ],
+      "recipes": [
+        {
+          "id": "thermal-propellant-rocket-standard",
+          "label": "Standard",
+          "machine": "Manufacturer",
+          "output_per_min": 1.25,
+          "ingredients": [
+            { "name": "Smokeless Powder", "item_id": "smokeless-powder", "amount_per_min": 20 },
+            { "name": "Steel Pipe", "item_id": "steel-pipe", "amount_per_min": 10 },
+            { "name": "Copper Sheet", "item_id": "copper-sheet", "amount_per_min": 20 },
+            { "name": "Crystal Oscillator", "item_id": "crystal-oscillator", "amount_per_min": 2.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crystal-oscillator",
+      "name": "Crystal Oscillator",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Assembler",
+      "base_output_per_min": 2.5,
+      "ingredients": [
+        { "name": "Quartz Crystal", "item_id": "quartz-crystal", "amount_per_min": 18 },
+        { "name": "Cable", "item_id": "cable", "amount_per_min": 14 }
+      ],
+      "recipes": [
+        {
+          "id": "crystal-oscillator-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 2.5,
+          "ingredients": [
+            { "name": "Quartz Crystal", "item_id": "quartz-crystal", "amount_per_min": 18 },
+            { "name": "Cable", "item_id": "cable", "amount_per_min": 14 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cluster-nobelisk",
+      "name": "Cluster Nobelisk",
+      "category": "Advanced Parts",
+      "tier": 5,
+      "machine": "Assembler",
+      "base_output_per_min": 1,
+      "ingredients": [
+        { "name": "Nobelisk", "item_id": "nobelisk", "amount_per_min": 7 },
+        { "name": "Steel Ingot", "item_id": "steel-ingot", "amount_per_min": 12 }
+      ],
+      "recipes": [
+        {
+          "id": "cluster-nobelisk-standard",
+          "label": "Standard",
+          "machine": "Assembler",
+          "output_per_min": 1,
+          "ingredients": [
+            { "name": "Nobelisk", "item_id": "nobelisk", "amount_per_min": 7 },
+            { "name": "Steel Ingot", "item_id": "steel-ingot", "amount_per_min": 12 }
+          ]
+        }
+      ]
+    }
+  ],
+  "item_lookup": {
+    "iron-ore": "Iron Ore",
+    "copper-ore": "Copper Ore",
+    "limestone": "Limestone",
+    "coal": "Coal",
+    "caterium-ore": "Caterium Ore",
+    "raw-quartz": "Raw Quartz",
+    "crude-oil": "Crude Oil",
+    "bauxite-ore": "Bauxite Ore",
+    "water": "Water",
+    "sulfur": "Sulfur",
+    "mycelia": "Mycelia",
+    "iron-ingot": "Iron Ingot",
+    "copper-ingot": "Copper Ingot",
+    "steel-ingot": "Steel Ingot",
+    "caterium-ingot": "Caterium Ingot",
+    "aluminum-ingot": "Aluminum Ingot",
+    "iron-plate": "Iron Plate",
+    "iron-rod": "Iron Rod",
+    "wire": "Wire",
+    "cable": "Cable",
+    "concrete": "Concrete",
+    "steel-beam": "Steel Beam",
+    "steel-pipe": "Steel Pipe",
+    "copper-sheet": "Copper Sheet",
+    "quickwire": "Quickwire",
+    "silica": "Silica",
+    "quartz-crystal": "Quartz Crystal",
+    "screw": "Screw",
+    "rotor": "Rotor",
+    "stator": "Stator",
+    "motor": "Motor",
+    "encased-industrial-beam": "Encased Industrial Beam",
+    "reinforced-iron-plate": "Reinforced Iron Plate",
+    "modular-frame": "Modular Frame",
+    "smart-plating": "Smart Plating",
+    "versatile-framework": "Versatile Framework",
+    "automated-wiring": "Automated Wiring",
+    "plastic": "Plastic",
+    "rubber": "Rubber",
+    "circuit-board": "Circuit Board",
+    "ai-limiter": "AI Limiter",
+    "high-speed-connector": "High-Speed Connector",
+    "computer": "Computer",
+    "heavy-modular-frame": "Heavy Modular Frame",
+    "aluminum-sheet": "Aluminum Sheet",
+    "aluminum-casing": "Aluminum Casing",
+    "alumina-solution": "Alumina Solution",
+    "turbomotor": "Turbomotor",
+    "cooling-system": "Cooling System",
+    "battery": "Battery",
+    "sulfuric-acid": "Sulfuric Acid",
+    "radio-control-unit": "Radio Control Unit",
+    "crystalized-intelligence": "Crystalized Intelligence",
+    "supercomputer": "Supercomputer",
+    "adaptive-control-unit": "Adaptive Control Unit",
+    "assembly-director-system": "Assembly Director System",
+    "gas-filter": "Gas Filter",
+    "fabric": "Fabric",
+    "nobelisk": "Nobelisk",
+    "smokeless-powder": "Smokeless Powder",
+    "thermal-propellant-rocket": "Thermal Propellant Rocket",
+    "crystal-oscillator": "Crystal Oscillator",
+    "cluster-nobelisk": "Cluster Nobelisk"
+  },
+  "mvp_targets": [
+    "iron-plate",
+    "screw",
+    "rotor",
+    "stator",
+    "motor",
+    "reinforced-iron-plate",
+    "modular-frame",
+    "encased-industrial-beam",
+    "smart-plating",
+    "versatile-framework",
+    "automated-wiring",
+    "circuit-board",
+    "ai-limiter",
+    "high-speed-connector",
+    "computer",
+    "heavy-modular-frame",
+    "aluminum-ingot",
+    "aluminum-sheet",
+    "aluminum-casing",
+    "turbomotor",
+    "cooling-system",
+    "battery",
+    "radio-control-unit",
+    "crystalized-intelligence",
+    "supercomputer",
+    "adaptive-control-unit",
+    "assembly-director-system",
+    "gas-filter",
+    "nobelisk",
+    "smokeless-powder",
+    "thermal-propellant-rocket",
+    "crystal-oscillator",
+    "cluster-nobelisk"
+  ]
+}

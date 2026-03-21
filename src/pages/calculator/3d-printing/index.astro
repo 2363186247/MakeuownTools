@@ -1,0 +1,65 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import filaments from '../../../data/filaments.json';
+
+type Material = { id: string; name: string };
+type Diameter = { id: string; name: string };
+type Combo = { material: Material; diameter: Diameter; href: string };
+type FilamentData = { materials: Material[]; diameters: Diameter[] };
+
+const data = filaments as FilamentData;
+const combos: Combo[] = [];
+data.materials.forEach(m => {
+  data.diameters.forEach(d => {
+    combos.push({ material: m, diameter: d, href: `/calculator/3d-printing/${m.id}-${d.id}` });
+  });
+});
+---
+
+<Layout
+  title="3D Printing Calculators | Make Your Own Tools"
+  description="Browse all material and diameter combinations for the 3D printing filament length calculator."
+>
+  <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+      <a
+        href="/"
+        class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-200 transition hover:border-white/30 hover:bg-white/10"
+      >
+        <span>←</span>
+        <span>Home</span>
+      </a>
+
+      <section class="mb-8 grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+        <div>
+          <p class="mb-3 inline-flex items-center rounded-full border border-emerald-300/35 bg-emerald-200/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-100">
+            Calculator Navigator
+          </p>
+          <h1 class="text-4xl font-semibold tracking-tight text-white md:text-5xl">3D Printing Filament Length</h1>
+          <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
+            Choose a material and diameter profile to open a dedicated calculator page with live length estimation and print setup recommendations.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+          <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Available Presets</p>
+          <p class="mt-1 text-3xl font-semibold text-white">{combos.length}</p>
+        </div>
+      </section>
+
+      <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {combos.map(combo => (
+          <a href={combo.href} class="group rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-white/[0.08]">
+            <div class="flex items-center justify-between">
+              <h2 class="font-semibold text-white">{combo.material.name}</h2>
+              <span class="rounded-md border border-white/15 bg-black/25 px-2 py-0.5 text-xs font-mono text-zinc-300">{combo.diameter.name}</span>
+            </div>
+            <p class="mt-2 text-sm text-zinc-300">Open dedicated profile calculator</p>
+            <p class="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-200">
+              Launch
+              <span class="transition group-hover:translate-x-0.5">→</span>
+            </p>
+          </a>
+        ))}
+      </section>
+  </main>
+</Layout>

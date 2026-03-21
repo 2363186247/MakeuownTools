@@ -1,0 +1,519 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import satisfactoryData from '../../../data/satisfactory.json';
+
+type Ingredient = {
+  name: string;
+  item_id?: string;
+  amount_per_min: number;
+};
+
+type Recipe = {
+  id: string;
+  label: string;
+  machine: string;
+  output_per_min: number;
+  ingredients: Ingredient[];
+};
+
+type ItemData = {
+  id: string;
+  name: string;
+  category: string;
+  machine: string;
+  base_output_per_min: number;
+  ingredients: Ingredient[];
+  recipes?: Recipe[];
+  is_raw_resource?: boolean;
+};
+
+type MachineInfo = {
+  id: string;
+  name: string;
+  power_mw: number;
+};
+
+type SatisfactoryData = {
+  items: ItemData[];
+  machines: Record<string, MachineInfo>;
+};
+
+function getRecipes(item: ItemData): Recipe[] {
+  if (Array.isArray(item.recipes) && item.recipes.length > 0) return item.recipes;
+  return [{
+    id: `${item.id}-fallback`,
+    label: 'Default',
+    machine: item.machine,
+    output_per_min: item.base_output_per_min,
+    ingredients: item.ingredients
+  }];
+}
+
+export function getStaticPaths() {
+  const dataset = satisfactoryData as SatisfactoryData;
+  return dataset.items.map((item) => ({
+    params: { item: item.id },
+    props: {
+      item,
+      allItems: dataset.items,
+      machines: dataset.machines
+    }
+  }));
+}
+
+const { item, allItems, machines } = Astro.props as {
+  item: ItemData;
+  allItems: ItemData[];
+  machines: Record<string, MachineInfo>;
+};
+
+const rootRecipes = getRecipes(item);
+const defaultRecipe = rootRecipes[0];
+const defaultMachine = machines[defaultRecipe.machine] ?? {
+  id: defaultRecipe.machine.toLowerCase().replace(/\s+/g, '-'),
+  name: defaultRecipe.machine,
+  power_mw: 0
+};
+---
+
+<Layout
+  title={`${item.name} Production Calculator | Satisfactory Tools`}
+  description={`Reverse-calculate machine count, total power, and full input chain to produce ${item.name} in Satisfactory.`}
+>
+  <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+    <a
+      href="/calculator/satisfactory/"
+      class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10"
+    >
+      <span>←</span>
+      <span>Satisfactory Calculators</span>
+    </a>
+
+    <header class="mb-10">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-amber-200">
+        <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+        Target Production Calculator
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight text-white md:text-6xl">{item.name}</h1>
+      <p class="mt-4 max-w-3xl text-zinc-400">
+        Choose recipe and clock speed, then instantly compute machine counts, power load, and full upstream dependency balancing.
+      </p>
+    </header>
+
+    <div class="grid gap-6 lg:grid-cols-[1fr_1.45fr]">
+      <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+        <label class="mb-6 block">
+          <span class="mb-2 block text-sm font-medium text-zinc-300">Target Output</span>
+          <div class="relative">
+            <input
+              type="number"
+              id="targetInput"
+              value={defaultRecipe.output_per_min}
+              min="0"
+              step="0.1"
+              class="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-4 text-3xl font-mono font-bold text-white outline-none transition focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20"
+            />
+            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-mono text-zinc-500">items / min</span>
+          </div>
+        </label>
+
+        <label class="mb-6 block">
+          <span class="mb-2 block text-sm font-medium text-zinc-300">Recipe</span>
+          <select
+            id="recipeSelect"
+            class="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-base text-white outline-none transition focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20"
+          >
+            {rootRecipes.map((recipe) => (
+              <option value={recipe.id} class="bg-zinc-900 text-zinc-100">{recipe.label} ({recipe.output_per_min}/min)</option>
+            ))}
+          </select>
+        </label>
+
+        <div class="mb-6">
+          <div class="mb-2 flex items-center justify-between">
+            <span class="text-sm font-medium text-zinc-300">Clock Speed</span>
+            <span id="clockValue" class="font-mono text-sm text-amber-200">100%</span>
+          </div>
+          <input id="clockRange" type="range" min="1" max="250" step="1" value="100" class="w-full accent-amber-500" />
+          <div class="mt-2 flex items-center gap-2">
+            <input
+              id="clockInput"
+              type="number"
+              min="1"
+              max="250"
+              step="1"
+              value="100"
+              class="w-24 rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm font-mono text-white outline-none focus:border-amber-500/50"
+            />
+            <span class="text-xs text-zinc-400">% (Power uses $clock^{1.6}$ approximation)</span>
+          </div>
+        </div>
+
+        <div class="space-y-4 rounded-2xl border border-white/5 bg-black/20 p-5">
+          <p class="text-xs uppercase tracking-widest text-zinc-500">Current Selection</p>
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <span class="text-sm text-zinc-300">Machine</span>
+            <span id="machineName" class="font-mono text-sm text-amber-200">{defaultMachine.name}</span>
+          </div>
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <span class="text-sm text-zinc-300">Recipe Output @ Clock</span>
+            <span id="recipeOutput" class="font-mono text-sm text-white">{defaultRecipe.output_per_min.toFixed(2)} / min</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-zinc-300">Machine Power @ Clock</span>
+            <span id="machinePowerPer" class="font-mono text-sm text-white">{defaultMachine.power_mw.toFixed(2)} MW</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-5 shadow-inner">
+            <p class="text-xs uppercase tracking-widest text-amber-200/70">Target Machine</p>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="machineCount" class="font-mono text-4xl font-bold text-white">1.00</span>
+              <span id="machineSuffix" class="text-xs text-amber-200/50">x {defaultMachine.name}</span>
+            </div>
+          </div>
+
+          <div class="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 p-5 shadow-inner">
+            <p class="text-xs uppercase tracking-widest text-blue-200/70">Target Power</p>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="powerUsage" class="font-mono text-4xl font-bold text-white">0.0</span>
+              <span class="text-xs text-blue-200/50">MW</span>
+            </div>
+          </div>
+
+          <div class="rounded-3xl border border-fuchsia-500/20 bg-gradient-to-br from-fuchsia-500/10 to-violet-500/5 p-5 shadow-inner">
+            <p class="text-xs uppercase tracking-widest text-fuchsia-200/70">Factory Total Power</p>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="factoryPower" class="font-mono text-4xl font-bold text-white">0.0</span>
+              <span class="text-xs text-fuchsia-200/50">MW</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+          <p class="mb-6 text-xs uppercase tracking-widest text-zinc-400">Direct Inputs (for selected recipe)</p>
+          <ul id="directInputsList" class="space-y-4"></ul>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+          <p class="mb-4 text-xs uppercase tracking-widest text-zinc-400">Full Machine Requirements (All Levels)</p>
+          <ul id="machineTotalsList" class="space-y-3"></ul>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+          <p class="mb-4 text-xs uppercase tracking-widest text-zinc-400">Raw Resource Inputs (All Levels)</p>
+          <ul id="rawTotalsList" class="space-y-3"></ul>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+          <p class="mb-4 text-xs uppercase tracking-widest text-zinc-400">Dependency Tree (expand/collapse)</p>
+          <ul id="treeRoot" class="space-y-2"></ul>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script define:vars={{ rootItemId: item.id, allItems, machinesData: machines, initialRecipeId: defaultRecipe.id, initialTarget: defaultRecipe.output_per_min }}>
+    // @ts-nocheck
+    const targetInput = document.getElementById('targetInput');
+    const recipeSelect = document.getElementById('recipeSelect');
+    const clockRange = document.getElementById('clockRange');
+    const clockInput = document.getElementById('clockInput');
+    const clockValue = document.getElementById('clockValue');
+
+    const machineName = document.getElementById('machineName');
+    const recipeOutput = document.getElementById('recipeOutput');
+    const machinePowerPer = document.getElementById('machinePowerPer');
+
+    const machineCountEl = document.getElementById('machineCount');
+    const machineSuffix = document.getElementById('machineSuffix');
+    const powerUsageEl = document.getElementById('powerUsage');
+    const factoryPowerEl = document.getElementById('factoryPower');
+
+    const directInputsList = document.getElementById('directInputsList');
+    const machineTotalsList = document.getElementById('machineTotalsList');
+    const rawTotalsList = document.getElementById('rawTotalsList');
+    const treeRoot = document.getElementById('treeRoot');
+
+    if (
+      !(targetInput instanceof HTMLInputElement) ||
+      !(recipeSelect instanceof HTMLSelectElement) ||
+      !(clockRange instanceof HTMLInputElement) ||
+      !(clockInput instanceof HTMLInputElement) ||
+      !(clockValue instanceof HTMLElement) ||
+      !(machineName instanceof HTMLElement) ||
+      !(recipeOutput instanceof HTMLElement) ||
+      !(machinePowerPer instanceof HTMLElement) ||
+      !(machineCountEl instanceof HTMLElement) ||
+      !(machineSuffix instanceof HTMLElement) ||
+      !(powerUsageEl instanceof HTMLElement) ||
+      !(factoryPowerEl instanceof HTMLElement) ||
+      !(directInputsList instanceof HTMLElement) ||
+      !(machineTotalsList instanceof HTMLElement) ||
+      !(rawTotalsList instanceof HTMLElement) ||
+      !(treeRoot instanceof HTMLElement)
+    ) {
+      throw new Error('Satisfactory calculator UI is missing required elements.');
+    }
+
+    const itemMap = new Map(allItems.map((entry) => [entry.id, entry]));
+
+    function getRecipes(entry) {
+      if (Array.isArray(entry.recipes) && entry.recipes.length > 0) {
+        return entry.recipes;
+      }
+
+      return [{
+        id: `${entry.id}-fallback`,
+        label: 'Default',
+        machine: entry.machine,
+        output_per_min: Number(entry.base_output_per_min) || 1,
+        ingredients: Array.isArray(entry.ingredients) ? entry.ingredients : []
+      }];
+    }
+
+    function getMachine(name) {
+      return machinesData[name] || { name, power_mw: 0 };
+    }
+
+    function getClockFactor() {
+      const clockPercent = Math.max(1, Math.min(250, Number(clockInput.value) || 100));
+      return clockPercent / 100;
+    }
+
+    function powerAtClock(basePower, clockFactor) {
+      return basePower * Math.pow(clockFactor, 1.6);
+    }
+
+    function renderList(target, entries, unit) {
+      if (entries.length === 0) {
+        target.innerHTML = '<li class="rounded-xl border border-white/5 bg-black/20 p-3 text-sm text-zinc-400">No data</li>';
+        return;
+      }
+
+      target.innerHTML = entries
+        .map(([name, value]) => `
+          <li class="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 p-3">
+            <span class="text-zinc-200">${name}</span>
+            <span class="font-mono text-zinc-100">${value.toFixed(2)} ${unit}</span>
+          </li>
+        `)
+        .join('');
+    }
+
+    function renderDirectInputs(ingredients, machineCount, clockFactor) {
+      if (!Array.isArray(ingredients) || ingredients.length === 0) {
+        directInputsList.innerHTML = '<li class="rounded-xl border border-white/5 bg-black/20 p-3 text-sm text-zinc-400">No ingredients</li>';
+        return;
+      }
+
+      directInputsList.innerHTML = ingredients
+        .map((ing) => {
+          const required = (Number(ing.amount_per_min) || 0) * machineCount * clockFactor;
+          return `
+            <li class="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 p-4">
+              <span class="font-medium text-zinc-200">${ing.name}</span>
+              <span class="font-mono text-2xl font-bold text-white">${required.toFixed(1)} <span class="text-sm font-normal text-zinc-500">/ min</span></span>
+            </li>
+          `;
+        })
+        .join('');
+    }
+
+    function renderTreeNode(node, isRoot = false) {
+      if (node.type === 'raw') {
+        return `
+          <li class="relative pl-4 before:absolute before:left-0 before:top-4 before:h-px before:w-3 before:bg-white/20">
+            <div class="rounded-xl border border-white/5 bg-black/25 p-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-zinc-200">${node.name}</span>
+                <span class="font-mono text-xs text-zinc-300">${node.rate.toFixed(2)}/min raw</span>
+              </div>
+            </div>
+          </li>
+        `;
+      }
+
+      const childrenHtml = node.children.length
+        ? `<ul class="mt-2 ml-4 space-y-2 border-l border-white/10 pl-4">${node.children.map((c) => renderTreeNode(c)).join('')}</ul>`
+        : '';
+
+      return `
+        <li class="relative pl-4 before:absolute before:left-0 before:top-4 before:h-px before:w-3 before:bg-white/20">
+          <details ${isRoot ? 'open' : ''} class="group rounded-xl border border-white/5 bg-black/25">
+            <summary class="cursor-pointer list-none p-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-zinc-100">${node.itemName}</span>
+                <span class="font-mono text-xs text-zinc-300">${node.targetRate.toFixed(2)}/min -> ${node.machineCount.toFixed(2)} x ${node.machineName}</span>
+              </div>
+            </summary>
+            ${childrenHtml}
+          </details>
+        </li>
+      `;
+    }
+
+    function calculateFactoryPlan(targetPerMin, rootRecipeId, clockFactor) {
+      const machineTotals = {};
+      const rawTotals = {};
+      let totalPowerMw = 0;
+
+      function walk(itemId, targetRate, depth) {
+        const current = itemMap.get(itemId);
+        if (!current || targetRate <= 0) {
+          return null;
+        }
+
+        const recipes = getRecipes(current);
+        const selectedRecipe = itemId === rootItemId
+          ? (recipes.find((r) => r.id === rootRecipeId) || recipes[0])
+          : recipes[0];
+
+        const machine = getMachine(selectedRecipe.machine || current.machine || 'Unknown');
+        const outputPerMachine = (Number(selectedRecipe.output_per_min) || 1) * clockFactor;
+        const machineCount = targetRate / outputPerMachine;
+        const machinePower = powerAtClock(Number(machine.power_mw) || 0, clockFactor);
+
+        machineTotals[machine.name] = (machineTotals[machine.name] || 0) + machineCount;
+        totalPowerMw += machineCount * machinePower;
+
+        const node = {
+          type: 'crafted',
+          depth,
+          itemName: current.name,
+          targetRate,
+          machineName: machine.name,
+          machineCount,
+          children: []
+        };
+
+        const ingredients = Array.isArray(selectedRecipe.ingredients) ? selectedRecipe.ingredients : [];
+        ingredients.forEach((ingredient) => {
+          const requiredPerMin = (Number(ingredient.amount_per_min) || 0) * machineCount * clockFactor;
+          const childId = ingredient.item_id;
+          const child = childId ? itemMap.get(childId) : null;
+
+          if (child && !child.is_raw_resource) {
+            const childNode = walk(childId, requiredPerMin, depth + 1);
+            if (childNode) node.children.push(childNode);
+            return;
+          }
+
+          const rawName = ingredient.name || (child ? child.name : 'Unknown');
+          rawTotals[rawName] = (rawTotals[rawName] || 0) + requiredPerMin;
+          node.children.push({ type: 'raw', name: rawName, rate: requiredPerMin });
+        });
+
+        return node;
+      }
+
+      const rootNode = walk(rootItemId, targetPerMin, 0);
+      return { machineTotals, rawTotals, totalPowerMw, rootNode };
+    }
+
+    function applyQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      const target = Number(params.get('target'));
+      const recipe = params.get('recipe');
+      const clock = Number(params.get('clock'));
+
+      if (!Number.isNaN(target) && target > 0) targetInput.value = String(target);
+      if (recipe && [...recipeSelect.options].some((opt) => opt.value === recipe)) {
+        recipeSelect.value = recipe;
+      } else {
+        recipeSelect.value = initialRecipeId;
+      }
+      if (!Number.isNaN(clock) && clock >= 1 && clock <= 250) {
+        const clockText = String(Math.round(clock));
+        clockInput.value = clockText;
+        clockRange.value = clockText;
+      }
+    }
+
+    function syncQueryParams(target, recipeId, clockPercent) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('target', String(Math.round(target * 100) / 100));
+      params.set('recipe', recipeId);
+      params.set('clock', String(Math.round(clockPercent)));
+      const query = params.toString();
+      const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+      history.replaceState(null, '', nextUrl);
+    }
+
+    function updateClockFromInput() {
+      const clamped = Math.max(1, Math.min(250, Number(clockInput.value) || 100));
+      clockInput.value = String(Math.round(clamped));
+      clockRange.value = String(Math.round(clamped));
+    }
+
+    function updateClockFromRange() {
+      const value = Math.max(1, Math.min(250, Number(clockRange.value) || 100));
+      clockRange.value = String(Math.round(value));
+      clockInput.value = String(Math.round(value));
+    }
+
+    function updateCalculations() {
+      const target = Math.max(0, Number(targetInput.value) || 0);
+      const recipeId = recipeSelect.value || initialRecipeId;
+      const clockPercent = Math.max(1, Math.min(250, Number(clockInput.value) || 100));
+      const clockFactor = clockPercent / 100;
+
+      const rootItem = itemMap.get(rootItemId);
+      if (!rootItem) return;
+
+      const rootRecipes = getRecipes(rootItem);
+      const selectedRecipe = rootRecipes.find((r) => r.id === recipeId) || rootRecipes[0];
+      const selectedMachine = getMachine(selectedRecipe.machine || rootItem.machine || 'Unknown');
+      const outputAtClock = (Number(selectedRecipe.output_per_min) || 1) * clockFactor;
+      const machinePowerAtClock = powerAtClock(Number(selectedMachine.power_mw) || 0, clockFactor);
+
+      const machineCount = target / outputAtClock;
+      const rootPower = machineCount * machinePowerAtClock;
+
+      clockValue.textContent = `${clockPercent.toFixed(0)}%`;
+      machineName.textContent = selectedMachine.name;
+      recipeOutput.textContent = `${outputAtClock.toFixed(2)} / min`;
+      machinePowerPer.textContent = `${machinePowerAtClock.toFixed(2)} MW`;
+
+      machineCountEl.textContent = machineCount.toFixed(2);
+      machineSuffix.textContent = `x ${selectedMachine.name}`;
+      powerUsageEl.textContent = rootPower.toFixed(1);
+
+      renderDirectInputs(selectedRecipe.ingredients, machineCount, clockFactor);
+
+      const plan = calculateFactoryPlan(target, selectedRecipe.id, clockFactor);
+      factoryPowerEl.textContent = plan.totalPowerMw.toFixed(1);
+
+      const machineEntries = Object.entries(plan.machineTotals).sort((a, b) => b[1] - a[1]);
+      const rawEntries = Object.entries(plan.rawTotals).sort((a, b) => b[1] - a[1]);
+      renderList(machineTotalsList, machineEntries, 'machines');
+      renderList(rawTotalsList, rawEntries, '/min');
+
+      if (plan.rootNode) {
+        treeRoot.innerHTML = renderTreeNode(plan.rootNode, true);
+      } else {
+        treeRoot.innerHTML = '<li class="rounded-xl border border-white/5 bg-black/20 p-3 text-sm text-zinc-400">No tree data</li>';
+      }
+
+      syncQueryParams(target, selectedRecipe.id, clockPercent);
+    }
+
+    targetInput.addEventListener('input', updateCalculations);
+    recipeSelect.addEventListener('change', updateCalculations);
+    clockInput.addEventListener('input', () => {
+      updateClockFromInput();
+      updateCalculations();
+    });
+    clockRange.addEventListener('input', () => {
+      updateClockFromRange();
+      updateCalculations();
+    });
+
+    applyQueryParams();
+    updateClockFromInput();
+    updateCalculations();
+  </script>
+</Layout>
