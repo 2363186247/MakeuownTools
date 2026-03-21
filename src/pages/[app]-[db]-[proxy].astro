@@ -55,16 +55,104 @@ services:
     <meta name="viewport" content="width=device-width" />
     <title>Docker Compose for {app.name}, {db.name} and {proxy.name}</title>
     <meta name="description" content={`Generate a complete docker-compose.yml file for ${app.name} with ${db.name} and ${proxy.name} reverse proxy.`} />
-    <style>
-      body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
-      pre { background: #1e1e1e; color: #d4d4d4; padding: 1.5rem; border-radius: 8px; overflow-x: auto; }
-      h1 { color: #333; }
-    </style>
   </head>
-  <body>
-    <h1>Deploy {app.name} + {db.name} + {proxy.name}</h1>
-    <p>Copy the following <code>docker-compose.yml</code> file to your server to easily deploy <strong>{app.name}</strong> using <strong>{db.name}</strong> as the database and <strong>{proxy.name}</strong> as the reverse proxy.</p>
-    
-    <pre><code>{composeYml}</code></pre>
+  <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
+    <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+      <section class="mb-8 rounded-2xl border border-zinc-200 bg-white/95 p-6 shadow-sm md:p-8">
+        <p class="mb-3 inline-flex items-center rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-zinc-600">
+          Docker Compose Generator
+        </p>
+        <h1 class="text-3xl font-semibold tracking-tight text-zinc-900 md:text-5xl">
+          Build {app.name} + {db.name} + {proxy.name} in seconds
+        </h1>
+        <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-600 md:text-base">
+          A minimal, production-friendly preset for your stack. Review the selected app, database, and proxy, then copy the generated
+          <span class="font-mono text-zinc-800">docker-compose.yml</span>
+          and deploy.
+        </p>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-5">
+        <aside class="space-y-4 lg:col-span-2">
+          <article class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">App</p>
+              <span class="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white">
+                {app.image.includes(':') ? app.image.split(':').pop() : 'latest'}
+              </span>
+            </div>
+            <h2 class="text-lg font-semibold text-zinc-900">{app.name}</h2>
+            <p class="mt-2 font-mono text-xs text-zinc-500">{app.image}</p>
+          </article>
+
+          <article class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">Database</p>
+              <span class="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white">
+                {db.image.includes(':') ? db.image.split(':').pop() : 'latest'}
+              </span>
+            </div>
+            <h2 class="text-lg font-semibold text-zinc-900">{db.name}</h2>
+            <p class="mt-2 font-mono text-xs text-zinc-500">{db.image}</p>
+          </article>
+
+          <article class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">Proxy</p>
+              <span class="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white">
+                {proxy.image.includes(':') ? proxy.image.split(':').pop() : 'latest'}
+              </span>
+            </div>
+            <h2 class="text-lg font-semibold text-zinc-900">{proxy.name}</h2>
+            <p class="mt-2 font-mono text-xs text-zinc-500">{proxy.image}</p>
+          </article>
+        </aside>
+
+        <section class="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-950 shadow-sm lg:col-span-3">
+          <header class="flex items-center justify-between border-b border-zinc-800 px-4 py-3 md:px-5">
+            <div class="flex items-center gap-2">
+              <span class="h-2.5 w-2.5 rounded-full bg-zinc-600"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-zinc-500"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-zinc-400"></span>
+              <p class="ml-2 font-mono text-xs text-zinc-300">docker-compose.yml</p>
+            </div>
+            <button
+              id="copyButton"
+              type="button"
+              class="rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-200 transition hover:border-zinc-500 hover:text-white"
+            >
+              Copy
+            </button>
+          </header>
+
+          <pre class="max-h-[65vh] overflow-auto p-4 text-sm leading-7 text-zinc-200 md:p-5"><code id="composeCode">{composeYml}</code></pre>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const copyButton = document.getElementById('copyButton');
+      const composeCode = document.getElementById('composeCode');
+
+      if (copyButton && composeCode) {
+        copyButton.addEventListener('click', async () => {
+          const originalText = copyButton.textContent;
+
+          try {
+            await navigator.clipboard.writeText(composeCode.textContent || '');
+            copyButton.textContent = 'Copied';
+            copyButton.classList.add('border-emerald-500', 'text-emerald-300');
+          } catch {
+            copyButton.textContent = 'Failed';
+            copyButton.classList.add('border-rose-500', 'text-rose-300');
+          }
+
+          setTimeout(() => {
+            copyButton.textContent = originalText;
+            copyButton.classList.remove('border-emerald-500', 'text-emerald-300', 'border-rose-500', 'text-rose-300');
+          }, 1600);
+        });
+      }
+    </script>
   </body>
 </html>
