@@ -1,7 +1,7 @@
 ---
-// src/pages/[app]-[db]-[proxy].astro
-import '../styles/global.css';
-import services from '../data/services.json';
+// src/pages/docker/[app]-[db]-[proxy].astro
+import '../../styles/global.css';
+import services from '../../data/services.json';
 
 type App = (typeof services.apps)[number];
 type Database = (typeof services.databases)[number];
@@ -128,7 +128,7 @@ volumes:
     <main class="mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20">
       <!-- Header -->
       <div class="mb-12 flex flex-col items-start gap-2">
-        <a href="/" class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-400 hover:text-zinc-200 transition">← Back</a>
+        <a href="/docker/" class="text-xs font-medium uppercase tracking-[0.16em] text-zinc-400 hover:text-zinc-200 transition">← Back</a>
         <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">
           Your Stack
         </h1>

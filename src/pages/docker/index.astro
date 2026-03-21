@@ -1,6 +1,6 @@
 ---
-import '../styles/global.css';
-import services from '../data/services.json';
+import '../../styles/global.css';
+import services from '../../data/services.json';
 
 type App = (typeof services.apps)[number];
 type Database = (typeof services.databases)[number];
@@ -19,7 +19,7 @@ services.apps.forEach((app) => {
         app,
         db,
         proxy,
-        href: `/${app.id}-${db.id}-${proxy.id}/`
+        href: `/docker/${app.id}-${db.id}-${proxy.id}/`
       });
     });
   });
@@ -47,7 +47,7 @@ const totalCombinations = combinations.length;
     />
     <meta name="google-site-verification" content="xxGFCr12kZ-UHYt3HzhmkN4lqPvZRTMc91ftmIXsXik" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="/" />
+    <link rel="canonical" href="/docker/" />
 
     <style>
       :root {
