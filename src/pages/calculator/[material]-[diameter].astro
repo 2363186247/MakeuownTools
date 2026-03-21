@@ -1,0 +1,274 @@
+---
+import '../../styles/global.css';
+import filaments from '../../data/filaments.json';
+
+type TempRange = { min: number; max: number; recommended: number };
+type Material = {
+  id: string;
+  name: string;
+  category: string;
+  density: number;
+  desc: string;
+  print_temp_c: TempRange;
+  bed_temp_c: TempRange;
+  enclosure_required: boolean;
+  enclosure_recommended: boolean;
+  fan_recommended: boolean;
+  drying_recommended: boolean;
+  hardened_nozzle_recommended?: boolean;
+};
+type Diameter = {
+  id: string;
+  name: string;
+  value: number;
+  area_mm2: number;
+  tolerance_mm: number;
+  common: boolean;
+};
+type FilamentData = {
+  units: { density: string; diameter: string };
+  materials: Material[];
+  diameters: Diameter[];
+};
+
+type StaticPathItem = {
+  params: { material: string; diameter: string };
+  props: { material: Material; diameter: Diameter };
+};
+
+export function getStaticPaths(): StaticPathItem[] {
+  const paths: StaticPathItem[] = [];
+  const data = filaments as FilamentData;
+
+  data.materials.forEach((material) => {
+    data.diameters.forEach((diameter) => {
+      paths.push({
+        params: { material: material.id, diameter: diameter.id },
+        props: { material, diameter }
+      });
+    });
+  });
+
+  return paths;
+}
+
+const { material, diameter } = Astro.props as { material: Material; diameter: Diameter };
+
+const printTemp = material.print_temp_c;
+const bedTemp = material.bed_temp_c;
+const data = filaments as FilamentData;
+const densityText = `${material.density} ${data.units.density}`;
+const diameterText = `${diameter.value} ${data.units.diameter}`;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{material.name} {diameter.name} Filament Length Calculator</title>
+    <meta
+      name="description"
+      content={`Calculate exact filament length for ${material.name} (${diameter.name}) by spool weight with recommended printing settings.`}
+    />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+  </head>
+
+  <body class="min-h-screen text-zinc-100 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
+    <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_85%_18%,rgba(245,158,11,0.16),transparent_35%),radial-gradient(circle_at_52%_88%,rgba(236,72,153,0.14),transparent_35%),linear-gradient(145deg,#09090b,#111827)]"></div>
+    <div class="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:34px_34px] [mask-image:radial-gradient(circle_at_center,black_45%,transparent_100%)]"></div>
+
+    <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+      <a
+        href="/calculator/"
+        class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-200 transition hover:border-white/30 hover:bg-white/10"
+      >
+        <span>←</span>
+        <span>All Calculators</span>
+      </a>
+
+      <section class="mb-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div>
+          <p class="mb-3 inline-flex items-center rounded-full border border-cyan-300/30 bg-cyan-200/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-cyan-200">
+            3D Printing Filament Length Calculator
+          </p>
+          <h1 class="text-4xl font-semibold tracking-tight text-white md:text-5xl">
+            {material.name} • {diameter.name}
+          </h1>
+          <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
+            {material.desc}
+            Estimate remaining filament length from spool net weight using material density and diameter cross-sectional area.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+          <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Selected Profile</p>
+          <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div class="rounded-xl border border-white/10 bg-black/20 px-3 py-2">
+              <p class="text-zinc-400">Density</p>
+              <p class="mt-1 font-mono text-zinc-100">{densityText}</p>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-black/20 px-3 py-2">
+              <p class="text-zinc-400">Diameter</p>
+              <p class="mt-1 font-mono text-zinc-100">{diameterText}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="rounded-3xl border border-white/15 bg-white/[0.04] p-6 shadow-xl shadow-black/20 backdrop-blur md:p-8">
+          <h2 class="text-lg font-semibold text-white">Length Estimation</h2>
+          <p class="mt-2 text-sm text-zinc-300">Input net filament weight on spool. Result updates instantly.</p>
+
+          <div class="mt-6 grid gap-5 sm:grid-cols-2">
+            <label class="block">
+              <span class="mb-2 block text-sm font-medium text-zinc-200">Spool Net Weight</span>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="weightInput"
+                  value="1000"
+                  min="0"
+                  step="1"
+                  class="w-full rounded-xl border border-white/15 bg-black/25 px-4 py-3 pr-14 text-lg font-mono text-white outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/30"
+                />
+                <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-zinc-400">g</span>
+              </div>
+            </label>
+
+            <label class="block">
+              <span class="mb-2 block text-sm font-medium text-zinc-200">Reference Full Spool</span>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="fullSpoolInput"
+                  value="1000"
+                  min="1"
+                  step="1"
+                  class="w-full rounded-xl border border-white/15 bg-black/25 px-4 py-3 pr-14 text-lg font-mono text-white outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/30"
+                />
+                <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-zinc-400">g</span>
+              </div>
+            </label>
+          </div>
+
+          <p id="validationMessage" class="mt-3 min-h-5 text-xs text-rose-300"></p>
+
+          <div class="mt-6 rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-300/15 to-blue-400/10 px-5 py-5">
+            <p class="text-xs uppercase tracking-[0.16em] text-cyan-200">Estimated Remaining Length</p>
+            <div class="mt-2 flex items-end gap-2">
+              <span id="resultLength" class="font-mono text-5xl font-semibold leading-none text-white">0.00</span>
+              <span class="pb-1 font-mono text-lg text-cyan-100">m</span>
+            </div>
+            <p id="spoolPercent" class="mt-3 text-sm text-cyan-100/90">0.0% of full spool</p>
+          </div>
+
+          <details class="mt-5 rounded-xl border border-white/10 bg-black/20 p-4">
+            <summary class="cursor-pointer text-sm font-medium text-zinc-200">Formula details</summary>
+            <div class="mt-3 space-y-2 text-xs leading-6 text-zinc-300">
+              <p>Volume (cm3) = Weight (g) / Density (g/cm3)</p>
+              <p>Radius (cm) = (Diameter (mm) / 10) / 2</p>
+              <p>Area (cm2) = PI * Radius^2</p>
+              <p>Length (m) = (Volume / Area) / 100</p>
+            </div>
+          </details>
+        </div>
+
+        <aside class="space-y-4">
+          <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-5 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Print Temperature</p>
+            <p class="mt-2 text-2xl font-semibold text-white">{printTemp.recommended}C</p>
+            <p class="mt-1 text-sm text-zinc-300">Range: {printTemp.min}C - {printTemp.max}C</p>
+          </div>
+
+          <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-5 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Bed Temperature</p>
+            <p class="mt-2 text-2xl font-semibold text-white">{bedTemp.recommended}C</p>
+            <p class="mt-1 text-sm text-zinc-300">Range: {bedTemp.min}C - {bedTemp.max}C</p>
+          </div>
+
+          <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-5 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Setup Suggestions</p>
+            <ul class="mt-3 space-y-2 text-sm text-zinc-200">
+              <li class="flex items-center gap-2">
+                <span class={material.enclosure_required ? 'text-rose-300' : 'text-emerald-300'}>{material.enclosure_required ? 'Yes' : 'No'}</span>
+                <span>Enclosure Required</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class={material.enclosure_recommended ? 'text-amber-300' : 'text-zinc-400'}>{material.enclosure_recommended ? 'Recommended' : 'Optional'}</span>
+                <span>Enclosure Recommendation</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class={material.drying_recommended ? 'text-amber-300' : 'text-zinc-400'}>{material.drying_recommended ? 'Recommended' : 'Optional'}</span>
+                <span>Drying Before Print</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class={material.fan_recommended ? 'text-emerald-300' : 'text-zinc-400'}>{material.fan_recommended ? 'Use Fan' : 'Low/Off Fan'}</span>
+                <span>Part Cooling Fan</span>
+              </li>
+              {material.hardened_nozzle_recommended && (
+                <li class="flex items-center gap-2">
+                  <span class="text-amber-300">Recommended</span>
+                  <span>Hardened Nozzle</span>
+                </li>
+              )}
+            </ul>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script define:vars={{ density: material.density, diameterMm: diameter.value }}>
+      const weightInput = document.getElementById('weightInput');
+      const fullSpoolInput = document.getElementById('fullSpoolInput');
+      const resultLength = document.getElementById('resultLength');
+      const spoolPercent = document.getElementById('spoolPercent');
+      const validationMessage = document.getElementById('validationMessage');
+
+      if (
+        !(weightInput instanceof HTMLInputElement) ||
+        !(fullSpoolInput instanceof HTMLInputElement) ||
+        !(resultLength instanceof HTMLElement) ||
+        !(spoolPercent instanceof HTMLElement) ||
+        !(validationMessage instanceof HTMLElement)
+      ) {
+        throw new Error('Calculator UI is missing required elements.');
+      }
+
+      const filamentDensity = Number(density);
+      const filamentDiameterMm = Number(diameterMm);
+
+      function calculateLengthMeters(weightGrams) {
+        const volumeCm3 = weightGrams / filamentDensity;
+        const radiusCm = (filamentDiameterMm / 10) / 2;
+        const areaCm2 = Math.PI * radiusCm * radiusCm;
+        const lengthCm = volumeCm3 / areaCm2;
+        return lengthCm / 100;
+      }
+
+      function update() {
+        const weight = Number(weightInput.value);
+        const fullSpool = Number(fullSpoolInput.value);
+
+        if (Number.isNaN(weight) || Number.isNaN(fullSpool) || weight < 0 || fullSpool <= 0) {
+          validationMessage.textContent = 'Please enter valid positive numbers.';
+          resultLength.textContent = '0.00';
+          spoolPercent.textContent = '0.0% of full spool';
+          return;
+        }
+
+        validationMessage.textContent = '';
+
+        const lengthM = calculateLengthMeters(weight);
+        const percentage = Math.min(999.9, (weight / fullSpool) * 100);
+
+        resultLength.textContent = lengthM.toFixed(2);
+        spoolPercent.textContent = `${percentage.toFixed(1)}% of full spool`;
+      }
+
+      weightInput.addEventListener('input', update);
+      fullSpoolInput.addEventListener('input', update);
+      update();
+    </script>
+  </body>
+</html>

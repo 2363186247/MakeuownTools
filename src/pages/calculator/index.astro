@@ -1,0 +1,38 @@
+---
+import '../../styles/global.css';
+import filaments from '../../data/filaments.json';
+
+type Material = { id: string; name: string };
+type Diameter = { id: string; name: string };
+type Combo = { material: Material; diameter: Diameter; href: string };
+type FilamentData = { materials: Material[]; diameters: Diameter[] };
+
+const data = filaments as FilamentData;
+const combos: Combo[] = [];
+data.materials.forEach(m => {
+  data.diameters.forEach(d => {
+    combos.push({ material: m, diameter: d, href: `/calculator/${m.id}-${d.id}` });
+  });
+});
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>3D Printing Calculators | Make Your Own Tools</title>
+  </head>
+  <body class="min-h-screen bg-zinc-50 p-10">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-4xl font-bold mb-8">🧮 3D Printing Calculators</h1>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {combos.map(combo => (
+          <a href={combo.href} class="p-4 bg-white border border-zinc-200 rounded-xl hover:shadow-md transition">
+            <h2 class="font-bold">{combo.material.name}</h2>
+            <p class="text-sm text-zinc-500">{combo.diameter.name}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </body>
+</html>
