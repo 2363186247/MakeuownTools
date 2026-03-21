@@ -12,8 +12,8 @@ type StaticPathItem = {
   props: { app: App; db: Database; proxy: Proxy };
 };
 
-// getStaticPaths 是 Astro 的核心，它会在构建时运行
-// 我们在这里进行数据的“乘法”，把所有的组合算出来
+// getStaticPaths is an Astro core hook and runs at build time.
+// Build all valid route combinations by multiplying compatible options.
 export function getStaticPaths() {
   const paths: StaticPathItem[] = [];
   
@@ -22,7 +22,7 @@ export function getStaticPaths() {
       if (!Array.isArray(app.supported_dbs) || !app.supported_dbs.includes(db.id)) return;
 
       services.proxies.forEach(proxy => {
-        // 每一种组合，生成一个 URL 路径，并把数据作为 props 传给页面
+        // Generate a unique URL path and pass matching data as props.
         paths.push({
           params: { app: app.id, db: db.id, proxy: proxy.id },
           props: { app, db, proxy }
@@ -34,7 +34,7 @@ export function getStaticPaths() {
   return paths;
 }
 
-// 接收 getStaticPaths 传过来的单个页面数据
+// Receive the single-page props from getStaticPaths.
 const { app, db, proxy } = Astro.props as { app: App; db: Database; proxy: Proxy };
 
 const appDbMapping = app.db_env_mapping ?? {};
@@ -77,8 +77,8 @@ const proxyExtraBlock = proxy.id === 'traefik'
   ? `\n    command:\n      - --providers.docker=true\n      - --entrypoints.web.address=:80\n      - --entrypoints.websecure.address=:443\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock:ro`
   : '';
 
-// 利用模板字符串自动生成 Docker Compose 配置
-// 注意这里对齐了 YAML 的缩进
+// Compose YAML is generated from template strings.
+// Keep indentation aligned so the output remains valid YAML.
 const composeYml = `
 version: '3.8'
 services:
