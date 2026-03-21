@@ -19,20 +19,60 @@ data.materials.forEach(m => {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>3D Printing Calculators | Make Your Own Tools</title>
+    <meta
+      name="description"
+      content="Browse all material and diameter combinations for the 3D printing filament length calculator."
+    />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
   </head>
-  <body class="min-h-screen bg-zinc-50 p-10">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-4xl font-bold mb-8">🧮 3D Printing Calculators</h1>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+  <body class="min-h-screen text-zinc-100 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]">
+    <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_16%_18%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_84%_18%,rgba(251,191,36,0.14),transparent_34%),radial-gradient(circle_at_50%_84%,rgba(168,85,247,0.14),transparent_36%),linear-gradient(130deg,#07090f,#0f172a,#111827)]"></div>
+    <div class="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(circle_at_center,black_45%,transparent_100%)]"></div>
+
+    <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
+      <a
+        href="/"
+        class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-200 transition hover:border-white/30 hover:bg-white/10"
+      >
+        <span>←</span>
+        <span>Home</span>
+      </a>
+
+      <section class="mb-8 grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+        <div>
+          <p class="mb-3 inline-flex items-center rounded-full border border-emerald-300/35 bg-emerald-200/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-100">
+            Calculator Navigator
+          </p>
+          <h1 class="text-4xl font-semibold tracking-tight text-white md:text-5xl">3D Printing Filament Length</h1>
+          <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
+            Choose a material and diameter profile to open a dedicated calculator page with live length estimation and print setup recommendations.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+          <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Available Presets</p>
+          <p class="mt-1 text-3xl font-semibold text-white">{combos.length}</p>
+        </div>
+      </section>
+
+      <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {combos.map(combo => (
-          <a href={combo.href} class="p-4 bg-white border border-zinc-200 rounded-xl hover:shadow-md transition">
-            <h2 class="font-bold">{combo.material.name}</h2>
-            <p class="text-sm text-zinc-500">{combo.diameter.name}</p>
+          <a href={combo.href} class="group rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-white/[0.08]">
+            <div class="flex items-center justify-between">
+              <h2 class="font-semibold text-white">{combo.material.name}</h2>
+              <span class="rounded-md border border-white/15 bg-black/25 px-2 py-0.5 text-xs font-mono text-zinc-300">{combo.diameter.name}</span>
+            </div>
+            <p class="mt-2 text-sm text-zinc-300">Open dedicated profile calculator</p>
+            <p class="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-200">
+              Launch
+              <span class="transition group-hover:translate-x-0.5">→</span>
+            </p>
           </a>
         ))}
-      </div>
-    </div>
+      </section>
+    </main>
   </body>
 </html>
