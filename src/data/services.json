@@ -5,7 +5,9 @@
       "name": "Ghost",
       "image": "ghost:latest",
       "port": "2368",
-      "supported_dbs": ["mysql"],
+      "supported_dbs": [
+        "mysql"
+      ],
       "db_env_mapping": {
         "host": "database__connection__host",
         "user": "database__connection__user",
@@ -18,7 +20,10 @@
       "name": "WordPress",
       "image": "wordpress:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "WORDPRESS_DB_HOST",
         "user": "WORDPRESS_DB_USER",
@@ -31,7 +36,10 @@
       "name": "Nextcloud",
       "image": "nextcloud:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "MYSQL_HOST",
         "user": "MYSQL_USER",
@@ -44,7 +52,11 @@
       "name": "Gitea",
       "image": "gitea/gitea:latest",
       "port": "3000",
-      "supported_dbs": ["mysql", "postgres", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "postgres",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "GITEA__database__HOST",
         "user": "GITEA__database__USER",
@@ -57,7 +69,10 @@
       "name": "Metabase",
       "image": "metabase/metabase:latest",
       "port": "3000",
-      "supported_dbs": ["postgres", "mysql"],
+      "supported_dbs": [
+        "postgres",
+        "mysql"
+      ],
       "db_env_mapping": {
         "host": "MB_DB_HOST",
         "user": "MB_DB_USER",
@@ -70,7 +85,11 @@
       "name": "Wiki.js",
       "image": "requarks/wiki:latest",
       "port": "3000",
-      "supported_dbs": ["postgres", "mysql", "mariadb"],
+      "supported_dbs": [
+        "postgres",
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "DB_HOST",
         "user": "DB_USER",
@@ -83,7 +102,11 @@
       "name": "Directus",
       "image": "directus/directus:latest",
       "port": "8055",
-      "supported_dbs": ["postgres", "mysql", "mariadb"],
+      "supported_dbs": [
+        "postgres",
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "DB_HOST",
         "user": "DB_USER",
@@ -96,7 +119,10 @@
       "name": "BookStack",
       "image": "lscr.io/linuxserver/bookstack:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "DB_HOST",
         "user": "DB_USERNAME",
@@ -109,7 +135,10 @@
       "name": "Matomo",
       "image": "matomo:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "MATOMO_DATABASE_HOST",
         "user": "MATOMO_DATABASE_USERNAME",
@@ -122,7 +151,10 @@
       "name": "Snipe-IT",
       "image": "snipe/snipe-it:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "DB_HOST",
         "user": "DB_USERNAME",
@@ -135,7 +167,10 @@
       "name": "Drupal",
       "image": "drupal:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "DRUPAL_DB_HOST",
         "user": "DRUPAL_DB_USER",
@@ -148,7 +183,10 @@
       "name": "Joomla",
       "image": "joomla:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb"
+      ],
       "db_env_mapping": {
         "host": "JOOMLA_DB_HOST",
         "user": "JOOMLA_DB_USER",
@@ -161,7 +199,11 @@
       "name": "MediaWiki",
       "image": "mediawiki:latest",
       "port": "80",
-      "supported_dbs": ["mysql", "mariadb", "postgres"],
+      "supported_dbs": [
+        "mysql",
+        "mariadb",
+        "postgres"
+      ],
       "db_env_mapping": {
         "host": "MEDIAWIKI_DB_HOST",
         "user": "MEDIAWIKI_DB_USER",
