@@ -57,6 +57,10 @@ const featuredDocker = servicesData.apps.slice(0, 3).flatMap((app) => {
 });
 
 const preferredDiameter = filamentsData.diameters.find((d) => d.common) ?? filamentsData.diameters[0];
+const featuredVram = {
+  name: 'LLM VRAM Calculator',
+  href: '/calculator/vram/'
+};
 const featuredFilament = filamentsData.materials.slice(0, 2).map((material) => ({
   name: `${material.name} · ${preferredDiameter.name}`,
   href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}`
@@ -70,7 +74,7 @@ const featuredSatisfactory = satData.mvp_targets.slice(0, 2)
     href: `/calculator/satisfactory/${item.id}`
   }));
 
-const featuredCalculator = [...featuredFilament, ...featuredSatisfactory];
+const featuredCalculator = [featuredVram, ...featuredFilament, ...featuredSatisfactory];
 ---
 
 <Layout
@@ -136,7 +140,7 @@ const featuredCalculator = [...featuredFilament, ...featuredSatisfactory];
           </div>
           <h2 class="text-2xl font-semibold tracking-tight text-white">General-Purpose Production Calculators</h2>
           <p class="mt-3 text-sm leading-7 text-zinc-200">
-            From 3D printing filament estimation to Satisfactory production chain reverse planning, a single hub covers multiple calculator scenarios with fast navigation and precise results.
+            Start with the new LLM VRAM Calculator, then move to 3D printing filament estimation and Satisfactory production chain reverse planning in one unified calculator hub.
           </p>
           <a href="/calculator/" class="mt-5 inline-flex items-center gap-2 rounded-xl border border-emerald-200/35 bg-emerald-100/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-100/20">
             Open Calculators

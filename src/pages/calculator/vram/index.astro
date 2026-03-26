@@ -1,0 +1,442 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="LLM VRAM Calculator | Make Your Own Tools"
+  description="Fetch real Hugging Face model configs and estimate VRAM for inference and LoRA scenarios with hardware matching."
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>←</span>
+      <span>All Calculators</span>
+    </a>
+
+    <header class="mb-10">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-cyan-200">
+        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400"></span>
+        AI Infrastructure Console
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight text-white md:text-6xl">LLM VRAM Calculator</h1>
+      <p class="mt-4 max-w-3xl text-zinc-400">
+        Fetch model config from Hugging Face, parse architecture parameters, and compute realistic VRAM usage for deployment and LoRA workflows.
+      </p>
+    </header>
+
+    <div class="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
+      <section class="space-y-6">
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">1. Model Source</h2>
+
+          <label class="mb-4 block">
+            <span class="mb-1 block text-xs text-zinc-400">Hugging Face Model ID</span>
+            <div class="flex gap-2">
+              <input id="modelIdInput" type="text" value="meta-llama/Meta-Llama-3-8B-Instruct" class="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 font-mono text-sm text-white outline-none transition focus:border-cyan-500/50" />
+              <button id="fetchBtn" class="rounded-xl bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-500">Fetch Config</button>
+            </div>
+          </label>
+
+          <label class="mb-2 block">
+            <span class="mb-1 block text-xs text-zinc-400">Hugging Face Token (Optional)</span>
+            <input id="hfTokenInput" type="password" placeholder="hf_..." class="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 font-mono text-xs text-white outline-none transition focus:border-cyan-500/50" />
+          </label>
+          <p class="text-xs text-zinc-500">
+            Needed only for gated models such as Llama 3. Token is stored only in localStorage and never sent to any server except direct Hugging Face requests from your browser.
+          </p>
+
+          <div id="statusMessage" class="mt-4 hidden rounded-lg border p-3 text-xs font-mono"></div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">2. Scenario</h2>
+
+          <div class="mb-4 grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-black/30 p-1">
+            <button id="modeInference" class="rounded-lg bg-cyan-500/20 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100">Inference</button>
+            <button id="modeTraining" class="rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300">Training / LoRA</button>
+          </div>
+
+          <div class="mb-3 flex items-center justify-between">
+            <span class="text-xs uppercase tracking-[0.12em] text-zinc-400">Context Length</span>
+            <span id="contextValue" class="font-mono text-xs text-cyan-200">8192 tokens</span>
+          </div>
+          <input id="contextRange" type="range" min="2048" max="131072" step="1024" value="8192" class="w-full accent-cyan-500" />
+
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <label>
+              <span class="mb-1 block text-xs text-zinc-400">Parameters (Billions)</span>
+              <input id="paramsInput" type="number" value="8" step="0.1" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs text-zinc-400">Hidden Size</span>
+              <input id="hiddenSizeInput" type="number" value="4096" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs text-zinc-400">Layers</span>
+              <input id="layersInput" type="number" value="32" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs text-zinc-400">Attention Heads</span>
+              <input id="headsInput" type="number" value="32" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs text-zinc-400">KV Heads</span>
+              <input id="kvHeadsInput" type="number" value="8" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs text-zinc-400">Vocab Size</span>
+              <input id="vocabInput" type="number" value="128256" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
+            </label>
+          </div>
+
+          <div class="mt-4 rounded-xl border border-white/10 bg-black/30 p-3">
+            <p class="text-xs uppercase tracking-[0.12em] text-zinc-500">Architecture Signal</p>
+            <p id="archSignal" class="mt-1 font-mono text-sm text-cyan-200">GQA detected</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-6">
+        <div class="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 p-6 backdrop-blur md:p-8">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-cyan-200">3. VRAM Matrix</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[620px] text-left text-sm">
+              <thead>
+                <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+                  <th class="py-3">Runtime</th>
+                  <th class="py-3">Quantization</th>
+                  <th class="py-3">Weights</th>
+                  <th class="py-3">KV / Activations</th>
+                  <th class="py-3">Total</th>
+                </tr>
+              </thead>
+              <tbody id="resultTableBody" class="text-zinc-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur md:p-8">
+          <p class="mb-3 text-xs uppercase tracking-widest text-zinc-400">Hardware Match</p>
+          <div class="flex flex-wrap gap-2" id="hardwareTags"></div>
+          <p id="hardwareHint" class="mt-3 text-sm text-zinc-400"></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const modelIdInput = document.getElementById('modelIdInput');
+    const hfTokenInput = document.getElementById('hfTokenInput');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const statusMessage = document.getElementById('statusMessage');
+
+    const paramsInput = document.getElementById('paramsInput');
+    const hiddenSizeInput = document.getElementById('hiddenSizeInput');
+    const layersInput = document.getElementById('layersInput');
+    const headsInput = document.getElementById('headsInput');
+    const kvHeadsInput = document.getElementById('kvHeadsInput');
+    const vocabInput = document.getElementById('vocabInput');
+
+    const contextRange = document.getElementById('contextRange');
+    const contextValue = document.getElementById('contextValue');
+
+    const modeInference = document.getElementById('modeInference');
+    const modeTraining = document.getElementById('modeTraining');
+
+    const archSignal = document.getElementById('archSignal');
+    const resultTableBody = document.getElementById('resultTableBody');
+    const hardwareTags = document.getElementById('hardwareTags');
+    const hardwareHint = document.getElementById('hardwareHint');
+
+    if (
+      !(modelIdInput instanceof HTMLInputElement) ||
+      !(hfTokenInput instanceof HTMLInputElement) ||
+      !(fetchBtn instanceof HTMLButtonElement) ||
+      !(statusMessage instanceof HTMLElement) ||
+      !(paramsInput instanceof HTMLInputElement) ||
+      !(hiddenSizeInput instanceof HTMLInputElement) ||
+      !(layersInput instanceof HTMLInputElement) ||
+      !(headsInput instanceof HTMLInputElement) ||
+      !(kvHeadsInput instanceof HTMLInputElement) ||
+      !(vocabInput instanceof HTMLInputElement) ||
+      !(contextRange instanceof HTMLInputElement) ||
+      !(contextValue instanceof HTMLElement) ||
+      !(modeInference instanceof HTMLButtonElement) ||
+      !(modeTraining instanceof HTMLButtonElement) ||
+      !(archSignal instanceof HTMLElement) ||
+      !(resultTableBody instanceof HTMLElement) ||
+      !(hardwareTags instanceof HTMLElement) ||
+      !(hardwareHint instanceof HTMLElement)
+    ) {
+      throw new Error('VRAM calculator UI is missing required elements.');
+    }
+
+    const modelIdInputEl = modelIdInput as HTMLInputElement;
+    const hfTokenInputEl = hfTokenInput as HTMLInputElement;
+    const fetchBtnEl = fetchBtn as HTMLButtonElement;
+    const statusMessageEl = statusMessage as HTMLElement;
+    const paramsInputEl = paramsInput as HTMLInputElement;
+    const hiddenSizeInputEl = hiddenSizeInput as HTMLInputElement;
+    const layersInputEl = layersInput as HTMLInputElement;
+    const headsInputEl = headsInput as HTMLInputElement;
+    const kvHeadsInputEl = kvHeadsInput as HTMLInputElement;
+    const vocabInputEl = vocabInput as HTMLInputElement;
+    const contextRangeEl = contextRange as HTMLInputElement;
+    const contextValueEl = contextValue as HTMLElement;
+    const modeInferenceEl = modeInference as HTMLButtonElement;
+    const modeTrainingEl = modeTraining as HTMLButtonElement;
+    const archSignalEl = archSignal as HTMLElement;
+    const resultTableBodyEl = resultTableBody as HTMLElement;
+    const hardwareTagsEl = hardwareTags as HTMLElement;
+    const hardwareHintEl = hardwareHint as HTMLElement;
+
+    let mode = 'inference';
+
+    const savedToken = localStorage.getItem('hf_token');
+    if (savedToken) hfTokenInputEl.value = savedToken;
+
+    function showStatus(message: string, isError = false): void {
+      statusMessageEl.classList.remove('hidden', 'border-red-500/30', 'bg-red-500/10', 'text-red-300', 'border-emerald-500/30', 'bg-emerald-500/10', 'text-emerald-300');
+      if (isError) {
+        statusMessageEl.classList.add('border-red-500/30', 'bg-red-500/10', 'text-red-300');
+      } else {
+        statusMessageEl.classList.add('border-emerald-500/30', 'bg-emerald-500/10', 'text-emerald-300');
+      }
+      statusMessageEl.textContent = message;
+    }
+
+    function toGB(bytes: number): number {
+      return bytes / (1024 ** 3);
+    }
+
+    function readNum(el: HTMLInputElement, fallback = 0): number {
+      const v = Number(el.value);
+      return Number.isFinite(v) ? v : fallback;
+    }
+
+    function estimateParamsFromArch(hidden: number, layers: number, vocab: number): number {
+      return ((layers * (12 * hidden * hidden)) + (vocab * hidden)) / 1e9;
+    }
+
+    function kvBytesPerToken(hidden: number, layers: number, attentionHeads: number, kvHeads: number): number {
+      const safeHeads = Math.max(1, attentionHeads);
+      const safeKvHeads = Math.max(1, kvHeads);
+      const headDim = hidden / safeHeads;
+      const kvHidden = headDim * safeKvHeads;
+      return 2 * 2 * layers * kvHidden;
+    }
+
+    type RuntimeRow = { runtime: string; quant: string; weights: number; dyn: number; total: number };
+
+    function runtimeRows(totalParamsB: number, contextTokens: number, hidden: number, layers: number, heads: number, kvHeads: number): RuntimeRow[] {
+      const weightFp16 = totalParamsB * 2;
+      const weight8 = totalParamsB * 1;
+      const weight4 = totalParamsB * 0.56;
+
+      const kvGB = toGB(kvBytesPerToken(hidden, layers, heads, kvHeads) * contextTokens);
+      const inferOverhead = 1.5;
+      const loraActivation = Math.max(4, (weightFp16 * 0.15) + kvGB * 0.5);
+      const loraOptimizer = totalParamsB * 0.2;
+
+      if (mode === 'inference') {
+        return [
+          { runtime: 'vLLM', quant: 'FP16/BF16', weights: weightFp16, dyn: kvGB + inferOverhead, total: weightFp16 + kvGB + inferOverhead },
+          { runtime: 'HuggingFace Transformers', quant: '8-bit', weights: weight8, dyn: kvGB + inferOverhead, total: weight8 + kvGB + inferOverhead },
+          { runtime: 'Ollama / GGUF', quant: 'Q4_K_M', weights: weight4, dyn: kvGB + inferOverhead, total: weight4 + kvGB + inferOverhead }
+        ];
+      }
+
+      return [
+        { runtime: 'LoRA (QLoRA)', quant: '4-bit base + adapters', weights: weight4 + (totalParamsB * 0.03), dyn: loraActivation, total: weight4 + (totalParamsB * 0.03) + loraActivation },
+        { runtime: 'LoRA (8-bit base)', quant: '8-bit base + adapters', weights: weight8 + (totalParamsB * 0.03), dyn: loraActivation + loraOptimizer, total: weight8 + (totalParamsB * 0.03) + loraActivation + loraOptimizer },
+        { runtime: 'Full Fine-tune', quant: 'FP16', weights: weightFp16 * 2, dyn: loraActivation + (weightFp16 * 2), total: (weightFp16 * 2) + loraActivation + (weightFp16 * 2) }
+      ];
+    }
+
+    function setHardwareMatch(requiredGb: number): void {
+      hardwareTagsEl.innerHTML = '';
+
+      const choices = [
+        { label: 'RTX 4060 8GB', gb: 8 },
+        { label: 'RTX 4070 12GB', gb: 12 },
+        { label: 'RTX 4090 24GB', gb: 24 },
+        { label: 'RTX A6000 48GB', gb: 48 },
+        { label: 'H100 80GB', gb: 80 }
+      ];
+
+      const viable = choices.filter((c) => c.gb >= requiredGb);
+      const primary = viable[0] || choices[choices.length - 1];
+
+      const tags = [];
+      if (requiredGb <= 24) {
+        tags.push(`1x ${primary.label}`);
+      } else if (requiredGb <= 48) {
+        tags.push('2x RTX 3090/4090 (24GB)');
+        tags.push('or 1x RTX A6000 48GB');
+      } else if (requiredGb <= 80) {
+        tags.push('1x H100 80GB');
+        tags.push('or multi-GPU 4090 setup');
+      } else {
+        tags.push('Multi-GPU datacenter setup required');
+      }
+
+      tags.forEach((text) => {
+        const el = document.createElement('span');
+        el.className = 'rounded-full border border-cyan-300/35 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100';
+        el.textContent = `Requires: ${text}`;
+        hardwareTagsEl.appendChild(el);
+      });
+
+      hardwareHintEl.textContent = `Estimated requirement uses ${mode === 'inference' ? 'inference' : 'training'} profile and selected context length.`;
+    }
+
+    function updateArchSignal(heads: number, kvHeads: number): void {
+      if (kvHeads <= 1) {
+        archSignalEl.textContent = 'MQA detected (single KV head)';
+      } else if (kvHeads < heads) {
+        archSignalEl.textContent = `GQA detected (${kvHeads} KV heads / ${heads} attention heads)`;
+      } else {
+        archSignalEl.textContent = 'MHA style attention (KV heads = attention heads)';
+      }
+    }
+
+    function render(): void {
+      const paramsBManual = Math.max(0.1, readNum(paramsInputEl, 8));
+      const hidden = Math.max(64, readNum(hiddenSizeInputEl, 4096));
+      const layers = Math.max(1, readNum(layersInputEl, 32));
+      const heads = Math.max(1, readNum(headsInputEl, 32));
+      const kvHeads = Math.max(1, readNum(kvHeadsInputEl, 8));
+      const vocab = Math.max(1000, readNum(vocabInputEl, 32000));
+      const context = Math.max(2048, readNum(contextRangeEl, 8192));
+
+      contextValueEl.textContent = `${context} tokens`;
+
+      const heuristics = estimateParamsFromArch(hidden, layers, vocab);
+      const paramsB = Math.max(paramsBManual, heuristics * 0.8);
+
+      const rows = runtimeRows(paramsB, context, hidden, layers, heads, kvHeads);
+      updateArchSignal(heads, kvHeads);
+
+      resultTableBodyEl.innerHTML = rows.map((row) => `
+          <tr class="border-b border-white/5">
+            <td class="py-3 font-medium text-white">${row.runtime}</td>
+            <td class="py-3 text-zinc-300">${row.quant}</td>
+            <td class="py-3 font-mono text-zinc-200">${row.weights.toFixed(1)} GB</td>
+            <td class="py-3 font-mono text-zinc-300">${row.dyn.toFixed(1)} GB</td>
+            <td class="py-3 font-mono text-cyan-200">${row.total.toFixed(1)} GB</td>
+          </tr>
+        `).join('');
+
+      const anchor = rows[rows.length - 1];
+      setHardwareMatch(anchor.total);
+    }
+
+    async function fetchModelConfig(): Promise<void> {
+      const modelId = modelIdInputEl.value.trim();
+      if (!modelId) {
+        showStatus('Please provide a valid Hugging Face model ID.', true);
+        return;
+      }
+
+      const token = hfTokenInputEl.value.trim();
+      if (token) {
+        localStorage.setItem('hf_token', token);
+      } else {
+        localStorage.removeItem('hf_token');
+      }
+
+      showStatus(`Fetching config for ${modelId} ...`);
+      fetchBtnEl.textContent = 'Loading...';
+
+      try {
+        const headers: Record<string, string> = {};
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const [configRes, modelRes] = await Promise.all([
+          fetch(`https://huggingface.co/${modelId}/resolve/main/config.json`, { headers }),
+          fetch(`https://huggingface.co/api/models/${modelId}`, { headers })
+        ]);
+
+        if (!configRes.ok) {
+          throw new Error(`Cannot fetch config.json (${configRes.status}). If this is a gated model, provide your HF token.`);
+        }
+
+        const config = await configRes.json();
+        const modelInfo = modelRes.ok ? await modelRes.json() : null;
+
+        if (typeof config.hidden_size === 'number') hiddenSizeInputEl.value = String(config.hidden_size);
+        if (typeof config.num_hidden_layers === 'number') layersInputEl.value = String(config.num_hidden_layers);
+        if (typeof config.num_attention_heads === 'number') headsInputEl.value = String(config.num_attention_heads);
+        if (typeof config.num_key_value_heads === 'number') kvHeadsInputEl.value = String(config.num_key_value_heads);
+        else if (typeof config.num_attention_heads === 'number') kvHeadsInputEl.value = String(config.num_attention_heads);
+        if (typeof config.vocab_size === 'number') vocabInputEl.value = String(config.vocab_size);
+
+        const contextCandidates = [
+          config.max_position_embeddings,
+          config.max_sequence_length,
+          config.model_max_length
+        ].filter((v) => typeof v === 'number' && Number.isFinite(v));
+        if (contextCandidates.length > 0) {
+          const clamped = Math.max(2048, Math.min(131072, contextCandidates[0]));
+          contextRangeEl.value = String(Math.round(clamped / 1024) * 1024);
+        }
+
+        let paramsB = 0;
+        if (modelInfo?.safetensors?.total) {
+          paramsB = modelInfo.safetensors.total / 1e9;
+        }
+        if (!paramsB && modelInfo?.config?.num_parameters) {
+          paramsB = modelInfo.config.num_parameters / 1e9;
+        }
+        if (!paramsB && typeof config.hidden_size === 'number' && typeof config.num_hidden_layers === 'number') {
+          paramsB = estimateParamsFromArch(
+            config.hidden_size,
+            config.num_hidden_layers,
+            Number(config.vocab_size) || 32000
+          );
+        }
+
+        if (paramsB > 0) {
+          paramsInputEl.value = paramsB.toFixed(2);
+        }
+
+        showStatus(`Loaded config for ${modelId}. Parsed architecture and refreshed estimates.`);
+        render();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        showStatus(message, true);
+      } finally {
+        fetchBtnEl.textContent = 'Fetch Config';
+      }
+    }
+
+    function setMode(nextMode: 'inference' | 'training'): void {
+      mode = nextMode;
+      if (mode === 'inference') {
+        modeInferenceEl.classList.add('bg-cyan-500/20', 'text-cyan-100');
+        modeInferenceEl.classList.remove('text-zinc-300');
+        modeTrainingEl.classList.remove('bg-cyan-500/20', 'text-cyan-100');
+        modeTrainingEl.classList.add('text-zinc-300');
+      } else {
+        modeTrainingEl.classList.add('bg-cyan-500/20', 'text-cyan-100');
+        modeTrainingEl.classList.remove('text-zinc-300');
+        modeInferenceEl.classList.remove('bg-cyan-500/20', 'text-cyan-100');
+        modeInferenceEl.classList.add('text-zinc-300');
+      }
+      render();
+    }
+
+    fetchBtnEl.addEventListener('click', fetchModelConfig);
+    modelIdInputEl.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') fetchModelConfig();
+    });
+
+    modeInferenceEl.addEventListener('click', () => setMode('inference'));
+    modeTrainingEl.addEventListener('click', () => setMode('training'));
+
+    [paramsInputEl, hiddenSizeInputEl, layersInputEl, headsInputEl, kvHeadsInputEl, vocabInputEl, contextRangeEl].forEach((el) => {
+      el.addEventListener('input', render);
+    });
+
+    setMode('inference');
+    render();
+  </script>
+</Layout>
