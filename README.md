@@ -1,44 +1,29 @@
-# Docker Compose Generator
+# 🛠️ Make Your Own Tools
 
-Generate production-friendly docker-compose presets for popular self-hosted apps.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Play_Now-10B981?style=for-the-badge)](https://makeuowntools.dpdns.org)
+[![Astro](https://img.shields.io/badge/Built_with-Astro-FF5D01?style=for-the-badge&logo=astro)](https://astro.build)
 
-## Commands
+A blazing-fast, ad-free collection of production calculators and utilities, built for developers and hardcore gamers. Everything runs locally in your browser with zero latency.
 
-| Command | Action |
-| :-- | :-- |
-| npm install | Install dependencies |
-| npm run dev | Start local dev server |
-| npm run build | Build static site |
-| node scripts/update_data.js | Refresh Docker image tags in data source |
+👉 **[Try it live here: makeuowntools.dpdns.org](https://makeuowntools.dpdns.org)**
 
-## Data Source
+## 🌟 Tools Included
 
-Service combinations are defined in [src/data/services.json](src/data/services.json).
+### 1. 🧠 LLM VRAM Estimator Pro
+Fetches live config data from Hugging Face to calculate exact VRAM requirements for Inference (vLLM, Ollama) and LoRA fine-tuning.
+* Supports linear power scaling and quantized models (4-bit GGUF, 8-bit).
+* Secure: Local-only HF Token support for gated models (like Llama-3).
 
-- apps: application image, exposed port, supported databases, and app DB env key mapping
-- databases: database image, default port, data volume path, and init env key mapping
-- proxies: proxy image and exposed HTTP/HTTPS ports
+### 2. 🏭 Satisfactory Target Production Calculator (v1.0 Ready)
+Reverse-plan your factory lines. Input your target output (e.g., 15 Heavy Modular Frames/min) and instantly get machine counts, power demand, and raw material inputs.
+* **Handles closed-loop byproducts automatically!**
+* Linear power scaling updated for v1.0.
 
-## Generated Compose ENV Template
+### 3. 🐳 Docker Compose Generator
+Stop writing invalid configurations. Generate production-ready, compatibility-checked Docker Compose stacks (App + DB + Proxy) in seconds.
 
-Generated YAML uses environment-variable references so you can connect a .env file directly in production.
+### 4. 🖨️ 3D Printing Filament Navigator
+Calculate exactly how many meters of PLA/PETG/ABS you have left based on the spool's net weight.
 
-Recommended .env example:
-
-```env
-APP_DB_HOST=db
-APP_DB_USER=app_user
-APP_DB_PASSWORD=change_me_app_password
-APP_DB_NAME=app_db
-DB_ROOT_PASSWORD=change_me_root_password
-```
-
-Notes:
-
-- APP_DB_HOST defaults to the selected database service name if omitted.
-- APP_DB_USER, APP_DB_PASSWORD, APP_DB_NAME are reused for both app connection and DB initialization.
-- DB_ROOT_PASSWORD is only used when the chosen database image supports a root password variable.
-
-## Automation
-
-The workflow in [.github/workflows/auto-update.yml](.github/workflows/auto-update.yml) runs weekly and updates [src/data/services.json](src/data/services.json) automatically.
+## 🚀 Why open source?
+I built these because I was tired of existing calculators that were slow, bloated, or covered in ads. Feel free to use the code, suggest new recipes, or submit a PR!
