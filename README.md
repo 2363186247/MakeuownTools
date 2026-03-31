@@ -24,6 +24,3 @@ Stop writing invalid configurations. Generate production-ready, compatibility-ch
 
 ### 4. 🖨️ 3D Printing Filament Navigator
 Calculate exactly how many meters of PLA/PETG/ABS you have left based on the spool's net weight.
-
-## 🚀 Why open source?
-I built these because I was tired of existing calculators that were slow, bloated, or covered in ads. Feel free to use the code, suggest new recipes, or submit a PR!
