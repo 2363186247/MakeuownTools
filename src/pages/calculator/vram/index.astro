@@ -124,6 +124,13 @@ import Layout from '../../../layouts/Layout.astro';
                 <input id="moeActiveExpertsInput" type="number" min="1" step="1" placeholder="e.g. 2" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-cyan-500/50" />
               </label>
             </div>
+            <div class="mt-3">
+              <div class="mb-1 flex items-center justify-between text-xs text-zinc-400">
+                <span>Shared Parameters Ratio</span>
+                <span id="moeSharedRatioValue" class="font-mono text-cyan-200">25%</span>
+              </div>
+              <input id="moeSharedRatioInput" type="range" min="0" max="100" step="1" value="25" class="w-full accent-cyan-500" />
+            </div>
             <p id="moeSignal" class="mt-2 font-mono text-xs text-zinc-400">Dense mode (MoE disabled)</p>
           </div>
       </section>
@@ -140,6 +147,7 @@ import Layout from '../../../layouts/Layout.astro';
                   <th class="py-3">Weights</th>
                   <th class="py-3">KV / Activations</th>
                   <th class="py-3">Total</th>
+                  <th class="py-3">Dense vs MoE</th>
                 </tr>
               </thead>
               <tbody id="resultTableBody" class="text-zinc-200"></tbody>
@@ -183,6 +191,8 @@ import Layout from '../../../layouts/Layout.astro';
     const moeExpertsInput = document.getElementById('moeExpertsInput');
     const moeActiveExpertsInput = document.getElementById('moeActiveExpertsInput');
     const moeSignal = document.getElementById('moeSignal');
+    const moeSharedRatioInput = document.getElementById('moeSharedRatioInput');
+    const moeSharedRatioValue = document.getElementById('moeSharedRatioValue');
 
     if (
       !(modelIdInput instanceof HTMLInputElement) ||
@@ -207,7 +217,9 @@ import Layout from '../../../layouts/Layout.astro';
       !(moeEnabledInput instanceof HTMLInputElement) ||
       !(moeExpertsInput instanceof HTMLInputElement) ||
       !(moeActiveExpertsInput instanceof HTMLInputElement) ||
-      !(moeSignal instanceof HTMLElement)
+      !(moeSignal instanceof HTMLElement) ||
+      !(moeSharedRatioInput instanceof HTMLInputElement) ||
+      !(moeSharedRatioValue instanceof HTMLElement)
     ) {
       throw new Error('VRAM calculator UI is missing required elements.');
     }
@@ -235,6 +247,8 @@ import Layout from '../../../layouts/Layout.astro';
     const moeExpertsInputEl = moeExpertsInput as HTMLInputElement;
     const moeActiveExpertsInputEl = moeActiveExpertsInput as HTMLInputElement;
     const moeSignalEl = moeSignal as HTMLElement;
+    const moeSharedRatioInputEl = moeSharedRatioInput as HTMLInputElement;
+    const moeSharedRatioValueEl = moeSharedRatioValue as HTMLElement;
 
     let mode = 'inference';
 
@@ -288,6 +302,7 @@ import Layout from '../../../layouts/Layout.astro';
       isMoe: boolean;
       totalExperts: number;
       activeExperts: number;
+      sharedRatio: number;
     };
 
     function runtimeRows(profile: ModelProfile, contextTokens: number, hidden: number, layers: number, heads: number, kvHeads: number): RuntimeRow[] {
@@ -319,19 +334,19 @@ import Layout from '../../../layouts/Layout.astro';
     function buildModelProfile(totalParamsB: number): ModelProfile {
       if (!moeEnabledInputEl.checked) {
         moeSignalEl.textContent = 'Dense mode (MoE disabled)';
-        return { totalParamsB, activeParamsB: totalParamsB, isMoe: false, totalExperts: 1, activeExperts: 1 };
+        return { totalParamsB, activeParamsB: totalParamsB, isMoe: false, totalExperts: 1, activeExperts: 1, sharedRatio: 1 };
       }
 
       const totalExperts = Math.max(1, Math.round(readNum(moeExpertsInputEl, 8)));
       const activeExperts = Math.max(1, Math.min(totalExperts, Math.round(readNum(moeActiveExpertsInputEl, 2))));
 
-      const sharedRatio = 0.25;
-      const routedRatio = 0.75;
+      const sharedRatio = Math.max(0, Math.min(1, readNum(moeSharedRatioInputEl, 25) / 100));
+      const routedRatio = 1 - sharedRatio;
       const activeRatio = activeExperts / totalExperts;
       const activeParamsB = totalParamsB * (sharedRatio + routedRatio * activeRatio);
 
-      moeSignalEl.textContent = `MoE active: ${activeExperts}/${totalExperts} experts (~${activeParamsB.toFixed(2)}B active params)`;
-      return { totalParamsB, activeParamsB, isMoe: true, totalExperts, activeExperts };
+      moeSignalEl.textContent = `MoE active: ${activeExperts}/${totalExperts} experts | shared ${(sharedRatio * 100).toFixed(0)}% (~${activeParamsB.toFixed(2)}B active params)`;
+      return { totalParamsB, activeParamsB, isMoe: true, totalExperts, activeExperts, sharedRatio };
     }
 
     function setHardwareMatch(requiredGb: number): void {
@@ -412,17 +427,38 @@ import Layout from '../../../layouts/Layout.astro';
       const profile = buildModelProfile(paramsB);
 
       const rows = runtimeRows(profile, context, hidden, layers, heads, effectiveKvHeads);
+      const denseRows = runtimeRows(
+        { totalParamsB: profile.totalParamsB, activeParamsB: profile.totalParamsB, isMoe: false, totalExperts: 1, activeExperts: 1, sharedRatio: 1 },
+        context,
+        hidden,
+        layers,
+        heads,
+        effectiveKvHeads
+      );
       updateArchSignal(heads, effectiveKvHeads);
+      moeSharedRatioValueEl.textContent = `${Math.round(readNum(moeSharedRatioInputEl, 25))}%`;
 
-      resultTableBodyEl.innerHTML = rows.map((row) => `
+      resultTableBodyEl.innerHTML = rows.map((row, index) => {
+        const denseTotal = denseRows[index]?.total ?? row.total;
+        const savingPct = denseTotal > 0 ? ((denseTotal - row.total) / denseTotal) * 100 : 0;
+        const savingText = profile.isMoe ? `${savingPct >= 0 ? '+' : ''}${savingPct.toFixed(2)}%` : '-';
+        const savingClass = profile.isMoe
+          ? savingPct >= 0
+            ? 'text-emerald-200'
+            : 'text-amber-200'
+          : 'text-zinc-500';
+
+        return `
           <tr class="border-b border-white/5">
             <td class="py-3 font-medium text-white">${row.runtime}</td>
             <td class="py-3 text-zinc-300">${row.quant}</td>
             <td class="py-3 font-mono text-zinc-200">${row.weights.toFixed(2)} GB</td>
             <td class="py-3 font-mono text-zinc-300">${row.dyn.toFixed(2)} GB</td>
             <td class="py-3 font-mono text-cyan-200">${row.total.toFixed(2)} GB</td>
+            <td class="py-3 font-mono ${savingClass}">${savingText}</td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
 
       const anchor = rows[rows.length - 1];
       setHardwareMatch(anchor.total);
@@ -563,6 +599,7 @@ import Layout from '../../../layouts/Layout.astro';
     moeEnabledInputEl.addEventListener('change', render);
     moeExpertsInputEl.addEventListener('input', render);
     moeActiveExpertsInputEl.addEventListener('input', render);
+    moeSharedRatioInputEl.addEventListener('input', render);
 
     setMode('inference');
     render();
