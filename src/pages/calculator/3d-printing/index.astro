@@ -66,11 +66,72 @@ data.materials.forEach(m => {
       <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
         <h3 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>Explore Other Calculators</h3>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <a href="/calculator/vram/" class="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20">LLM VRAM Planning</a>
-          <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-300/20">NAS & RAID Capacity</a>
-          <a href="/calculator/off-grid-solar/" class="rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-medium text-amber-100 transition hover:bg-amber-300/20">Off-Grid Solar Sizing</a>
-          <a href="/calculator/satisfactory/" class="rounded-xl border border-orange-300/25 bg-orange-300/10 px-4 py-3 text-sm font-medium text-orange-100 transition hover:bg-orange-300/20">Satisfactory Planner</a>
+          <a href="/calculator/vram/" data-tool-link data-tool-name="LLM VRAM Calculator" class="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20">LLM VRAM Planning</a>
+          <a href="/calculator/nas-raid/" data-tool-link data-tool-name="NAS & RAID Storage Calculator" class="rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-300/20">NAS & RAID Capacity</a>
+          <a href="/calculator/off-grid-solar/" data-tool-link data-tool-name="RV Off-Grid Solar & Battery Calculator" class="rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-medium text-amber-100 transition hover:bg-amber-300/20">Off-Grid Solar Sizing</a>
+          <a href="/calculator/satisfactory/" data-tool-link data-tool-name="Satisfactory Factory Reverse Planner" class="rounded-xl border border-orange-300/25 bg-orange-300/10 px-4 py-3 text-sm font-medium text-orange-100 transition hover:bg-orange-300/20">Satisfactory Planner</a>
         </div>
+      </section>
+
+      <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8" id="recentToolsSection">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h3 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>Recently Visited Tools</h3>
+          <button id="clearRecentTools" class="text-xs uppercase tracking-[0.12em] text-zinc-500 transition hover:text-zinc-300">Clear</button>
+        </div>
+        <div id="recentToolsList" class="flex flex-wrap gap-2"></div>
       </section>
   </main>
 </Layout>
+
+<script>
+  (() => {
+    const RECENT_KEY = 'recent_calculator_tools';
+    const recentToolsList = document.getElementById('recentToolsList');
+    const clearRecentTools = document.getElementById('clearRecentTools');
+    if (!(recentToolsList instanceof HTMLElement) || !(clearRecentTools instanceof HTMLButtonElement)) return;
+
+    type RecentTool = { name: string; href: string };
+
+    const getRecent = (): RecentTool[] => {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]');
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((item) => item && typeof item.name === 'string' && typeof item.href === 'string').slice(0, 8);
+      } catch {
+        return [];
+      }
+    };
+
+    const setRecent = (items: RecentTool[]) => {
+      localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, 8)));
+    };
+
+    const renderRecent = () => {
+      const items = getRecent();
+      if (!items.length) {
+        recentToolsList.innerHTML = '<p class="text-sm text-zinc-500">No tools visited yet. Use the links above to build quick history.</p>';
+        return;
+      }
+      recentToolsList.innerHTML = items.map((item) => (`
+        <a href="${item.href}" class="rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:text-white">${item.name}</a>
+      `)).join('');
+    };
+
+    document.querySelectorAll<HTMLAnchorElement>('a[data-tool-link]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const name = link.dataset.toolName?.trim() || link.textContent?.trim() || 'Calculator Tool';
+        const href = link.getAttribute('href') || '/calculator/';
+        const next = getRecent().filter((item) => item.href !== href);
+        next.unshift({ name, href });
+        setRecent(next);
+      });
+    });
+
+    clearRecentTools.addEventListener('click', () => {
+      localStorage.removeItem(RECENT_KEY);
+      renderRecent();
+    });
+
+    renderRecent();
+  })();
+</script>
