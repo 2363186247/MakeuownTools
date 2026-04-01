@@ -1,0 +1,366 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import {
+  CHEMISTRY_DEFAULTS,
+  estimateOffGridSystem,
+  getOffGridSolarSeoEntries,
+  getSolarKeywordEntries,
+  getSolarScenarioEntries,
+  type OffGridSeoEntry,
+  type SolarKeywordEntry,
+  type SolarComparisonEntry,
+  type SolarScenarioEntry,
+  type SolarVoltage
+} from '../../../data/offGridSolarSeo';
+
+export function getStaticPaths() {
+  return getOffGridSolarSeoEntries().map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }));
+}
+
+type Props = { entry: OffGridSeoEntry };
+const { entry } = Astro.props as Props;
+
+const pageTitle = entry.title;
+const pageDescription = entry.description;
+const siteOrigin = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://makeyourowntools.com';
+const canonicalUrl = `${siteOrigin}/calculator/off-grid-solar/${entry.slug}/`;
+
+function fmt(v: number, d = 2): string {
+  return v.toFixed(d);
+}
+
+let scenarioCalc: ReturnType<typeof estimateOffGridSystem> | null = null;
+let voltageRows: Array<{ voltage: SolarVoltage; calc: ReturnType<typeof estimateOffGridSystem> }> = [];
+let faqItems: Array<{ question: string; answer: string }> = [];
+const keywordEntry = entry.type === 'keyword' ? (entry as SolarKeywordEntry) : null;
+const scenarioLikeEntry = (entry.type === 'scenario' || entry.type === 'keyword')
+  ? (entry as SolarScenarioEntry | SolarKeywordEntry)
+  : null;
+
+function hashSeed(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function rotateTake<T>(pool: T[], count: number, seed: number): T[] {
+  if (pool.length <= count) return pool;
+  const start = seed % pool.length;
+  const result: T[] = [];
+  for (let i = 0; i < count; i += 1) {
+    result.push(pool[(start + i) % pool.length]);
+  }
+  return result;
+}
+
+if (scenarioLikeEntry) {
+  const s = scenarioLikeEntry;
+  const chemistryDefaults = CHEMISTRY_DEFAULTS[s.batteryChemistry];
+  scenarioCalc = estimateOffGridSystem({
+    appliances: s.appliances,
+    voltage: s.voltage,
+    sunHours: s.sunHours,
+    autonomyDays: s.autonomyDays,
+    batteryChemistry: s.batteryChemistry,
+    ...chemistryDefaults
+  });
+
+  const scenarioFaqPool: Array<{ question: string; answer: string }> = [
+    {
+      question: `${s.voltage}V solar setup: how many battery Ah do I need?`,
+      answer: `For this load profile, estimated ${s.batteryChemistry.toUpperCase()} bank sizing is ${fmt(scenarioCalc.batteryAh, 1)} Ah at ${s.voltage}V with ${s.autonomyDays}-day autonomy.`
+    },
+    {
+      question: `How many watts of solar panels are required for ${s.sunHours} peak sun hours?`,
+      answer: `The calculator estimates ${fmt(scenarioCalc.panelW, 0)} W panel capacity after charge and derate factors.`
+    },
+    {
+      question: 'Why does lower battery voltage usually require higher Ah?',
+      answer: 'For the same energy demand, lower voltage systems need more current. That translates into larger Ah requirements and often thicker cabling.'
+    },
+    {
+      question: 'Should I oversize panels or batteries first?',
+      answer: 'In low-sun conditions, panel oversizing usually improves daily recovery. In high-cloud windows, additional battery autonomy reduces outage risk.'
+    },
+    {
+      question: `Is ${s.batteryChemistry.toUpperCase()} efficient for this load profile?`,
+      answer: `Yes, the model applies chemistry-specific assumptions for DoD and charging to keep estimates closer to practical planning ranges.`
+    },
+    {
+      question: 'Can this replace a full electrical audit?',
+      answer: 'Use this for planning and shortlist decisions, then validate with measured appliance duty cycles and local irradiance history.'
+    }
+  ];
+
+  faqItems = rotateTake(scenarioFaqPool, 4, hashSeed(entry.slug));
+}
+
+if (entry.type === 'comparison') {
+  const c = entry as SolarComparisonEntry;
+  voltageRows = ([12, 24, 48] as SolarVoltage[]).map((voltage) => ({
+    voltage,
+    calc: estimateOffGridSystem({
+      appliances: c.appliances,
+      voltage,
+      sunHours: 4.5,
+      autonomyDays: 1,
+      batteryChemistry: 'lifepo4',
+      ...CHEMISTRY_DEFAULTS.lifepo4
+    })
+  }));
+
+  const comparisonFaqPool: Array<{ question: string; answer: string }> = [
+    {
+      question: '12V vs 24V vs 48V: which is better for off-grid systems?',
+      answer: 'Higher-voltage architectures reduce current for the same power, which can improve wiring efficiency and scalability. Final choice depends on load size and equipment compatibility.'
+    },
+    {
+      question: 'Does changing voltage change daily energy use?',
+      answer: 'Daily energy in Wh stays the same for the same appliances. Voltage mainly changes current, wiring stress, and battery Ah sizing.'
+    },
+    {
+      question: 'Can I use this calculator before buying hardware?',
+      answer: 'Yes. Use these estimates for pre-purchase planning, then validate with real appliance duty cycles and local irradiance data.'
+    },
+    {
+      question: 'Which voltage reduces cable losses in longer runs?',
+      answer: 'For the same power, 24V and 48V systems run lower current than 12V, usually reducing copper losses and cable sizing pressure.'
+    },
+    {
+      question: 'Is 48V always the best choice?',
+      answer: 'Not always. 48V helps larger systems, but compatibility and budget may favor 24V or 12V for small and medium builds.'
+    },
+    {
+      question: 'How should inverter surge be considered?',
+      answer: 'Use startup surge requirements from appliances and verify inverter surge ratings, especially for compressor and microwave loads.'
+    }
+  ];
+
+  faqItems = rotateTake(comparisonFaqPool, 4, hashSeed(entry.slug));
+}
+
+const related = [
+  ...getSolarKeywordEntries().slice(0, 12),
+  ...getSolarScenarioEntries().slice(0, 12)
+].slice(0, 18);
+
+const keywordGuides: Record<string, { title: string; lines: string[] }> = {
+  region: {
+    title: 'Regional Sun-Window Guidance',
+    lines: [
+      'Use local monthly irradiance data to tune peak-sun-hour assumptions before procurement.',
+      'Cloud-prone months usually benefit from higher autonomy targets and larger reserve buffers.',
+      'For winter-heavy climates, panel overbuild is often cheaper than repeated battery deep cycles.'
+    ]
+  },
+  chemistry: {
+    title: 'Battery Chemistry Planning Notes',
+    lines: [
+      'LiFePO4 generally supports higher usable DoD and stable cycle life for daily off-grid cycling.',
+      'AGM requires more conservative DoD planning, often increasing required nominal Ah.',
+      'NMC can reduce volume and mass but should be evaluated against thermal and lifecycle targets.'
+    ]
+  },
+  brand: {
+    title: 'Brand-Oriented Load Architecture',
+    lines: [
+      'Brand keyword pages map typical duty-cycle patterns to speed up first-pass sizing decisions.',
+      'Validate actual appliance telemetry after install and update sizing margins if runtime differs.',
+      'Use the interactive calculator to test alternative voltage and autonomy assumptions quickly.'
+    ]
+  }
+};
+
+const keywordGuide = keywordEntry ? keywordGuides[keywordEntry.keywordCategory] : null;
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: `${siteOrigin}/`
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Calculator Hub',
+      item: `${siteOrigin}/calculator/`
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: 'RV Off-Grid Solar & Battery Sizing Calculator',
+      item: `${siteOrigin}/calculator/off-grid-solar/`
+    },
+    {
+      '@type': 'ListItem',
+      position: 4,
+      name: pageTitle,
+      item: canonicalUrl
+    }
+  ]
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Fragment slot="head">
+    <link rel="canonical" href={canonicalUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/off-grid-solar/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>←</span>
+      <span>Off-Grid Solar Calculator</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">Solar pSEO Landing</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-4xl">{pageTitle}</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">{pageDescription}</p>
+    </header>
+
+    {scenarioLikeEntry && scenarioCalc && (
+      <section class="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+        <article class="rounded-3xl border border-amber-300/20 bg-gradient-to-br from-amber-300/10 to-orange-500/8 p-6 md:p-7">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-100">Sizing Snapshot</h2>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Daily Energy</p>
+              <p class="mt-1 font-mono text-2xl text-white">{fmt(scenarioCalc.whDaily, 0)} Wh</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Battery Bank</p>
+              <p class="mt-1 font-mono text-2xl text-cyan-100">{fmt(scenarioCalc.batteryAh, 1)} Ah</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Solar Array</p>
+              <p class="mt-1 font-mono text-xl text-emerald-100">{fmt(scenarioCalc.panelW, 0)} W</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Inverter Baseline</p>
+              <p class="mt-1 font-mono text-xl text-amber-100">{fmt(scenarioCalc.recommendedInverterW, 0)} W</p>
+            </div>
+          </div>
+          <a href="/calculator/off-grid-solar/" class="mt-5 inline-flex items-center gap-2 rounded-xl border border-amber-200/35 bg-amber-100/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-100/20">
+            Open Interactive Off-Grid Calculator
+            <span>→</span>
+          </a>
+        </article>
+
+        <article class="rounded-3xl border border-white/10 bg-black/35 p-6 md:p-7">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Load Breakdown</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[560px] text-left text-sm">
+              <thead>
+                <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+                  <th class="py-3">Appliance</th>
+                  <th class="py-3">Power</th>
+                  <th class="py-3">Daily Runtime</th>
+                  <th class="py-3">Wh/Day</th>
+                </tr>
+              </thead>
+              <tbody class="text-zinc-200">
+                {(entry as SolarScenarioEntry).appliances.map((a) => (
+                  <tr class="border-b border-white/5">
+                    <td class="py-3 font-medium text-white">{a.name}</td>
+                    <td class="py-3 font-mono">{a.powerW} W</td>
+                    <td class="py-3 font-mono">{fmt(a.hoursPerDay, 2)} h</td>
+                    <td class="py-3 font-mono text-cyan-200">{fmt(a.powerW * a.hoursPerDay, 0)} Wh</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    )}
+
+    {keywordEntry && keywordGuide && (
+      <section class="mt-8 rounded-3xl border border-white/10 bg-black/30 p-6 md:p-8">
+        <h2 class="mb-2 text-sm font-semibold uppercase tracking-widest text-zinc-300">{keywordGuide.title}</h2>
+        <p class="mb-4 text-sm text-amber-100">{keywordEntry.highlight}</p>
+        <div class="grid gap-3 md:grid-cols-3">
+          {keywordGuide.lines.map((line) => (
+            <article class="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-zinc-300">{line}</article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {entry.type === 'comparison' && (
+      <section class="rounded-3xl border border-white/10 bg-black/35 p-6 md:p-7">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Voltage Architecture Comparison</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+                <th class="py-3">Voltage</th>
+                <th class="py-3">Battery Ah</th>
+                <th class="py-3">Solar W</th>
+                <th class="py-3">Inverter W</th>
+              </tr>
+            </thead>
+            <tbody class="text-zinc-200">
+              {voltageRows.map((row) => (
+                <tr class="border-b border-white/5">
+                  <td class="py-3 font-medium text-white">{row.voltage}V</td>
+                  <td class="py-3 font-mono text-cyan-200">{fmt(row.calc.batteryAh, 1)} Ah</td>
+                  <td class="py-3 font-mono text-emerald-200">{fmt(row.calc.panelW, 0)} W</td>
+                  <td class="py-3 font-mono text-amber-200">{fmt(row.calc.recommendedInverterW, 0)} W</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Related Long-Tail Solar Calculators</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {related.map((item) => (
+          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            {'keywordCategory' in item
+              ? `${item.keywordLabel} · ${item.voltage}V · ${item.sunHours}h sun`
+              : `${item.voltage}V · ${item.sunHours}h sun · ${item.autonomyDays} day`}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">FAQ</h2>
+      <div class="space-y-3">
+        {faqItems.map((item) => (
+          <article class="rounded-2xl border border-white/10 bg-black/30 p-4">
+            <h3 class="text-sm font-semibold text-white">{item.question}</h3>
+            <p class="mt-2 text-sm leading-7 text-zinc-300">{item.answer}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</Layout>

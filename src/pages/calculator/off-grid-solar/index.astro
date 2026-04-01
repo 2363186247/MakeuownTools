@@ -1,0 +1,290 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getSolarKeywordEntriesByCategory } from '../../../data/offGridSolarSeo';
+
+const regionKeywords = getSolarKeywordEntriesByCategory('region').slice(0, 9);
+const chemistryKeywords = getSolarKeywordEntriesByCategory('chemistry').slice(0, 9);
+const brandKeywords = getSolarKeywordEntriesByCategory('brand').slice(0, 9);
+---
+
+<Layout
+  title="RV Off-Grid Solar & Battery Sizing Calculator | 12V 24V 48V"
+  description="Calculate daily energy use, LiFePO4 battery bank Ah, and solar panel wattage for RV and off-grid setups across 12V, 24V, and 48V systems."
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>←</span>
+      <span>All Calculators</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">
+        Off-Grid Power Planner
+      </p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">RV Off-Grid Solar & Battery Sizing Calculator</h1>
+      <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
+        Enter appliance watts and daily usage to estimate required LiFePO4 battery Ah, solar panel wattage, and inverter sizing. Built for RV, vanlife, and camping off-grid setups.
+      </p>
+    </header>
+
+    <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+      <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">1. Appliance Load Profile</h2>
+        <p class="mb-4 text-xs text-zinc-500">Use real average draw values. Burst loads can be covered by inverter surge headroom.</p>
+
+        <div id="loadRows" class="space-y-3"></div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button id="addRowBtn" class="rounded-xl border border-amber-200/35 bg-amber-100/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-amber-100 transition hover:bg-amber-100/20">+ Add Appliance</button>
+          <button id="presetRvBtn" class="rounded-xl border border-sky-200/35 bg-sky-100/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-sky-100 transition hover:bg-sky-100/20">Load RV Preset</button>
+          <button id="presetCampBtn" class="rounded-xl border border-emerald-200/35 bg-emerald-100/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-100 transition hover:bg-emerald-100/20">Load Camping Preset</button>
+        </div>
+      </section>
+
+      <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">2. System Settings</h2>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Battery Voltage</span>
+            <select id="voltageSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50">
+              <option value="12">12V</option>
+              <option value="24">24V</option>
+              <option value="48">48V</option>
+            </select>
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Peak Sun Hours</span>
+            <input id="sunHoursInput" type="number" min="1.5" max="10" step="0.1" value="4.5" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Autonomy (Days)</span>
+            <input id="autonomyInput" type="number" min="1" max="4" step="1" value="1" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Battery DoD</span>
+            <input id="dodInput" type="number" min="0.6" max="0.95" step="0.01" value="0.9" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
+          </label>
+        </div>
+
+        <p class="mt-4 text-xs text-zinc-500">Tip: leave defaults if uncertain. Values are tuned for LiFePO4 planning and conservative solar derating.</p>
+      </section>
+    </div>
+
+    <section class="mt-6 rounded-3xl border border-amber-300/20 bg-gradient-to-br from-amber-300/10 to-orange-500/8 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-100">3. Sizing Output</h2>
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Daily Load</p>
+          <p id="dailyWhOut" class="mt-1 font-mono text-2xl text-white">0 Wh</p>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Battery Bank</p>
+          <p id="batteryAhOut" class="mt-1 font-mono text-2xl text-cyan-100">0 Ah</p>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Solar Array</p>
+          <p id="solarWOut" class="mt-1 font-mono text-2xl text-emerald-100">0 W</p>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Inverter Baseline</p>
+          <p id="inverterWOut" class="mt-1 font-mono text-2xl text-amber-100">0 W</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="mt-6 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Popular Long-Tail Solar Calculators</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/60w-1440m-plus-1000w-10m-12v-4sunh-1day-off-grid-solar-battery-calculator/" class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:text-white">60W Fridge + 1000W Microwave · 12V</a>
+        <a href="/calculator/off-grid-solar/60w-1440m-plus-1000w-10m-plus-40w-300m-24v-5sunh-1day-off-grid-solar-battery-calculator/" class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:text-white">Fridge + Microwave + Lights · 24V</a>
+        <a href="/calculator/off-grid-solar/60w-1440m-plus-75w-480m-plus-90w-360m-plus-40w-300m-48v-4sunh-2day-off-grid-solar-battery-calculator/" class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:text-white">Fridge + Starlink + Laptop · 48V</a>
+      </div>
+    </section>
+
+    <section class="mt-6 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Regional Sunlight Matrix Pages</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {regionKeywords.map((item) => (
+          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            {item.keywordLabel} · {item.voltage}V · {item.sunHours}h sun
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-6 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Battery Chemistry Pages</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {chemistryKeywords.map((item) => (
+          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            {item.keywordLabel} · {item.voltage}V sizing
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-6 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Brand-Tuned Load Profiles</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {brandKeywords.map((item) => (
+          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            {item.keywordLabel} · {item.voltage}V
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <script>
+    type LoadRow = { name: string; watts: number; hours: number };
+
+    const loadRows = document.getElementById('loadRows');
+    const addRowBtn = document.getElementById('addRowBtn');
+    const presetRvBtn = document.getElementById('presetRvBtn');
+    const presetCampBtn = document.getElementById('presetCampBtn');
+
+    const voltageSelect = document.getElementById('voltageSelect');
+    const sunHoursInput = document.getElementById('sunHoursInput');
+    const autonomyInput = document.getElementById('autonomyInput');
+    const dodInput = document.getElementById('dodInput');
+
+    const dailyWhOut = document.getElementById('dailyWhOut');
+    const batteryAhOut = document.getElementById('batteryAhOut');
+    const solarWOut = document.getElementById('solarWOut');
+    const inverterWOut = document.getElementById('inverterWOut');
+
+    if (
+      !(loadRows instanceof HTMLElement) ||
+      !(addRowBtn instanceof HTMLButtonElement) ||
+      !(presetRvBtn instanceof HTMLButtonElement) ||
+      !(presetCampBtn instanceof HTMLButtonElement) ||
+      !(voltageSelect instanceof HTMLSelectElement) ||
+      !(sunHoursInput instanceof HTMLInputElement) ||
+      !(autonomyInput instanceof HTMLInputElement) ||
+      !(dodInput instanceof HTMLInputElement) ||
+      !(dailyWhOut instanceof HTMLElement) ||
+      !(batteryAhOut instanceof HTMLElement) ||
+      !(solarWOut instanceof HTMLElement) ||
+      !(inverterWOut instanceof HTMLElement)
+    ) {
+      throw new Error('Off-grid solar calculator UI is missing required elements.');
+    }
+
+    const loadRowsEl = loadRows as HTMLElement;
+    const addRowBtnEl = addRowBtn as HTMLButtonElement;
+    const presetRvBtnEl = presetRvBtn as HTMLButtonElement;
+    const presetCampBtnEl = presetCampBtn as HTMLButtonElement;
+    const voltageSelectEl = voltageSelect as HTMLSelectElement;
+    const sunHoursInputEl = sunHoursInput as HTMLInputElement;
+    const autonomyInputEl = autonomyInput as HTMLInputElement;
+    const dodInputEl = dodInput as HTMLInputElement;
+    const dailyWhOutEl = dailyWhOut as HTMLElement;
+    const batteryAhOutEl = batteryAhOut as HTMLElement;
+    const solarWOutEl = solarWOut as HTMLElement;
+    const inverterWOutEl = inverterWOut as HTMLElement;
+
+    let rows: LoadRow[] = [
+      { name: 'Fridge', watts: 60, hours: 24 },
+      { name: 'Microwave', watts: 1000, hours: 10 / 60 }
+    ];
+
+    function renderRows(): void {
+      loadRowsEl.innerHTML = rows.map((row, index) => `
+        <div class="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-3 md:grid-cols-[1fr_120px_120px_56px]">
+          <input data-k="name" data-i="${index}" type="text" value="${row.name}" class="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
+          <input data-k="watts" data-i="${index}" type="number" min="0" step="1" value="${row.watts}" class="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
+          <input data-k="hours" data-i="${index}" type="number" min="0" step="0.1" value="${row.hours.toFixed(2)}" class="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
+          <button data-k="del" data-i="${index}" class="rounded-lg border border-red-300/30 bg-red-300/10 px-2 py-2 text-xs font-semibold text-red-100">Del</button>
+        </div>
+      `).join('');
+    }
+
+    function readNum(v: string, fallback: number): number {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function compute(): void {
+      const voltage = Math.max(12, readNum(voltageSelectEl.value, 12));
+      const sunHours = Math.max(1.5, readNum(sunHoursInputEl.value, 4.5));
+      const autonomy = Math.max(1, readNum(autonomyInputEl.value, 1));
+      const dod = Math.min(0.95, Math.max(0.6, readNum(dodInputEl.value, 0.9)));
+
+      const whDaily = rows.reduce((sum, row) => sum + Math.max(0, row.watts) * Math.max(0, row.hours), 0);
+      const whRequired = whDaily * autonomy;
+      const effectiveBatteryWh = whRequired / Math.max(0.55, dod * 0.9);
+      const batteryAh = effectiveBatteryWh / voltage;
+      const solarW = whDaily / sunHours / (0.92 * 0.75);
+      const inverter = Math.max(...rows.map((row) => row.watts), 300) * 1.25;
+
+      dailyWhOutEl.textContent = `${whDaily.toFixed(0)} Wh`;
+      batteryAhOutEl.textContent = `${batteryAh.toFixed(1)} Ah @ ${voltage}V`;
+      solarWOutEl.textContent = `${solarW.toFixed(0)} W`;
+      inverterWOutEl.textContent = `${inverter.toFixed(0)} W`;
+    }
+
+    function setPreset(type: 'rv' | 'camp'): void {
+      if (type === 'rv') {
+        rows = [
+          { name: 'Fridge', watts: 60, hours: 24 },
+          { name: 'Microwave', watts: 1000, hours: 10 / 60 },
+          { name: 'LED Lights', watts: 40, hours: 5 }
+        ];
+      } else {
+        rows = [
+          { name: 'CPAP', watts: 40, hours: 8 },
+          { name: 'Vent Fan', watts: 45, hours: 8 },
+          { name: 'Starlink', watts: 75, hours: 6 }
+        ];
+      }
+      renderRows();
+      compute();
+    }
+
+    loadRowsEl.addEventListener('input', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+
+      const idx = Number(target.dataset.i ?? '-1');
+      const key = target.dataset.k;
+      if (!Number.isInteger(idx) || idx < 0 || idx >= rows.length) return;
+
+      if (key === 'name') rows[idx].name = target.value;
+      if (key === 'watts') rows[idx].watts = readNum(target.value, rows[idx].watts);
+      if (key === 'hours') rows[idx].hours = readNum(target.value, rows[idx].hours);
+      compute();
+    });
+
+    loadRowsEl.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+      if (target.dataset.k !== 'del') return;
+      const idx = Number(target.dataset.i ?? '-1');
+      if (!Number.isInteger(idx) || idx < 0 || idx >= rows.length) return;
+      rows.splice(idx, 1);
+      if (rows.length === 0) rows.push({ name: 'Load', watts: 60, hours: 2 });
+      renderRows();
+      compute();
+    });
+
+    addRowBtnEl.addEventListener('click', () => {
+      rows.push({ name: 'New Load', watts: 100, hours: 1 });
+      renderRows();
+      compute();
+    });
+
+    presetRvBtnEl.addEventListener('click', () => setPreset('rv'));
+    presetCampBtnEl.addEventListener('click', () => setPreset('camp'));
+
+    [voltageSelectEl, sunHoursInputEl, autonomyInputEl, dodInputEl].forEach((el) => {
+      el.addEventListener('input', compute);
+    });
+
+    renderRows();
+    compute();
+  </script>
+</Layout>

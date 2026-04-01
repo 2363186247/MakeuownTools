@@ -52,6 +52,7 @@ let faqItems: Array<{ question: string; answer: string }> = [];
 let brandRegionHeadline = '';
 let brandRegionBody = '';
 let brandRegionTips: string[] = [];
+let glossaryTerms: Array<{ term: string; definition: string }> = [];
 
 const BRAND_CONTENT: Record<string, { headline: string; body: string; tips: string[] }> = {
   synology: {
@@ -115,6 +116,48 @@ const REGION_CONTENT: Record<string, { headline: string; body: string; tips: str
   }
 };
 
+const GLOSSARY_BY_BRAND: Record<string, Array<{ term: string; definition: string }>> = {
+  synology: [
+    { term: 'SHR', definition: 'Synology Hybrid RAID that improves flexibility when mixing drive sizes.' },
+    { term: 'Btrfs Snapshots', definition: 'Point-in-time snapshots used for rollback and data protection policies.' },
+    { term: 'Storage Pool', definition: 'Logical disk group where RAID layout is created before volumes are provisioned.' }
+  ],
+  qnap: [
+    { term: 'Qtier', definition: 'QNAP auto-tiering system that moves hot and cold data across storage classes.' },
+    { term: 'Storage & Snapshots', definition: 'QTS module for RAID pool management, volume control, and snapshots.' },
+    { term: 'Thin Provisioning', definition: 'Allocates logical space first and consumes physical capacity over time.' }
+  ],
+  truenas: [
+    { term: 'vdev', definition: 'A virtual device group in ZFS; multiple vdevs form a storage pool.' },
+    { term: 'Scrub', definition: 'Background integrity scan that verifies checksums and repairs parity mismatches.' },
+    { term: 'RAID-Z Expansion', definition: 'ZFS feature set and planning topic for growing parity groups safely.' }
+  ],
+  unraid: [
+    { term: 'Parity Disk', definition: 'Dedicated parity disk(s) protecting data disks in the Unraid array model.' },
+    { term: 'Cache Pool', definition: 'Fast SSD/NVMe pool used for writes and application workloads.' },
+    { term: 'Mover', definition: 'Scheduled process that migrates data between cache and array tiers.' }
+  ]
+};
+
+const GLOSSARY_BY_REGION: Record<string, Array<{ term: string; definition: string }>> = {
+  us: [
+    { term: 'Cost-per-Usable-TB', definition: 'Planning metric that compares real usable capacity after reserve and parity.' },
+    { term: 'Promo Window', definition: 'Seasonal pricing period used for phased drive purchasing strategies.' }
+  ],
+  uk: [
+    { term: 'Power Budget', definition: 'Expected always-on energy usage cost factored into NAS layout decisions.' },
+    { term: 'Rebuild Window', definition: 'Estimated time exposure while replacing a failed drive and restoring parity.' }
+  ],
+  eu: [
+    { term: 'Lifecycle Planning', definition: 'Capacity and reliability strategy across multiple hardware refresh cycles.' },
+    { term: 'Operational Headroom', definition: 'Intentional free-space margin to protect performance and snapshot behavior.' }
+  ],
+  apac: [
+    { term: 'Procurement Variance', definition: 'Regional differences in disk availability and replacement lead times.' },
+    { term: 'Spare Strategy', definition: 'Policy of keeping spare disks available to reduce recovery delay risk.' }
+  ]
+};
+
 function slugSeed(slug: string): number {
   let seed = 0;
   for (let i = 0; i < slug.length; i += 1) {
@@ -141,6 +184,34 @@ function keywordPrefixText(item: NasRaidSeoEntry): string {
   if (!item.keywordLabel) return 'This NAS planning scenario';
   if (item.keywordKind === 'brand') return `For ${item.keywordLabel} users, this NAS planning scenario`;
   return `For ${item.keywordLabel} homelab buyers, this NAS planning scenario`;
+}
+
+function synonymOf(key: 'choose' | 'compare' | 'usable' | 'capacity' | 'risk' | 'practical', seed: number): string {
+  const map: Record<string, string[]> = {
+    choose: ['choose', 'pick', 'select'],
+    compare: ['compare', 'evaluate', 'benchmark'],
+    usable: ['usable', 'real-world usable', 'effective'],
+    capacity: ['capacity', 'storage headroom', 'available space'],
+    risk: ['risk', 'failure exposure', 'rebuild risk'],
+    practical: ['practical', 'worth deploying', 'viable']
+  };
+  const list = map[key];
+  return list[seed % list.length];
+}
+
+function applyFaqVariants(items: Array<{ question: string; answer: string }>, slug: string): Array<{ question: string; answer: string }> {
+  const seed = slugSeed(slug);
+  return items.map((item, index) => {
+    const localSeed = seed + index * 97;
+    const q = item.question
+      .replace('usable', synonymOf('usable', localSeed + 1))
+      .replace('capacity', synonymOf('capacity', localSeed + 2))
+      .replace('compare', synonymOf('compare', localSeed + 3))
+      .replace('choose', synonymOf('choose', localSeed + 4))
+      .replace('risk', synonymOf('risk', localSeed + 5))
+      .replace('practical', synonymOf('practical', localSeed + 6));
+    return { ...item, question: q };
+  });
 }
 
 if (entry.type === 'scenario') {
@@ -181,7 +252,7 @@ if (entry.type === 'scenario') {
     }
   ];
 
-  faqItems = pickBySeed(scenarioFaqPool, 4, slugSeed(entry.slug));
+  faqItems = applyFaqVariants(pickBySeed(scenarioFaqPool, 4, slugSeed(entry.slug)), entry.slug);
 }
 
 if (entry.type === 'comparison') {
@@ -222,7 +293,7 @@ if (entry.type === 'comparison') {
     }
   ];
 
-  faqItems = pickBySeed(comparisonFaqPool, 4, slugSeed(entry.slug));
+  faqItems = applyFaqVariants(pickBySeed(comparisonFaqPool, 4, slugSeed(entry.slug)), entry.slug);
 }
 
 if (entry.keywordKind === 'brand' && entry.keywordKey) {
@@ -231,6 +302,7 @@ if (entry.keywordKind === 'brand' && entry.keywordKey) {
     brandRegionHeadline = brand.headline;
     brandRegionBody = brand.body;
     brandRegionTips = brand.tips;
+    glossaryTerms = GLOSSARY_BY_BRAND[entry.keywordKey] ?? [];
   }
 }
 
@@ -240,6 +312,7 @@ if (entry.keywordKind === 'region' && entry.keywordKey) {
     brandRegionHeadline = region.headline;
     brandRegionBody = region.body;
     brandRegionTips = region.tips;
+    glossaryTerms = GLOSSARY_BY_REGION[entry.keywordKey] ?? [];
   }
 }
 
@@ -446,6 +519,20 @@ const faqJsonLd = {
             ))}
           </ul>
         )}
+      </section>
+    )}
+
+    {glossaryTerms.length > 0 && (
+      <section class="mt-8 rounded-3xl border border-cyan-300/20 bg-white/[0.02] p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-cyan-200">Brand / Region Glossary</h2>
+        <div class="grid gap-3 md:grid-cols-2">
+          {glossaryTerms.map((item) => (
+            <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <h3 class="text-sm font-semibold text-white">{item.term}</h3>
+              <p class="mt-2 text-sm leading-7 text-zinc-300">{item.definition}</p>
+            </article>
+          ))}
+        </div>
       </section>
     )}
 
