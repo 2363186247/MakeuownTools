@@ -24,3 +24,9 @@ Stop writing invalid configurations. Generate production-ready, compatibility-ch
 
 ### 4. 🖨️ 3D Printing Filament Navigator
 Calculate exactly how many meters of PLA/PETG/ABS you have left based on the spool's net weight.
+
+### 5. 💾 NAS & RAID Storage Calculator
+Plan homelab and datahoarder builds before buying disks.
+* Calculates raw/usable capacity, fault tolerance, and efficiency for RAID 0/1/5/6/10 and ZFS RAID-Z1/Z2/Z3.
+* Includes quick presets and RAID 10 vs RAID 5 snapshots for practical purchasing decisions.
+

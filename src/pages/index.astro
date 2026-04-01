@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import services from '../data/services.json';
 import filaments from '../data/filaments.json';
 import satisfactoryData from '../data/satisfactory.json';
+import { NAS_RAID_TOTAL_ROUTES } from '../data/nasRaidSeo';
 
 type App = {
   id: string;
@@ -43,7 +44,7 @@ const dockerRoutes = servicesData.apps.reduce((total, app) => {
 
 const filamentRoutes = filamentsData.materials.length * filamentsData.diameters.length;
 const satisfactoryRoutes = satData.items.length;
-const nasRaidRoutes = 1;
+const nasRaidRoutes = NAS_RAID_TOTAL_ROUTES;
 const calculatorRoutes = filamentRoutes + satisfactoryRoutes + nasRaidRoutes;
 
 const featuredDocker = servicesData.apps.slice(0, 3).flatMap((app) => {

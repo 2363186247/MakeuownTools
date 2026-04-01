@@ -1,5 +1,9 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import { RAID_LABEL, getComparisonEntries, getScenarioEntries } from '../../../data/nasRaidSeo';
+
+const seoScenarios = getScenarioEntries().slice(0, 20);
+const seoComparisons = getComparisonEntries();
 ---
 
 <Layout
@@ -105,6 +109,35 @@ import Layout from '../../../layouts/Layout.astro';
               </thead>
               <tbody id="compareBody" class="text-zinc-200"></tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <h2 class="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-300">Long-Tail RAID Capacity Pages</h2>
+          <p class="mb-4 text-sm leading-7 text-zinc-400">
+            Navigate directly to highly specific calculator pages for common purchase plans and array comparisons.
+          </p>
+          <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {seoScenarios.map((entry) => (
+              <a href={`/calculator/nas-raid/${entry.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+                {entry.drives}x {entry.sizeTb}TB {RAID_LABEL[entry.level]}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-300">Comparison Pages</h3>
+          <div class="space-y-2">
+            {seoComparisons.map((entry) => (
+              <a href={`/calculator/nas-raid/${entry.slug}/`} class="block rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+                {RAID_LABEL[entry.left]} vs {RAID_LABEL[entry.right]}
+              </a>
+            ))}
           </div>
         </div>
       </div>

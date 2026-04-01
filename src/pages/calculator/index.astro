@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import filaments from '../../data/filaments.json';
 import satisfactoryData from '../../data/satisfactory.json';
+import { NAS_RAID_TOTAL_ROUTES } from '../../data/nasRaidSeo';
 
 type Material = { id: string; name: string };
 type Diameter = { id: string; name: string; common?: boolean };
@@ -24,7 +25,7 @@ const satData = satisfactoryData as SatisfactoryDataset;
 const filamentRoutes = filamentData.materials.length * filamentData.diameters.length;
 const satisfactoryTargets = satData.mvp_targets.length;
 const vramRoutes = 1;
-const nasRaidRoutes = 1;
+const nasRaidRoutes = NAS_RAID_TOTAL_ROUTES;
 const allCalculatorRoutes = filamentRoutes + satData.items.length + vramRoutes + nasRaidRoutes;
 
 const preferredDiameter = filamentData.diameters.find((d) => d.common) ?? filamentData.diameters[0];
