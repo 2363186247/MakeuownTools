@@ -1,5 +1,13 @@
 export type RaidLevel = 'raid0' | 'raid1' | 'raid5' | 'raid6' | 'raid10' | 'raidz1' | 'raidz2' | 'raidz3';
 
+export type KeywordKind = 'brand' | 'region';
+
+export type KeywordContext = {
+  keywordKind?: KeywordKind;
+  keywordKey?: string;
+  keywordLabel?: string;
+};
+
 export type ScenarioEntry = {
   type: 'scenario';
   slug: string;
@@ -9,7 +17,7 @@ export type ScenarioEntry = {
   level: RaidLevel;
   title: string;
   description: string;
-};
+} & KeywordContext;
 
 export type ComparisonEntry = {
   type: 'comparison';
@@ -18,7 +26,7 @@ export type ComparisonEntry = {
   right: RaidLevel;
   title: string;
   description: string;
-};
+} & KeywordContext;
 
 export type NasRaidSeoEntry = ScenarioEntry | ComparisonEntry;
 
@@ -37,6 +45,21 @@ const SCENARIO_DRIVES = [2, 3, 4, 5, 6, 8, 10, 12];
 const SCENARIO_SIZES = [4, 6, 8, 10, 12, 14, 16, 18, 20];
 const SCENARIO_LEVELS: RaidLevel[] = ['raid1', 'raid5', 'raid6', 'raid10', 'raidz1', 'raidz2'];
 const DEFAULT_RESERVE = 10;
+
+const KEYWORD_SCENARIO_DRIVES = [4, 6, 8, 10];
+const KEYWORD_SCENARIO_SIZES = [8, 12, 16, 20];
+const KEYWORD_SCENARIO_LEVELS: RaidLevel[] = ['raid5', 'raid6', 'raid10', 'raidz1', 'raidz2'];
+
+const KEYWORD_MODIFIERS: Array<{ kind: KeywordKind; key: string; label: string }> = [
+  { kind: 'brand', key: 'synology', label: 'Synology' },
+  { kind: 'brand', key: 'qnap', label: 'QNAP' },
+  { kind: 'brand', key: 'truenas', label: 'TrueNAS' },
+  { kind: 'brand', key: 'unraid', label: 'Unraid' },
+  { kind: 'region', key: 'us', label: 'US' },
+  { kind: 'region', key: 'uk', label: 'UK' },
+  { kind: 'region', key: 'eu', label: 'EU' },
+  { kind: 'region', key: 'apac', label: 'APAC' }
+];
 
 const COMPARISON_PAIRS: Array<{ left: RaidLevel; right: RaidLevel }> = [
   { left: 'raid10', right: 'raid5' },
@@ -116,6 +139,10 @@ function makeComparisonSlug(left: RaidLevel, right: RaidLevel): string {
   return `${left}-vs-${right}-storage-capacity`;
 }
 
+function withModifierSlug(baseSlug: string, modifierKey: string): string {
+  return `${modifierKey}-${baseSlug}`;
+}
+
 export function getScenarioEntries(): ScenarioEntry[] {
   const entries: ScenarioEntry[] = [];
 
@@ -156,8 +183,70 @@ export function getComparisonEntries(): ComparisonEntry[] {
   }));
 }
 
+export function getKeywordScenarioEntries(): ScenarioEntry[] {
+  const base = getScenarioEntries().filter((entry) => (
+    KEYWORD_SCENARIO_DRIVES.includes(entry.drives)
+    && KEYWORD_SCENARIO_SIZES.includes(entry.sizeTb)
+    && KEYWORD_SCENARIO_LEVELS.includes(entry.level)
+  ));
+
+  const entries: ScenarioEntry[] = [];
+  base.forEach((entry) => {
+    KEYWORD_MODIFIERS.forEach((modifier) => {
+      const labelPrefix = modifier.kind === 'brand'
+        ? `${modifier.label} `
+        : `${modifier.label} `;
+      const audienceHint = modifier.kind === 'brand'
+        ? `for ${modifier.label} NAS users`
+        : `for ${modifier.label} homelab buyers`;
+
+      entries.push({
+        ...entry,
+        slug: withModifierSlug(entry.slug, modifier.key),
+        keywordKind: modifier.kind,
+        keywordKey: modifier.key,
+        keywordLabel: modifier.label,
+        title: `${labelPrefix}${entry.drives}x ${entry.sizeTb}TB ${RAID_LABEL[entry.level]} Calculator`,
+        description: `Estimate usable capacity, fault tolerance, and efficiency ${audienceHint} using ${entry.drives}x ${entry.sizeTb}TB in ${RAID_LABEL[entry.level]}.`
+      });
+    });
+  });
+
+  return entries;
+}
+
+export function getKeywordComparisonEntries(): ComparisonEntry[] {
+  const base = getComparisonEntries();
+
+  const entries: ComparisonEntry[] = [];
+  base.forEach((entry) => {
+    KEYWORD_MODIFIERS.forEach((modifier) => {
+      const audienceHint = modifier.kind === 'brand'
+        ? `${modifier.label} NAS users`
+        : `${modifier.label} homelab setups`;
+
+      entries.push({
+        ...entry,
+        slug: withModifierSlug(entry.slug, modifier.key),
+        keywordKind: modifier.kind,
+        keywordKey: modifier.key,
+        keywordLabel: modifier.label,
+        title: `${modifier.label} ${RAID_LABEL[entry.left]} vs ${RAID_LABEL[entry.right]} Storage Calculator`,
+        description: `Compare usable capacity, fault tolerance, and efficiency between ${RAID_LABEL[entry.left]} and ${RAID_LABEL[entry.right]} for ${audienceHint}.`
+      });
+    });
+  });
+
+  return entries;
+}
+
 export function getNasRaidSeoEntries(): NasRaidSeoEntry[] {
-  return [...getScenarioEntries(), ...getComparisonEntries()];
+  return [
+    ...getScenarioEntries(),
+    ...getComparisonEntries(),
+    ...getKeywordScenarioEntries(),
+    ...getKeywordComparisonEntries()
+  ];
 }
 
 export const NAS_RAID_BASE_ROUTES = 1;

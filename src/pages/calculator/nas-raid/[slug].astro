@@ -42,10 +42,106 @@ function levelAdvice(level: RaidLevel): string {
 
 const pageTitle = entry.title;
 const pageDescription = entry.description;
+const siteOrigin = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://makeyourowntools.com';
+const canonicalUrl = `${siteOrigin}/calculator/nas-raid/${entry.slug}/`;
 
 let scenarioResult: ReturnType<typeof calculateNasRaid> | null = null;
 let comparisonRows: Array<{ drives: number; left: ReturnType<typeof calculateNasRaid>; right: ReturnType<typeof calculateNasRaid> }> = [];
 let scenarioTable: Array<{ level: RaidLevel; result: ReturnType<typeof calculateNasRaid> }> = [];
+let faqItems: Array<{ question: string; answer: string }> = [];
+let brandRegionHeadline = '';
+let brandRegionBody = '';
+let brandRegionTips: string[] = [];
+
+const BRAND_CONTENT: Record<string, { headline: string; body: string; tips: string[] }> = {
+  synology: {
+    headline: 'Synology Planning Notes',
+    body: 'Synology users usually optimize for predictable rebuild behavior and conservative free-space policies, especially when using large-capacity SHR/RAID pools for media and backup workloads.',
+    tips: [
+      'Keep spare bays in your growth plan so expansions do not force emergency migrations.',
+      'Budget extra free space for snapshot retention and background indexing tasks.',
+      'Prefer dual-parity style layouts for larger pools with long rebuild windows.'
+    ]
+  },
+  qnap: {
+    headline: 'QNAP Planning Notes',
+    body: 'QNAP buyers often compare capacity efficiency against service consolidation needs, where VM storage, containers, and media serving all compete for IOPS and free space.',
+    tips: [
+      'Model around mixed workloads: media throughput plus VM random I/O.',
+      'Reserve enough headroom so thin-provisioned services do not overrun the array.',
+      'When in doubt, prioritize safer parity for arrays above 6 drives.'
+    ]
+  },
+  truenas: {
+    headline: 'TrueNAS / ZFS Planning Notes',
+    body: 'TrueNAS and ZFS planners usually care about parity width, scrub cadence, and healthy operating headroom. Capacity is only one part of pool durability.',
+    tips: [
+      'Treat RAID-Z2 as a common baseline for medium and large homelab pools.',
+      'Keep meaningful free space to reduce fragmentation pressure under snapshots.',
+      'Plan vdev growth strategy early, since expansion paths affect long-term efficiency.'
+    ]
+  },
+  unraid: {
+    headline: 'Unraid Planning Notes',
+    body: 'Unraid users often optimize for incremental growth and flexible disk replacement, where parity planning and usable capacity targets evolve over time rather than all at once.',
+    tips: [
+      'Capacity plans should include phased drive upgrades, not only day-one layout.',
+      'Use parity-protected growth steps to avoid risky bulk migrations.',
+      'Track cache and parity pressure separately from archive data growth.'
+    ]
+  }
+};
+
+const REGION_CONTENT: Record<string, { headline: string; body: string; tips: string[] }> = {
+  us: {
+    headline: 'US Buyer Context',
+    body: 'US buyers often evaluate frequent pricing swings and promo cycles. Capacity planning should account for staged purchases instead of one-time all-disk upgrades.',
+    tips: ['Use parity layouts that remain valid during phased expansions.', 'Compare total usable-per-dollar across multiple disk sizes, not only one SKU.']
+  },
+  uk: {
+    headline: 'UK Buyer Context',
+    body: 'UK homelab planners commonly balance higher per-drive pricing with power and chassis constraints, so efficient but resilient layouts become more valuable.',
+    tips: ['Model dual-parity options early if rebuild time is a concern.', 'Include reserve headroom to avoid running pools at high fill percentages.']
+  },
+  eu: {
+    headline: 'EU Buyer Context',
+    body: 'EU deployments often place additional emphasis on energy efficiency and predictable lifecycle upgrades, especially for always-on NAS fleets.',
+    tips: ['Choose a layout that minimizes emergency rebuild risk under continuous operation.', 'Prefer capacity plans that survive one upgrade cycle without pool redesign.']
+  },
+  apac: {
+    headline: 'APAC Buyer Context',
+    body: 'APAC builders frequently compare availability windows and procurement variance, which makes robust fallback capacity and staged scaling useful in practice.',
+    tips: ['Plan a spare strategy alongside RAID level selection.', 'Validate that chosen parity can tolerate delayed disk replacement windows.']
+  }
+};
+
+function slugSeed(slug: string): number {
+  let seed = 0;
+  for (let i = 0; i < slug.length; i += 1) {
+    seed = (seed * 31 + slug.charCodeAt(i)) % 1000003;
+  }
+  return seed;
+}
+
+function pickBySeed<T>(items: T[], count: number, seed: number): T[] {
+  const copy = [...items];
+  const picked: T[] = [];
+  let current = seed;
+
+  while (copy.length > 0 && picked.length < count) {
+    const index = current % copy.length;
+    picked.push(copy.splice(index, 1)[0]);
+    current = (current * 131 + 17) % 1000003;
+  }
+
+  return picked;
+}
+
+function keywordPrefixText(item: NasRaidSeoEntry): string {
+  if (!item.keywordLabel) return 'This NAS planning scenario';
+  if (item.keywordKind === 'brand') return `For ${item.keywordLabel} users, this NAS planning scenario`;
+  return `For ${item.keywordLabel} homelab buyers, this NAS planning scenario`;
+}
 
 if (entry.type === 'scenario') {
   const scenario = entry as ScenarioEntry;
@@ -56,6 +152,36 @@ if (entry.type === 'scenario') {
     level,
     result: calculateNasRaid(level, scenario.drives, scenario.sizeTb, scenario.reservePct)
   }));
+
+  const prefix = keywordPrefixText(entry);
+  const scenarioFaqPool = [
+    {
+      question: `How much usable storage does ${scenario.drives}x ${scenario.sizeTb}TB ${RAID_LABEL[scenario.level]} provide?`,
+      answer: `${prefix} estimates ${scenarioResult.usableAfterReserve.toFixed(2)} TB usable after a ${scenario.reservePct}% reserve from ${scenarioResult.raw.toFixed(2)} TB raw.`
+    },
+    {
+      question: `How many disk failures can ${RAID_LABEL[scenario.level]} tolerate in this setup?`,
+      answer: `This setup can tolerate ${scenarioResult.tolerance}. Real-world survivability depends on mirror placement, rebuild stress, and drive health.`
+    },
+    {
+      question: `Why include a ${scenario.reservePct}% reserve when planning NAS capacity?`,
+      answer: `Keeping free space improves filesystem behavior for snapshots, metadata, and write performance. Full arrays often perform worse and rebuild more slowly.`
+    },
+    {
+      question: `Is ${RAID_LABEL[scenario.level]} still practical with ${scenario.sizeTb}TB drives?`,
+      answer: `It can be practical, but larger drives increase rebuild windows. Validate parity choice and backup policy before committing to the final layout.`
+    },
+    {
+      question: `Should I optimize this ${scenario.drives}-drive plan for capacity or resiliency first?`,
+      answer: `For long-lived NAS pools, resiliency first is usually safer. Capacity can be expanded later, while a risky parity choice can force migration sooner.`
+    },
+    {
+      question: `Can this calculator replace real-world benchmark and rebuild testing?`,
+      answer: `No. Use this page for pre-purchase sizing, then validate with workload benchmarks, SMART health policy, and a tested restore plan.`
+    }
+  ];
+
+  faqItems = pickBySeed(scenarioFaqPool, 4, slugSeed(entry.slug));
 }
 
 if (entry.type === 'comparison') {
@@ -67,10 +193,107 @@ if (entry.type === 'comparison') {
     left: calculateNasRaid(comparison.left, drives, sizeTb, 10),
     right: calculateNasRaid(comparison.right, drives, sizeTb, 10)
   }));
+
+  const prefix = keywordPrefixText(entry);
+  const comparisonFaqPool = [
+    {
+      question: `Which has more usable capacity: ${RAID_LABEL[comparison.left]} or ${RAID_LABEL[comparison.right]}?`,
+      answer: `${prefix} compares both modes at fixed drive sizes so you can see usable capacity differences before buying disks.`
+    },
+    {
+      question: `How should I choose between ${RAID_LABEL[comparison.left]} and ${RAID_LABEL[comparison.right]}?`,
+      answer: `Choose based on your risk tolerance, rebuild window, and performance profile. Higher parity usually lowers capacity but improves resilience.`
+    },
+    {
+      question: 'Does this comparison include filesystem reserve?',
+      answer: 'Yes. The comparison table applies a 10% reserve baseline to reflect realistic operating headroom in NAS and homelab environments.'
+    },
+    {
+      question: `Does ${RAID_LABEL[comparison.left]} rebuild faster than ${RAID_LABEL[comparison.right]}?`,
+      answer: 'Rebuild behavior depends on array width, disk size, and workload pressure. This page focuses on capacity and tolerance; benchmark your actual platform before final choice.'
+    },
+    {
+      question: `Which option is usually better for long-term homelab growth?`,
+      answer: 'The better option is the one that keeps acceptable usable capacity while preserving safety margins during future disk expansions.'
+    },
+    {
+      question: `Can two layouts with similar capacity still have very different risk?`,
+      answer: 'Yes. Similar usable TB does not imply similar failure tolerance or rebuild exposure. Capacity and resiliency should be evaluated together.'
+    }
+  ];
+
+  faqItems = pickBySeed(comparisonFaqPool, 4, slugSeed(entry.slug));
 }
+
+if (entry.keywordKind === 'brand' && entry.keywordKey) {
+  const brand = BRAND_CONTENT[entry.keywordKey];
+  if (brand) {
+    brandRegionHeadline = brand.headline;
+    brandRegionBody = brand.body;
+    brandRegionTips = brand.tips;
+  }
+}
+
+if (entry.keywordKind === 'region' && entry.keywordKey) {
+  const region = REGION_CONTENT[entry.keywordKey];
+  if (region) {
+    brandRegionHeadline = region.headline;
+    brandRegionBody = region.body;
+    brandRegionTips = region.tips;
+  }
+}
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: `${siteOrigin}/`
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Calculator Hub',
+      item: `${siteOrigin}/calculator/`
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: 'NAS & RAID Storage Calculator',
+      item: `${siteOrigin}/calculator/nas-raid/`
+    },
+    {
+      '@type': 'ListItem',
+      position: 4,
+      name: pageTitle,
+      item: canonicalUrl
+    }
+  ]
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
+  <Fragment slot="head">
+    <link rel="canonical" href={canonicalUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
     <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
       <span>←</span>
@@ -81,6 +304,11 @@ if (entry.type === 'comparison') {
       <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">
         NAS pSEO Landing
       </p>
+      {entry.keywordLabel && (
+        <p class="ml-2 mb-3 inline-flex items-center rounded-full border border-emerald-400/35 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100">
+          {entry.keywordKind === 'brand' ? 'Brand Focus' : 'Region Focus'} · {entry.keywordLabel}
+        </p>
+      )}
       <h1 class="text-3xl font-semibold tracking-tight text-white md:text-4xl">{pageTitle.replace(' | NAS Capacity', '')}</h1>
       <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">{pageDescription}</p>
     </header>
@@ -207,6 +435,20 @@ if (entry.type === 'comparison') {
       </section>
     )}
 
+    {brandRegionHeadline && (
+      <section class="mt-8 rounded-3xl border border-emerald-300/25 bg-gradient-to-br from-emerald-400/10 to-cyan-500/8 p-6 md:p-8">
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-widest text-emerald-200">{brandRegionHeadline}</h2>
+        <p class="text-sm leading-7 text-zinc-200">{brandRegionBody}</p>
+        {brandRegionTips.length > 0 && (
+          <ul class="mt-4 space-y-2 text-sm text-zinc-300">
+            {brandRegionTips.map((tip) => (
+              <li>• {tip}</li>
+            ))}
+          </ul>
+        )}
+      </section>
+    )}
+
     <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Related Long-Tail Calculators</h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -214,6 +456,18 @@ if (entry.type === 'comparison') {
           <a href={`/calculator/nas-raid/${scenario.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
             {scenario.drives}x {scenario.sizeTb}TB {RAID_LABEL[scenario.level]}
           </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">FAQ</h2>
+      <div class="space-y-3">
+        {faqItems.map((item) => (
+          <article class="rounded-2xl border border-white/10 bg-black/30 p-4">
+            <h3 class="text-sm font-semibold text-white">{item.question}</h3>
+            <p class="mt-2 text-sm leading-7 text-zinc-300">{item.answer}</p>
+          </article>
         ))}
       </div>
     </section>

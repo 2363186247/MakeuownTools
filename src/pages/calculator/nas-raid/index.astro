@@ -1,9 +1,17 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import { RAID_LABEL, getComparisonEntries, getScenarioEntries } from '../../../data/nasRaidSeo';
+import {
+  RAID_LABEL,
+  getComparisonEntries,
+  getKeywordComparisonEntries,
+  getKeywordScenarioEntries,
+  getScenarioEntries
+} from '../../../data/nasRaidSeo';
 
 const seoScenarios = getScenarioEntries().slice(0, 20);
 const seoComparisons = getComparisonEntries();
+const keywordScenarios = getKeywordScenarioEntries().slice(0, 24);
+const keywordComparisons = getKeywordComparisonEntries().slice(0, 16);
 ---
 
 <Layout
@@ -136,6 +144,35 @@ const seoComparisons = getComparisonEntries();
             {seoComparisons.map((entry) => (
               <a href={`/calculator/nas-raid/${entry.slug}/`} class="block rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
                 {RAID_LABEL[entry.left]} vs {RAID_LABEL[entry.right]}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <div class="grid gap-6 lg:grid-cols-2">
+        <div>
+          <h2 class="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-300">Brand / Region RAID Pages</h2>
+          <p class="mb-4 text-sm leading-7 text-zinc-400">
+            Targeted pages for Synology, QNAP, TrueNAS, Unraid, and regional homelab search intent.
+          </p>
+          <div class="grid gap-2 sm:grid-cols-2">
+            {keywordScenarios.map((entry) => (
+              <a href={`/calculator/nas-raid/${entry.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-emerald-300/40 hover:text-white">
+                {entry.keywordLabel} · {entry.drives}x {entry.sizeTb}TB {RAID_LABEL[entry.level]}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-300">Keyword Comparison Pages</h3>
+          <div class="space-y-2">
+            {keywordComparisons.map((entry) => (
+              <a href={`/calculator/nas-raid/${entry.slug}/`} class="block rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+                {entry.keywordLabel} · {RAID_LABEL[entry.left]} vs {RAID_LABEL[entry.right]}
               </a>
             ))}
           </div>
