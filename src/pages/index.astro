@@ -43,7 +43,8 @@ const dockerRoutes = servicesData.apps.reduce((total, app) => {
 
 const filamentRoutes = filamentsData.materials.length * filamentsData.diameters.length;
 const satisfactoryRoutes = satData.items.length;
-const calculatorRoutes = filamentRoutes + satisfactoryRoutes;
+const nasRaidRoutes = 1;
+const calculatorRoutes = filamentRoutes + satisfactoryRoutes + nasRaidRoutes;
 
 const featuredDocker = servicesData.apps.slice(0, 3).flatMap((app) => {
   const db = servicesData.databases.find((d) => app.supported_dbs.includes(d.id));
@@ -61,6 +62,10 @@ const featuredVram = {
   name: 'LLM VRAM Calculator',
   href: '/calculator/vram/'
 };
+const featuredNasRaid = {
+  name: 'NAS & RAID Storage Calculator',
+  href: '/calculator/nas-raid/'
+};
 const featuredFilament = filamentsData.materials.slice(0, 2).map((material) => ({
   name: `${material.name} · ${preferredDiameter.name}`,
   href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}`
@@ -74,7 +79,7 @@ const featuredSatisfactory = satData.mvp_targets.slice(0, 2)
     href: `/calculator/satisfactory/${item.id}`
   }));
 
-const featuredCalculator = [featuredVram, ...featuredFilament, ...featuredSatisfactory];
+const featuredCalculator = [featuredVram, featuredNasRaid, ...featuredFilament, ...featuredSatisfactory];
 ---
 
 <Layout
@@ -140,7 +145,7 @@ const featuredCalculator = [featuredVram, ...featuredFilament, ...featuredSatisf
           </div>
           <h2 class="text-2xl font-semibold tracking-tight text-white">General-Purpose Production Calculators</h2>
           <p class="mt-3 text-sm leading-7 text-zinc-200">
-            Start with the new LLM VRAM Calculator, then move to 3D printing filament estimation and Satisfactory production chain reverse planning in one unified calculator hub.
+            Start with the LLM VRAM Calculator or the new NAS & RAID planner, then move to 3D printing and Satisfactory production workflows in one unified calculator hub.
           </p>
           <a href="/calculator/" class="mt-5 inline-flex items-center gap-2 rounded-xl border border-emerald-200/35 bg-emerald-100/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-100/20">
             Open Calculators

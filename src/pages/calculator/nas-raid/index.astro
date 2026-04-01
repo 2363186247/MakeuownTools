@@ -1,0 +1,346 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="NAS & RAID Storage Calculator | Make Your Own Tools"
+  description="Calculate usable storage, fault tolerance, and efficiency for RAID and RAID-Z arrays before buying disks."
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>←</span>
+      <span>All Calculators</span>
+    </a>
+
+    <header class="mb-10">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-sky-200">
+        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400"></span>
+        Homelab / NAS Planning
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight text-white md:text-6xl">NAS & RAID Storage Calculator</h1>
+      <p class="mt-4 max-w-3xl text-zinc-400">
+        Estimate usable capacity, redundancy, and storage efficiency for RAID and ZFS RAID-Z setups before purchasing disks.
+      </p>
+    </header>
+
+    <section class="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
+      <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">1. Array Inputs</h2>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Drive Count</span>
+            <input id="driveCountInput" type="number" min="1" step="1" value="4" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-sky-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Drive Size (TB)</span>
+            <input id="driveSizeInput" type="number" min="0.1" step="0.1" value="8" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-sky-500/50" />
+          </label>
+
+          <label class="sm:col-span-2">
+            <span class="mb-1 block text-xs text-zinc-400">RAID / ZFS Mode</span>
+            <select id="raidLevelSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-sky-500/50">
+              <option value="raid0">RAID 0 (striping, no redundancy)</option>
+              <option value="raid1">RAID 1 (mirroring)</option>
+              <option value="raid5" selected>RAID 5 (single parity)</option>
+              <option value="raid6">RAID 6 (dual parity)</option>
+              <option value="raid10">RAID 10 (striped mirrors)</option>
+              <option value="raidz1">ZFS RAID-Z1</option>
+              <option value="raidz2">ZFS RAID-Z2</option>
+              <option value="raidz3">ZFS RAID-Z3</option>
+            </select>
+          </label>
+
+          <label class="sm:col-span-2">
+            <span class="mb-1 block text-xs text-zinc-400">Filesystem Reserve (%)</span>
+            <input id="reserveInput" type="number" min="0" max="40" step="1" value="10" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white outline-none focus:border-sky-500/50" />
+            <p class="mt-1 text-xs text-zinc-500">Recommended to keep free space for snapshots, metadata, and performance headroom.</p>
+          </label>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-white/10 bg-black/30 p-4">
+          <p class="mb-2 text-xs uppercase tracking-[0.12em] text-zinc-500">Quick Presets (pSEO style)</p>
+          <div id="presetButtons" class="flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="rounded-3xl border border-sky-500/20 bg-gradient-to-br from-sky-500/10 to-cyan-500/5 p-6 backdrop-blur md:p-8">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-200">2. Capacity Result</h2>
+
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Raw Capacity</p>
+              <p id="rawCapOut" class="mt-1 font-mono text-2xl text-white">-</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Usable Capacity</p>
+              <p id="usableCapOut" class="mt-1 font-mono text-2xl text-sky-200">-</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Fault Tolerance</p>
+              <p id="faultOut" class="mt-1 font-mono text-xl text-emerald-200">-</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Efficiency</p>
+              <p id="effOut" class="mt-1 font-mono text-xl text-amber-200">-</p>
+            </div>
+          </div>
+
+          <div id="adviceBox" class="mt-4 rounded-xl border border-white/10 bg-black/25 p-3 text-sm text-zinc-300"></div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur md:p-8">
+          <h3 class="mb-3 text-xs uppercase tracking-widest text-zinc-400">3. RAID 10 vs RAID 5 Snapshot</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[540px] text-left text-sm">
+              <thead>
+                <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+                  <th class="py-3">Mode</th>
+                  <th class="py-3">Usable</th>
+                  <th class="py-3">Tolerance</th>
+                  <th class="py-3">Efficiency</th>
+                </tr>
+              </thead>
+              <tbody id="compareBody" class="text-zinc-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    type RaidLevel = 'raid0' | 'raid1' | 'raid5' | 'raid6' | 'raid10' | 'raidz1' | 'raidz2' | 'raidz3';
+
+    const driveCountInput = document.getElementById('driveCountInput');
+    const driveSizeInput = document.getElementById('driveSizeInput');
+    const raidLevelSelect = document.getElementById('raidLevelSelect');
+    const reserveInput = document.getElementById('reserveInput');
+
+    const rawCapOut = document.getElementById('rawCapOut');
+    const usableCapOut = document.getElementById('usableCapOut');
+    const faultOut = document.getElementById('faultOut');
+    const effOut = document.getElementById('effOut');
+    const adviceBox = document.getElementById('adviceBox');
+    const compareBody = document.getElementById('compareBody');
+    const presetButtons = document.getElementById('presetButtons');
+
+    if (
+      !(driveCountInput instanceof HTMLInputElement) ||
+      !(driveSizeInput instanceof HTMLInputElement) ||
+      !(raidLevelSelect instanceof HTMLSelectElement) ||
+      !(reserveInput instanceof HTMLInputElement) ||
+      !(rawCapOut instanceof HTMLElement) ||
+      !(usableCapOut instanceof HTMLElement) ||
+      !(faultOut instanceof HTMLElement) ||
+      !(effOut instanceof HTMLElement) ||
+      !(adviceBox instanceof HTMLElement) ||
+      !(compareBody instanceof HTMLElement) ||
+      !(presetButtons instanceof HTMLElement)
+    ) {
+      throw new Error('NAS RAID calculator UI is missing required elements.');
+    }
+
+    const driveCountInputEl = driveCountInput as HTMLInputElement;
+    const driveSizeInputEl = driveSizeInput as HTMLInputElement;
+    const raidLevelSelectEl = raidLevelSelect as HTMLSelectElement;
+    const reserveInputEl = reserveInput as HTMLInputElement;
+    const rawCapOutEl = rawCapOut as HTMLElement;
+    const usableCapOutEl = usableCapOut as HTMLElement;
+    const faultOutEl = faultOut as HTMLElement;
+    const effOutEl = effOut as HTMLElement;
+    const adviceBoxEl = adviceBox as HTMLElement;
+    const compareBodyEl = compareBody as HTMLElement;
+    const presetButtonsEl = presetButtons as HTMLElement;
+
+    const PRESETS = [
+      { label: '4x 8TB RAID 5', drives: 4, sizeTb: 8, level: 'raid5' as RaidLevel },
+      { label: '6x 12TB RAID-Z2', drives: 6, sizeTb: 12, level: 'raidz2' as RaidLevel },
+      { label: '8x 16TB RAID 10', drives: 8, sizeTb: 16, level: 'raid10' as RaidLevel },
+      { label: '5x 18TB RAID-Z1', drives: 5, sizeTb: 18, level: 'raidz1' as RaidLevel }
+    ];
+
+    const levelNames: Record<RaidLevel, string> = {
+      raid0: 'RAID 0',
+      raid1: 'RAID 1',
+      raid5: 'RAID 5',
+      raid6: 'RAID 6',
+      raid10: 'RAID 10',
+      raidz1: 'RAID-Z1',
+      raidz2: 'RAID-Z2',
+      raidz3: 'RAID-Z3'
+    };
+
+    function fmtTb(value: number): string {
+      return `${value.toFixed(2)} TB`;
+    }
+
+    function readNum(el: HTMLInputElement, fallback: number): number {
+      const value = Number(el.value);
+      return Number.isFinite(value) ? value : fallback;
+    }
+
+    function parityCount(level: RaidLevel): number {
+      if (level === 'raid5' || level === 'raidz1') return 1;
+      if (level === 'raid6' || level === 'raidz2') return 2;
+      if (level === 'raidz3') return 3;
+      return 0;
+    }
+
+    function minDrives(level: RaidLevel): number {
+      switch (level) {
+        case 'raid0': return 1;
+        case 'raid1': return 2;
+        case 'raid5': return 3;
+        case 'raid6': return 4;
+        case 'raid10': return 4;
+        case 'raidz1': return 3;
+        case 'raidz2': return 4;
+        case 'raidz3': return 5;
+      }
+    }
+
+    function tolerance(level: RaidLevel, drives: number): string {
+      if (level === 'raid0') return '0 drives';
+      if (level === 'raid1') return `${Math.max(1, drives - 1)} drives*`;
+      if (level === 'raid10') return '1 drive per mirror pair*';
+      const p = parityCount(level);
+      return `${p} drive${p > 1 ? 's' : ''}`;
+    }
+
+    function usableDataDisks(level: RaidLevel, drives: number): number {
+      if (level === 'raid0') return drives;
+      if (level === 'raid1') return 1;
+      if (level === 'raid10') return Math.floor(drives / 2);
+      return Math.max(0, drives - parityCount(level));
+    }
+
+    function levelAdvice(level: RaidLevel): string {
+      switch (level) {
+        case 'raid0': return 'Maximum capacity and speed, but any single disk failure loses the whole array.';
+        case 'raid1': return 'Strong redundancy but low capacity efficiency. Great for small, critical datasets.';
+        case 'raid5': return 'Balanced capacity and redundancy, but rebuild stress can be high on large disks.';
+        case 'raid6': return 'Safer for larger arrays with dual parity, at the cost of one extra parity disk.';
+        case 'raid10': return 'Excellent random I/O and rebuild behavior; capacity is typically 50% of raw.';
+        case 'raidz1': return 'ZFS single-parity equivalent of RAID 5; common for smaller homelab pools.';
+        case 'raidz2': return 'Popular TrueNAS default for medium arrays; dual-parity with good safety margin.';
+        case 'raidz3': return 'High resiliency for big pools and long rebuild windows, but lowest efficiency.';
+      }
+    }
+
+    function calculate(level: RaidLevel, drives: number, sizeTb: number, reservePct: number) {
+      const min = minDrives(level);
+      const valid = drives >= min;
+      const evenNeeded = level === 'raid10';
+      const raid10Valid = !evenNeeded || drives % 2 === 0;
+
+      const raw = Math.max(0, drives) * Math.max(0, sizeTb);
+      const dataDisks = usableDataDisks(level, drives);
+      const usableBeforeReserve = dataDisks * sizeTb;
+      const reserve = Math.max(0, Math.min(40, reservePct)) / 100;
+      const usableAfterReserve = usableBeforeReserve * (1 - reserve);
+      const efficiency = raw > 0 ? (usableBeforeReserve / raw) * 100 : 0;
+
+      return {
+        valid: valid && raid10Valid,
+        min,
+        raid10Valid,
+        raw,
+        usableBeforeReserve,
+        usableAfterReserve,
+        efficiency,
+        tol: tolerance(level, drives)
+      };
+    }
+
+    function renderComparison(drives: number, sizeTb: number, reservePct: number): void {
+      const raid5 = calculate('raid5', drives, sizeTb, reservePct);
+      const raid10 = calculate('raid10', drives, sizeTb, reservePct);
+
+      const rows = [
+        { mode: 'RAID 5', result: raid5 },
+        { mode: 'RAID 10', result: raid10 }
+      ];
+
+      compareBodyEl.innerHTML = rows.map((row) => {
+        if (!row.result.valid) {
+          return `
+            <tr class="border-b border-white/5">
+              <td class="py-3 font-medium text-white">${row.mode}</td>
+              <td class="py-3 text-zinc-500">N/A</td>
+              <td class="py-3 text-zinc-500">N/A</td>
+              <td class="py-3 text-zinc-500">N/A</td>
+            </tr>
+          `;
+        }
+
+        return `
+          <tr class="border-b border-white/5">
+            <td class="py-3 font-medium text-white">${row.mode}</td>
+            <td class="py-3 font-mono text-sky-200">${fmtTb(row.result.usableAfterReserve)}</td>
+            <td class="py-3 text-zinc-300">${row.result.tol}</td>
+            <td class="py-3 font-mono text-zinc-200">${row.result.efficiency.toFixed(1)}%</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function render(): void {
+      const drives = Math.max(1, Math.floor(readNum(driveCountInputEl, 4)));
+      const sizeTb = Math.max(0.1, readNum(driveSizeInputEl, 8));
+      const reservePct = Math.max(0, Math.min(40, readNum(reserveInputEl, 10)));
+      const level = raidLevelSelectEl.value as RaidLevel;
+
+      const result = calculate(level, drives, sizeTb, reservePct);
+
+      rawCapOutEl.textContent = fmtTb(result.raw);
+
+      if (!result.valid) {
+        usableCapOutEl.textContent = 'Invalid setup';
+        faultOutEl.textContent = '-';
+        effOutEl.textContent = '-';
+        const base = `Mode ${levelNames[level]} requires at least ${result.min} drives.`;
+        const extra = level === 'raid10' && !result.raid10Valid
+          ? ' RAID 10 also requires an even number of drives.'
+          : '';
+        adviceBoxEl.textContent = `${base}${extra}`;
+      } else {
+        usableCapOutEl.textContent = fmtTb(result.usableAfterReserve);
+        faultOutEl.textContent = result.tol;
+        effOutEl.textContent = `${result.efficiency.toFixed(1)}%`;
+        adviceBoxEl.textContent = `${levelAdvice(level)} Reserve applied: ${reservePct.toFixed(0)}%.`;
+      }
+
+      renderComparison(drives, sizeTb, reservePct);
+    }
+
+    function applyPreset(drives: number, sizeTb: number, level: RaidLevel): void {
+      driveCountInputEl.value = String(drives);
+      driveSizeInputEl.value = String(sizeTb);
+      raidLevelSelectEl.value = level;
+      render();
+    }
+
+    function setupPresets(): void {
+      presetButtonsEl.innerHTML = '';
+      PRESETS.forEach((preset) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rounded-full border border-sky-300/35 bg-sky-300/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition hover:bg-sky-300/20';
+        btn.textContent = preset.label;
+        btn.addEventListener('click', () => applyPreset(preset.drives, preset.sizeTb, preset.level));
+        presetButtonsEl.appendChild(btn);
+      });
+    }
+
+    [driveCountInputEl, driveSizeInputEl, reserveInputEl].forEach((el) => {
+      el.addEventListener('input', render);
+    });
+    raidLevelSelectEl.addEventListener('change', render);
+
+    setupPresets();
+    render();
+  </script>
+</Layout>
