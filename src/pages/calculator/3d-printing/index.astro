@@ -31,7 +31,8 @@ data.materials.forEach(m => {
 
       <section class="mb-8 grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-end">
         <div>
-          <p class="mb-3 inline-flex items-center rounded-full border border-emerald-300/35 bg-emerald-200/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-100">
+          <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-300/35 bg-emerald-200/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-100">
+            <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12v8H6z"/><path d="M8 8V5h8v3"/></svg>
             Calculator Navigator
           </p>
           <h1 class="text-4xl font-semibold tracking-tight text-white md:text-5xl">3D Printing Filament Length</h1>
@@ -50,7 +51,7 @@ data.materials.forEach(m => {
         {combos.map(combo => (
           <a href={combo.href} class="group rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-white/[0.08]">
             <div class="flex items-center justify-between">
-              <h2 class="font-semibold text-white">{combo.material.name}</h2>
+              <h2 class="inline-flex items-center gap-2 font-semibold text-white"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18h16"/><path d="M6 18v-6h12v6"/></svg>{combo.material.name}</h2>
               <span class="rounded-md border border-white/15 bg-black/25 px-2 py-0.5 text-xs font-mono text-zinc-300">{combo.diameter.name}</span>
             </div>
             <p class="mt-2 text-sm text-zinc-300">Open dedicated profile calculator</p>

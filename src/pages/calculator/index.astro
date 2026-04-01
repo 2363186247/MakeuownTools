@@ -55,8 +55,26 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 			<div class="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-emerald-400/15 blur-3xl"></div>
 			<div class="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl"></div>
 
-			<div class="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+			<div class="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
 				<div>
+					<div class="mb-4 flex flex-wrap gap-2">
+						<span class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-medium text-cyan-100">
+							<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M12 5v14"/></svg>
+							AI
+						</span>
+						<span class="inline-flex items-center gap-2 rounded-full border border-sky-300/30 bg-sky-300/10 px-3 py-1 text-xs font-medium text-sky-100">
+							<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+							Storage
+						</span>
+						<span class="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-xs font-medium text-amber-100">
+							<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/></svg>
+							Power
+						</span>
+						<span class="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100">
+							<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16M7 16l3-8 4 6 3-4"/></svg>
+							Fabrication
+						</span>
+					</div>
 					<p class="mb-3 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-zinc-200">
 						Calculator Hub
 					</p>
@@ -98,7 +116,7 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 		<section class="mt-7 grid gap-5 lg:grid-cols-2 xl:grid-cols-5">
 			<article class="group rounded-3xl border border-cyan-300/25 bg-gradient-to-br from-cyan-300/12 to-blue-500/10 p-6 shadow-2xl shadow-cyan-900/15 transition hover:border-cyan-200/40 md:p-7">
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-xs uppercase tracking-[0.16em] text-cyan-100">AI / LLM</p>
+					<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-cyan-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg>AI / LLM</p>
 					<span class="rounded-full border border-cyan-200/35 bg-cyan-100/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-100">Priority</span>
 				</div>
 				<h2 class="text-2xl font-semibold tracking-tight text-white">LLM VRAM Calculator</h2>
@@ -113,7 +131,7 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 
 			<article class="group rounded-3xl border border-sky-300/25 bg-gradient-to-br from-sky-300/12 to-indigo-500/10 p-6 shadow-2xl shadow-sky-900/15 transition hover:border-sky-200/40 md:p-7">
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-xs uppercase tracking-[0.16em] text-sky-100">NAS / Homelab</p>
+					<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-sky-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>NAS / Homelab</p>
 					<span class="rounded-full border border-sky-200/35 bg-sky-100/10 px-2.5 py-0.5 text-xs font-semibold text-sky-100">New</span>
 				</div>
 				<h2 class="text-2xl font-semibold tracking-tight text-white">NAS & RAID Storage Calculator</h2>
@@ -128,7 +146,7 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 
 			<article class="group rounded-3xl border border-amber-300/25 bg-gradient-to-br from-amber-300/12 to-yellow-500/10 p-6 shadow-2xl shadow-amber-900/15 transition hover:border-amber-200/40 md:p-7">
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-xs uppercase tracking-[0.16em] text-amber-100">RV / Off-Grid</p>
+					<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-amber-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M5 9h14M7 16h10"/></svg>RV / Off-Grid</p>
 					<span class="rounded-full border border-amber-200/35 bg-amber-100/10 px-2.5 py-0.5 text-xs font-semibold text-amber-100">SEO Scale</span>
 				</div>
 				<h2 class="text-2xl font-semibold tracking-tight text-white">RV Solar & Battery Calculator</h2>
@@ -143,7 +161,7 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 
 			<article class="group rounded-3xl border border-emerald-300/25 bg-gradient-to-br from-emerald-300/12 to-lime-500/10 p-6 shadow-2xl shadow-emerald-900/15 transition hover:border-emerald-200/40 md:p-7">
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-xs uppercase tracking-[0.16em] text-emerald-100">3D Printing</p>
+					<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-emerald-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12v8H6z"/><path d="M8 8V5h8v3"/></svg>3D Printing</p>
 					<span class="rounded-full border border-emerald-200/35 bg-emerald-100/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-100">Live</span>
 				</div>
 				<h2 class="text-2xl font-semibold tracking-tight text-white">Filament Length Navigator</h2>
@@ -168,7 +186,7 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 
 			<article class="group rounded-3xl border border-amber-300/25 bg-gradient-to-br from-amber-300/12 to-orange-500/10 p-6 shadow-2xl shadow-amber-900/15 transition hover:border-amber-200/40 md:p-7">
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-xs uppercase tracking-[0.16em] text-amber-100">Satisfactory</p>
+					<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-amber-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18h16"/><path d="M6 18v-6h4v6M14 18v-9h4v9"/></svg>Satisfactory</p>
 					<span class="rounded-full border border-amber-200/35 bg-amber-100/10 px-2.5 py-0.5 text-xs font-semibold text-amber-100">Live</span>
 				</div>
 				<h2 class="text-2xl font-semibold tracking-tight text-white">Factory Reverse Planner</h2>

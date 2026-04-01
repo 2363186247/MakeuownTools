@@ -18,7 +18,8 @@ const brandKeywords = getSolarKeywordEntriesByCategory('brand').slice(0, 9);
     </a>
 
     <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
-      <p class="mb-3 inline-flex items-center rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">
+      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">
+        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
         Off-Grid Power Planner
       </p>
       <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">RV Off-Grid Solar & Battery Sizing Calculator</h1>
@@ -29,7 +30,7 @@ const brandKeywords = getSolarKeywordEntriesByCategory('brand').slice(0, 9);
 
     <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
       <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
-        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">1. Appliance Load Profile</h2>
+        <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M5 9h14M7 16h10"/></svg>1. Appliance Load Profile</h2>
         <p class="mb-4 text-xs text-zinc-500">Use real average draw values. Burst loads can be covered by inverter surge headroom.</p>
 
         <div id="loadRows" class="space-y-3"></div>
@@ -42,7 +43,7 @@ const brandKeywords = getSolarKeywordEntriesByCategory('brand').slice(0, 9);
       </section>
 
       <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8">
-        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">2. System Settings</h2>
+        <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>2. System Settings</h2>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label>
@@ -75,7 +76,7 @@ const brandKeywords = getSolarKeywordEntriesByCategory('brand').slice(0, 9);
     </div>
 
     <section class="mt-6 rounded-3xl border border-amber-300/20 bg-gradient-to-br from-amber-300/10 to-orange-500/8 p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-100">3. Sizing Output</h2>
+      <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-amber-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M8 14h8M10 11h4"/></svg>3. Sizing Output</h2>
       <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
           <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Daily Load</p>
