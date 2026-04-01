@@ -35,6 +35,19 @@ import Layout from '../../../layouts/Layout.astro';
             </div>
           </label>
 
+          <div class="mb-4">
+            <p class="mb-2 text-xs uppercase tracking-[0.12em] text-zinc-500">Quick Picks</p>
+            <div id="quickModelPicks" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <div class="mb-4 rounded-xl border border-white/10 bg-black/30 p-3">
+            <div class="mb-2 flex items-center justify-between gap-3">
+              <p class="text-xs uppercase tracking-[0.12em] text-zinc-500">Recent Models</p>
+              <button id="clearRecentModelsBtn" class="text-xs text-zinc-400 transition hover:text-zinc-200">Clear</button>
+            </div>
+            <div id="recentModelsList" class="flex flex-wrap gap-2"></div>
+          </div>
+
           <label class="mb-2 block">
             <span class="mb-1 block text-xs text-zinc-400">Hugging Face Token (Optional)</span>
             <input id="hfTokenInput" type="password" placeholder="hf_..." class="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 font-mono text-xs text-white outline-none transition focus:border-cyan-500/50" />
@@ -44,6 +57,36 @@ import Layout from '../../../layouts/Layout.astro';
           </p>
 
           <div id="statusMessage" class="mt-4 hidden rounded-lg border p-3 text-xs font-mono"></div>
+
+          <div id="configSummaryCard" class="mt-4 hidden rounded-xl border border-white/10 bg-black/35 p-4">
+            <p class="mb-3 text-xs uppercase tracking-[0.12em] text-zinc-500">Parsed Summary</p>
+            <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+              <div>
+                <dt class="text-zinc-500">Model Type</dt>
+                <dd id="summaryModelType" class="font-mono text-zinc-200">-</dd>
+              </div>
+              <div>
+                <dt class="text-zinc-500">Parameters</dt>
+                <dd id="summaryParams" class="font-mono text-zinc-200">-</dd>
+              </div>
+              <div>
+                <dt class="text-zinc-500">Hidden / Layers</dt>
+                <dd id="summaryHiddenLayers" class="font-mono text-zinc-200">-</dd>
+              </div>
+              <div>
+                <dt class="text-zinc-500">Heads / KV Heads</dt>
+                <dd id="summaryHeads" class="font-mono text-zinc-200">-</dd>
+              </div>
+              <div>
+                <dt class="text-zinc-500">Max Context</dt>
+                <dd id="summaryContext" class="font-mono text-zinc-200">-</dd>
+              </div>
+              <div>
+                <dt class="text-zinc-500">Attention Pattern</dt>
+                <dd id="summaryAttention" class="font-mono text-zinc-200">-</dd>
+              </div>
+            </dl>
+          </div>
       </section>
 
       <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8 lg:h-full">
@@ -168,6 +211,16 @@ import Layout from '../../../layouts/Layout.astro';
     const hfTokenInput = document.getElementById('hfTokenInput');
     const fetchBtn = document.getElementById('fetchBtn');
     const statusMessage = document.getElementById('statusMessage');
+    const quickModelPicks = document.getElementById('quickModelPicks');
+    const recentModelsList = document.getElementById('recentModelsList');
+    const clearRecentModelsBtn = document.getElementById('clearRecentModelsBtn');
+    const configSummaryCard = document.getElementById('configSummaryCard');
+    const summaryModelType = document.getElementById('summaryModelType');
+    const summaryParams = document.getElementById('summaryParams');
+    const summaryHiddenLayers = document.getElementById('summaryHiddenLayers');
+    const summaryHeads = document.getElementById('summaryHeads');
+    const summaryContext = document.getElementById('summaryContext');
+    const summaryAttention = document.getElementById('summaryAttention');
 
     const paramsInput = document.getElementById('paramsInput');
     const hiddenSizeInput = document.getElementById('hiddenSizeInput');
@@ -199,6 +252,16 @@ import Layout from '../../../layouts/Layout.astro';
       !(hfTokenInput instanceof HTMLInputElement) ||
       !(fetchBtn instanceof HTMLButtonElement) ||
       !(statusMessage instanceof HTMLElement) ||
+      !(quickModelPicks instanceof HTMLElement) ||
+      !(recentModelsList instanceof HTMLElement) ||
+      !(clearRecentModelsBtn instanceof HTMLButtonElement) ||
+      !(configSummaryCard instanceof HTMLElement) ||
+      !(summaryModelType instanceof HTMLElement) ||
+      !(summaryParams instanceof HTMLElement) ||
+      !(summaryHiddenLayers instanceof HTMLElement) ||
+      !(summaryHeads instanceof HTMLElement) ||
+      !(summaryContext instanceof HTMLElement) ||
+      !(summaryAttention instanceof HTMLElement) ||
       !(paramsInput instanceof HTMLInputElement) ||
       !(hiddenSizeInput instanceof HTMLInputElement) ||
       !(layersInput instanceof HTMLInputElement) ||
@@ -228,6 +291,16 @@ import Layout from '../../../layouts/Layout.astro';
     const hfTokenInputEl = hfTokenInput as HTMLInputElement;
     const fetchBtnEl = fetchBtn as HTMLButtonElement;
     const statusMessageEl = statusMessage as HTMLElement;
+    const quickModelPicksEl = quickModelPicks as HTMLElement;
+    const recentModelsListEl = recentModelsList as HTMLElement;
+    const clearRecentModelsBtnEl = clearRecentModelsBtn as HTMLButtonElement;
+    const configSummaryCardEl = configSummaryCard as HTMLElement;
+    const summaryModelTypeEl = summaryModelType as HTMLElement;
+    const summaryParamsEl = summaryParams as HTMLElement;
+    const summaryHiddenLayersEl = summaryHiddenLayers as HTMLElement;
+    const summaryHeadsEl = summaryHeads as HTMLElement;
+    const summaryContextEl = summaryContext as HTMLElement;
+    const summaryAttentionEl = summaryAttention as HTMLElement;
     const paramsInputEl = paramsInput as HTMLInputElement;
     const hiddenSizeInputEl = hiddenSizeInput as HTMLInputElement;
     const layersInputEl = layersInput as HTMLInputElement;
@@ -251,6 +324,15 @@ import Layout from '../../../layouts/Layout.astro';
     const moeSharedRatioValueEl = moeSharedRatioValue as HTMLElement;
 
     let mode = 'inference';
+    const RECENT_MODELS_KEY = 'vram_recent_models';
+
+    const QUICK_MODEL_IDS = [
+      'Qwen/Qwen2.5-7B-Instruct',
+      'meta-llama/Llama-3.1-8B-Instruct',
+      'mistralai/Mistral-7B-Instruct-v0.3',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B'
+    ];
 
     const savedToken = localStorage.getItem('hf_token');
     if (savedToken) hfTokenInputEl.value = savedToken;
@@ -263,6 +345,89 @@ import Layout from '../../../layouts/Layout.astro';
         statusMessageEl.classList.add('border-emerald-500/30', 'bg-emerald-500/10', 'text-emerald-300');
       }
       statusMessageEl.textContent = message;
+    }
+
+    function readRecentModels(): string[] {
+      try {
+        const raw = localStorage.getItem(RECENT_MODELS_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((item) => typeof item === 'string' && item.trim().length > 0).slice(0, 5);
+      } catch {
+        return [];
+      }
+    }
+
+    function writeRecentModels(models: string[]): void {
+      localStorage.setItem(RECENT_MODELS_KEY, JSON.stringify(models.slice(0, 5)));
+    }
+
+    function pushRecentModel(modelId: string): void {
+      const normalized = modelId.trim();
+      if (!normalized) return;
+      const current = readRecentModels().filter((item) => item !== normalized);
+      writeRecentModels([normalized, ...current]);
+      renderRecentModels();
+    }
+
+    function renderRecentModels(): void {
+      const models = readRecentModels();
+      if (models.length === 0) {
+        recentModelsListEl.innerHTML = '<span class="text-xs text-zinc-500">No recent models yet.</span>';
+        return;
+      }
+
+      recentModelsListEl.innerHTML = '';
+      models.forEach((modelId) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rounded-full border border-white/15 bg-black/40 px-3 py-1 text-xs font-mono text-zinc-200 transition hover:border-cyan-400/60 hover:text-cyan-100';
+        btn.textContent = modelId;
+        btn.addEventListener('click', () => {
+          modelIdInputEl.value = modelId;
+          fetchModelConfig();
+        });
+        recentModelsListEl.appendChild(btn);
+      });
+    }
+
+    function renderQuickPicks(): void {
+      quickModelPicksEl.innerHTML = '';
+      QUICK_MODEL_IDS.forEach((modelId) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/70 hover:bg-cyan-300/20';
+        btn.textContent = modelId;
+        btn.addEventListener('click', () => {
+          modelIdInputEl.value = modelId;
+          fetchModelConfig();
+        });
+        quickModelPicksEl.appendChild(btn);
+      });
+    }
+
+    function renderConfigSummary(modelId: string, config: any, paramsB: number): void {
+      const heads = Number(config.num_attention_heads) || 0;
+      const kvHeads = Number(config.num_key_value_heads) || heads;
+      let pattern = 'Unknown';
+      if (kvHeads <= 1) pattern = 'MQA';
+      else if (heads > 0 && kvHeads < heads) pattern = 'GQA';
+      else if (heads > 0) pattern = 'MHA';
+
+      const contextCandidates = [
+        config.max_position_embeddings,
+        config.max_sequence_length,
+        config.model_max_length
+      ].filter((v) => typeof v === 'number' && Number.isFinite(v));
+
+      summaryModelTypeEl.textContent = String(config.model_type || modelId || '-');
+      summaryParamsEl.textContent = paramsB > 0 ? `${paramsB.toFixed(2)}B` : '-';
+      summaryHiddenLayersEl.textContent = `${Number(config.hidden_size) || '-'} / ${Number(config.num_hidden_layers) || '-'}`;
+      summaryHeadsEl.textContent = `${heads || '-'} / ${kvHeads || '-'}`;
+      summaryContextEl.textContent = contextCandidates.length > 0 ? `${contextCandidates[0]} tokens` : '-';
+      summaryAttentionEl.textContent = pattern;
+      configSummaryCardEl.classList.remove('hidden');
     }
 
     function toGB(bytes: number): number {
@@ -558,6 +723,9 @@ import Layout from '../../../layouts/Layout.astro';
           paramsInputEl.value = paramsB.toFixed(2);
         }
 
+        renderConfigSummary(modelId, config, paramsB);
+        pushRecentModel(modelId);
+
         showStatus(`Loaded config for ${modelId}. Parsed architecture and refreshed estimates.`);
         render();
       } catch (error: unknown) {
@@ -600,6 +768,13 @@ import Layout from '../../../layouts/Layout.astro';
     moeExpertsInputEl.addEventListener('input', render);
     moeActiveExpertsInputEl.addEventListener('input', render);
     moeSharedRatioInputEl.addEventListener('input', render);
+    clearRecentModelsBtnEl.addEventListener('click', () => {
+      localStorage.removeItem(RECENT_MODELS_KEY);
+      renderRecentModels();
+    });
+
+    renderQuickPicks();
+    renderRecentModels();
 
     setMode('inference');
     render();
