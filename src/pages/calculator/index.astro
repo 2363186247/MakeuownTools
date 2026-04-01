@@ -36,6 +36,14 @@ const filamentFeatured = filamentData.materials.slice(0, 3).map((material) => ({
 	href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}`
 }));
 
+const quickLaunch = [
+	{ label: 'LLM VRAM', href: '/calculator/vram/', tone: 'cyan' },
+	{ label: 'NAS / RAID', href: '/calculator/nas-raid/', tone: 'sky' },
+	{ label: 'Off-Grid Solar', href: '/calculator/off-grid-solar/', tone: 'amber' },
+	{ label: '3D Printing', href: '/calculator/3d-printing/', tone: 'emerald' },
+	{ label: 'Satisfactory', href: '/calculator/satisfactory/', tone: 'orange' }
+] as const;
+
 const satFeatured = satData.mvp_targets.slice(0, 4)
 	.map((id) => satData.items.find((item) => item.id === id))
 	.filter((item): item is SatisfactoryItem => Boolean(item));
@@ -82,32 +90,53 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 					<p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
 						One hub for multiple domains: VRAM capacity planning for LLM deployment, 3D printing filament estimation, and Satisfactory factory reverse planning.
 					</p>
+					<div class="mt-6">
+						<p class="mb-3 text-xs uppercase tracking-[0.16em] text-zinc-400">Quick Launch</p>
+						<div class="flex flex-wrap gap-2">
+							{quickLaunch.map((item) => (
+								<a
+									href={item.href}
+									class:list={[
+										'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition',
+										item.tone === 'cyan' && 'border-cyan-300/30 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20',
+										item.tone === 'sky' && 'border-sky-300/30 bg-sky-300/10 text-sky-100 hover:bg-sky-300/20',
+										item.tone === 'amber' && 'border-amber-300/30 bg-amber-300/10 text-amber-100 hover:bg-amber-300/20',
+										item.tone === 'emerald' && 'border-emerald-300/30 bg-emerald-300/10 text-emerald-100 hover:bg-emerald-300/20',
+										item.tone === 'orange' && 'border-orange-300/30 bg-orange-300/10 text-orange-100 hover:bg-orange-300/20'
+									]}
+								>
+									<span>{item.label}</span>
+									<span>→</span>
+								</a>
+							))}
+						</div>
+					</div>
 				</div>
 
 				<div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
 					<div class="rounded-2xl border border-white/15 bg-black/25 p-4">
-						<p class="text-xs uppercase tracking-[0.16em] text-zinc-400">All Calculator Pages</p>
-						<p class="mt-1 text-3xl font-semibold text-white">{allCalculatorRoutes}</p>
+						<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>All Calculator Pages</p>
+						<p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={allCalculatorRoutes}>0</p>
 					</div>
 					<div class="rounded-2xl border border-white/15 bg-black/25 p-4">
-						<p class="text-xs uppercase tracking-[0.16em] text-zinc-400">AI VRAM Tools</p>
-						<p class="mt-1 text-3xl font-semibold text-white">{vramRoutes}</p>
+						<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg>AI VRAM Tools</p>
+						<p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={vramRoutes}>0</p>
 					</div>
 					<div class="rounded-2xl border border-white/15 bg-black/25 p-4">
-						<p class="text-xs uppercase tracking-[0.16em] text-zinc-400">NAS / RAID Tools</p>
-						<p class="mt-1 text-3xl font-semibold text-white">{nasRaidRoutes}</p>
+						<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>NAS / RAID Tools</p>
+						<p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={nasRaidRoutes}>0</p>
 					</div>
 					<div class="rounded-2xl border border-white/15 bg-black/25 p-4">
-						<p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Off-Grid Solar Tools</p>
-						<p class="mt-1 text-3xl font-semibold text-white">{offGridSolarRoutes}</p>
+						<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M5 9h14M7 16h10"/></svg>Off-Grid Solar Tools</p>
+						<p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={offGridSolarRoutes}>0</p>
 					</div>
 					<div class="rounded-2xl border border-white/15 bg-black/25 p-4">
-						<p class="text-xs uppercase tracking-[0.16em] text-zinc-400">3D Printing Profiles</p>
-						<p class="mt-1 text-3xl font-semibold text-white">{filamentRoutes}</p>
+						<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12v8H6z"/><path d="M8 8V5h8v3"/></svg>3D Printing Profiles</p>
+						<p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={filamentRoutes}>0</p>
 					</div>
 					<div class="rounded-2xl border border-white/15 bg-black/25 p-4">
-						<p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Satisfactory Targets</p>
-						<p class="mt-1 text-3xl font-semibold text-white">{satisfactoryTargets}</p>
+						<p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18h16"/><path d="M6 18v-6h4v6M14 18v-9h4v9"/></svg>Satisfactory Targets</p>
+						<p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={satisfactoryTargets}>0</p>
 					</div>
 				</div>
 			</div>
@@ -210,5 +239,50 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 			</article>
 		</section>
 
+		<section class="mt-7 rounded-3xl border border-white/12 bg-white/[0.02] p-6 md:p-7">
+			<div class="mb-4 flex items-center justify-between gap-3">
+				<h3 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>Discover More Calculators</h3>
+				<span class="text-xs uppercase tracking-[0.14em] text-zinc-500">Cross-Domain</span>
+			</div>
+			<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+				<a href="/calculator/vram/" class="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20">LLM VRAM Capacity Planning</a>
+				<a href="/calculator/nas-raid/" class="rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-300/20">NAS RAID Capacity & Tolerance</a>
+				<a href="/calculator/off-grid-solar/" class="rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-medium text-amber-100 transition hover:bg-amber-300/20">Off-Grid Solar & Battery Sizing</a>
+				<a href="/calculator/satisfactory/" class="rounded-xl border border-orange-300/25 bg-orange-300/10 px-4 py-3 text-sm font-medium text-orange-100 transition hover:bg-orange-300/20">Satisfactory Reverse Planning</a>
+			</div>
+		</section>
+
 	</main>
 </Layout>
+
+<script>
+	(() => {
+		const counters = Array.from(document.querySelectorAll<HTMLElement>('[data-countup]'));
+		if (!counters.length) return;
+
+		const animateCounter = (node: HTMLElement) => {
+			const target = Number(node.dataset.target ?? '0');
+			const duration = 900;
+			const start = performance.now();
+
+			const step = (now: number) => {
+				const progress = Math.min((now - start) / duration, 1);
+				const eased = 1 - Math.pow(1 - progress, 3);
+				node.textContent = String(Math.round(target * eased));
+				if (progress < 1) requestAnimationFrame(step);
+			};
+
+			requestAnimationFrame(step);
+		};
+
+		const observer = new IntersectionObserver((entries, obs) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) return;
+				animateCounter(entry.target as HTMLElement);
+				obs.unobserve(entry.target);
+			});
+		}, { threshold: 0.4 });
+
+		counters.forEach((counter) => observer.observe(counter));
+	})();
+</script>
