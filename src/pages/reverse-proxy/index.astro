@@ -1,0 +1,467 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {
+  REVERSE_PROXY_APP_PRESETS,
+  REVERSE_PROXY_SERVERS,
+  defaultOptionsFor,
+  generateReverseProxyConfig,
+  getReverseProxySeoEntries,
+  type ProxyApp,
+  type ProxyServer
+} from '../../data/reverseProxySeo';
+
+const defaultOptions = defaultOptionsFor('node', 'nginx');
+const seoEntries = getReverseProxySeoEntries();
+const featuredEntries = seoEntries.slice(0, 8);
+---
+
+<Layout
+  title="Reverse Proxy Config Generator | Nginx, Caddy, Traefik"
+  description="Generate production-ready reverse proxy config for Nginx, Caddy, and Traefik with HTTPS, CORS, websocket, compression, and upload limits."
+  canonical="/reverse-proxy/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-12 md:px-8 md:py-16">
+    <a href="/" class="mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white/30 hover:bg-white/10">
+      <span>←</span>
+      <span>Home</span>
+    </a>
+
+    <section class="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-7 md:p-9">
+      <div class="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl"></div>
+
+      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-cyan-100">
+        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        Proxy Automation Studio
+      </p>
+      <h1 class="text-4xl font-semibold tracking-tight text-white md:text-6xl">Reverse Proxy Config Generator</h1>
+      <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
+        Build production-grade reverse proxy configs instantly. Select app profile, ports, HTTPS, websocket, CORS, compression,
+        upload limits, health endpoints, and hardening controls, then export a ready-to-ship Nginx config, Caddyfile, or Traefik dynamic config.
+      </p>
+    </section>
+
+    <section class="mt-7 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+      <div class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+        <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
+          <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M12 3v18"/></svg>
+          1. Proxy Inputs
+        </h2>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Proxy Engine</span>
+            <select id="serverSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50">
+              {REVERSE_PROXY_SERVERS.map((server) => (
+                <option value={server.id} selected={server.id === defaultOptions.server}>{server.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">App Preset</span>
+            <select id="appSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50">
+              {REVERSE_PROXY_APP_PRESETS.map((app) => (
+                <option value={app.id} selected={app.id === defaultOptions.app}>{app.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label class="sm:col-span-2">
+            <span class="mb-1 block text-xs text-zinc-400">Domain</span>
+            <input id="domainInput" type="text" value={defaultOptions.domain} placeholder="api.example.com" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Upstream Host</span>
+            <input id="upstreamHostInput" type="text" value={defaultOptions.upstreamHost} placeholder="127.0.0.1" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Upstream Scheme</span>
+            <select id="upstreamSchemeSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50">
+              <option value="http" selected>http</option>
+              <option value="https">https</option>
+            </select>
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Upstream Port</span>
+            <input id="upstreamPortInput" type="number" min="1" max="65535" value={defaultOptions.upstreamPort} class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Upload Limit (MB)</span>
+            <input id="uploadMbInput" type="number" min="1" max="2048" value={defaultOptions.uploadMb} class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">CORS Origin</span>
+            <input id="corsOriginInput" type="text" value={defaultOptions.corsOrigin} placeholder="*" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Health Check Path</span>
+            <input id="healthPathInput" type="text" value="/health" placeholder="/health" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Rate Limit (req/s)</span>
+            <input id="rateLimitInput" type="number" min="0" max="5000" value="20" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+          </label>
+        </div>
+
+        <div class="mt-5 grid gap-2 sm:grid-cols-3">
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="httpsInput" type="checkbox" checked class="h-4 w-4 accent-cyan-500" /> HTTPS (Let's Encrypt)</label>
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="websocketInput" type="checkbox" class="h-4 w-4 accent-cyan-500" /> WebSocket</label>
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="corsInput" type="checkbox" class="h-4 w-4 accent-cyan-500" /> CORS Headers</label>
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="gzipInput" type="checkbox" checked class="h-4 w-4 accent-cyan-500" /> Gzip</label>
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="brotliInput" type="checkbox" class="h-4 w-4 accent-cyan-500" /> Brotli / Zstd</label>
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="securityHeadersInput" type="checkbox" checked class="h-4 w-4 accent-cyan-500" /> Security Headers</label>
+          <label class="flex items-center gap-2 rounded-xl border border-white/12 bg-black/25 px-3 py-2 text-xs text-zinc-300"><input id="hstsInput" type="checkbox" checked class="h-4 w-4 accent-cyan-500" /> HSTS</label>
+        </div>
+
+        <div id="hardeningHint" class="mt-4 rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-zinc-300"></div>
+
+        <div class="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
+          <p class="mb-2 text-xs uppercase tracking-[0.14em] text-zinc-500">Quick Presets</p>
+          <div class="flex flex-wrap gap-2" id="presetButtons"></div>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 to-blue-500/8 p-6 md:p-8">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h2 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-cyan-100">
+            <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M8 14h8M10 11h4"/></svg>
+            2. Generated Config
+          </h2>
+          <div class="flex items-center gap-2">
+            <button id="copyBtn" class="rounded-lg border border-cyan-200/35 bg-cyan-100/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-100/20">Copy</button>
+            <button id="downloadBtn" class="rounded-lg border border-cyan-200/35 bg-cyan-100/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-100/20">Download</button>
+          </div>
+        </div>
+        <p id="configMeta" class="mb-3 text-xs text-zinc-300"></p>
+        <pre class="max-h-[580px] overflow-auto rounded-2xl border border-white/10 bg-black/40 p-4 text-[12px] leading-6 text-zinc-100"><code id="configOutput"></code></pre>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h3 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
+        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>
+        Reverse Proxy Long-Tail Pages
+      </h3>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {featuredEntries.map((entry) => (
+          <a href={`/reverse-proxy/${entry.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+            {entry.title.replace(' | Config Generator', '')}
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <script id="proxyPresetsData" type="application/json" is:inline>{JSON.stringify(REVERSE_PROXY_APP_PRESETS)}</script>
+  <script id="proxyDefaultOutputData" type="application/json" is:inline>{JSON.stringify(generateReverseProxyConfig(defaultOptions))}</script>
+
+  <script>
+    // @ts-nocheck
+
+    const serverSelect = document.getElementById('serverSelect');
+    const appSelect = document.getElementById('appSelect');
+    const domainInput = document.getElementById('domainInput');
+    const upstreamHostInput = document.getElementById('upstreamHostInput');
+    const upstreamSchemeSelect = document.getElementById('upstreamSchemeSelect');
+    const upstreamPortInput = document.getElementById('upstreamPortInput');
+    const uploadMbInput = document.getElementById('uploadMbInput');
+    const corsOriginInput = document.getElementById('corsOriginInput');
+    const healthPathInput = document.getElementById('healthPathInput');
+    const rateLimitInput = document.getElementById('rateLimitInput');
+    const httpsInput = document.getElementById('httpsInput');
+    const websocketInput = document.getElementById('websocketInput');
+    const corsInput = document.getElementById('corsInput');
+    const gzipInput = document.getElementById('gzipInput');
+    const brotliInput = document.getElementById('brotliInput');
+    const securityHeadersInput = document.getElementById('securityHeadersInput');
+    const hstsInput = document.getElementById('hstsInput');
+    const configOutput = document.getElementById('configOutput');
+    const configMeta = document.getElementById('configMeta');
+    const hardeningHint = document.getElementById('hardeningHint');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const presetButtons = document.getElementById('presetButtons');
+
+    if (
+      !(serverSelect instanceof HTMLSelectElement) ||
+      !(appSelect instanceof HTMLSelectElement) ||
+      !(domainInput instanceof HTMLInputElement) ||
+      !(upstreamHostInput instanceof HTMLInputElement) ||
+      !(upstreamSchemeSelect instanceof HTMLSelectElement) ||
+      !(upstreamPortInput instanceof HTMLInputElement) ||
+      !(uploadMbInput instanceof HTMLInputElement) ||
+      !(corsOriginInput instanceof HTMLInputElement) ||
+      !(healthPathInput instanceof HTMLInputElement) ||
+      !(rateLimitInput instanceof HTMLInputElement) ||
+      !(httpsInput instanceof HTMLInputElement) ||
+      !(websocketInput instanceof HTMLInputElement) ||
+      !(corsInput instanceof HTMLInputElement) ||
+      !(gzipInput instanceof HTMLInputElement) ||
+      !(brotliInput instanceof HTMLInputElement) ||
+      !(securityHeadersInput instanceof HTMLInputElement) ||
+      !(hstsInput instanceof HTMLInputElement) ||
+      !(configOutput instanceof HTMLElement) ||
+      !(configMeta instanceof HTMLElement) ||
+      !(hardeningHint instanceof HTMLElement) ||
+      !(copyBtn instanceof HTMLButtonElement) ||
+      !(downloadBtn instanceof HTMLButtonElement) ||
+      !(presetButtons instanceof HTMLElement)
+    ) {
+      throw new Error('Reverse proxy generator UI is missing required elements.');
+    }
+
+    const appPresetsNode = document.getElementById('proxyPresetsData');
+    const defaultOutputNode = document.getElementById('proxyDefaultOutputData');
+    const appPresets = appPresetsNode ? JSON.parse(appPresetsNode.textContent || '[]') : [];
+    const defaultOutput = defaultOutputNode ? JSON.parse(defaultOutputNode.textContent || '""') : '';
+    const appPresetMap = new Map(appPresets.map((item) => [item.id, item]));
+
+    function readNum(value, fallback) {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : fallback;
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+    }
+
+    function generateConfig(state) {
+      const domain = state.domain.trim() || 'example.com';
+      const uploadMb = Math.max(1, Math.round(state.uploadMb));
+      const port = Math.max(1, Math.round(state.upstreamPort));
+      const rate = Math.max(0, Math.round(state.rateLimitRps));
+      const healthPath = state.healthPath?.trim() || '/health';
+
+      if (state.server === 'nginx') {
+        const wsBlock = state.websocket
+          ? '        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection "upgrade";\n'
+          : '';
+        const corsBlock = state.cors
+          ? `        add_header Access-Control-Allow-Origin "${state.corsOrigin || '*'}" always;\n        add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;\n        add_header Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With" always;\n`
+          : '';
+        const brotli = state.brotli
+          ? '    brotli on;\n    brotli_comp_level 5;\n'
+          : '';
+        const securityHeaders = state.securityHeaders
+          ? '    add_header X-Content-Type-Options "nosniff" always;\n    add_header X-Frame-Options "SAMEORIGIN" always;\n    add_header Referrer-Policy "strict-origin-when-cross-origin" always;\n'
+          : '';
+        const hsts = state.https && state.hsts
+          ? '    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;\n'
+          : '';
+        const tlsServer = state.https
+          ? `server {\n    listen 80;\n    server_name ${domain};\n    location /.well-known/acme-challenge/ { root /var/www/certbot; }\n    location / { return 301 https://$host$request_uri; }\n}\n\n${rate > 0 ? `limit_req_zone $binary_remote_addr zone=global_rate:10m rate=${rate}r/s;\n\n` : ''}server {\n    listen 443 ssl http2;\n    server_name ${domain};\n    ssl_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;\n    ssl_certificate_key /etc/letsencrypt/live/${domain}/privkey.pem;`
+          : `server {\n    listen 80;\n    server_name ${domain};`;
+
+        return `# Generated by Reverse Proxy Config Generator\n${tlsServer}\n    client_max_body_size ${uploadMb}m;\n    gzip ${state.gzip ? 'on' : 'off'};\n${brotli}${securityHeaders}${hsts}    location = ${healthPath} {\n        access_log off;\n        return 200 "ok";\n    }\n\n    location / {\n${rate > 0 ? '        limit_req zone=global_rate burst=30 nodelay;\n' : ''}        proxy_pass ${state.upstreamScheme}://${state.upstreamHost}:${port};\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto $scheme;\n${wsBlock}${corsBlock}    }\n}`;
+      }
+
+      if (state.server === 'caddy') {
+        const headers = state.cors
+          ? `\n    header Access-Control-Allow-Origin "${state.corsOrigin || '*'}"\n    header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"\n    header Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With"`
+          : '';
+        const encoders = [state.gzip ? 'gzip' : '', state.brotli ? 'zstd' : ''].filter(Boolean).join(' ');
+        const encodeLine = encoders ? `\n    encode ${encoders}` : '';
+
+        const secureHeaders = state.securityHeaders
+          ? '\n    header X-Content-Type-Options "nosniff"\n    header X-Frame-Options "SAMEORIGIN"\n    header Referrer-Policy "strict-origin-when-cross-origin"'
+          : '';
+        const hsts = state.https && state.hsts
+          ? '\n    header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"'
+          : '';
+
+        return `# Generated by Reverse Proxy Config Generator\n${state.https ? domain : `http://${domain}`} {\n    reverse_proxy ${state.upstreamScheme}://${state.upstreamHost}:${port}\n    respond ${healthPath} "ok" 200\n    request_body { max_size ${uploadMb}MB }${encodeLine}${headers}${secureHeaders}${hsts}\n    ${state.https ? 'tls {\n        issuer acme\n    }' : 'tls internal'}\n}`;
+      }
+
+      const middlewares = [
+        state.cors ? `${state.app}-cors` : '',
+        (state.gzip || state.brotli) ? `${state.app}-compress` : '',
+        state.securityHeaders ? `${state.app}-secureheaders` : '',
+        rate > 0 ? `${state.app}-ratelimit` : ''
+      ].filter(Boolean);
+      const corsLines = state.cors
+        ? `\n    ${state.app}-cors:\n      headers:\n        accessControlAllowOriginList: ["${state.corsOrigin || '*'}"]\n        accessControlAllowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]\n        accessControlAllowHeaders: ["Authorization", "Content-Type", "X-Requested-With"]`
+        : '';
+      const compressLines = (state.gzip || state.brotli)
+        ? `\n    ${state.app}-compress:\n      compress: {}`
+        : '';
+      const secureHeaderLines = state.securityHeaders
+        ? `\n    ${state.app}-secureheaders:\n      headers:\n        customResponseHeaders:\n          X-Content-Type-Options: "nosniff"\n          X-Frame-Options: "SAMEORIGIN"\n          Referrer-Policy: "strict-origin-when-cross-origin"${state.hsts && state.https ? '\n          Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"' : ''}`
+        : '';
+      const rateLimitLines = rate > 0
+        ? `\n    ${state.app}-ratelimit:\n      rateLimit:\n        average: ${rate}\n        burst: 30`
+        : '';
+
+      return `# Generated by Reverse Proxy Config Generator\nhttp:\n  routers:\n    ${state.app}-router:\n      rule: "Host(\`${domain}\`)"\n      entryPoints: [${state.https ? 'websecure' : 'web'}]\n      service: ${state.app}-service${middlewares.length ? `\n      middlewares: [${middlewares.join(', ')}]` : ''}${state.https ? '\n      tls: {}' : ''}\n  services:\n    ${state.app}-service:\n      loadBalancer:\n        servers:\n          - url: "${state.upstreamScheme}://${state.upstreamHost}:${port}"\n  middlewares:${corsLines}${compressLines}${secureHeaderLines}${rateLimitLines}\n\n# Health endpoint suggestion: ${healthPath}\n# Upload limit target: ${uploadMb}MB\n# WebSocket: ${state.websocket ? 'enabled' : 'disabled'} (Traefik handles upgrade automatically)`;
+    }
+
+    function readState() {
+      return {
+        server: serverSelect.value || 'nginx',
+        app: appSelect.value || 'node',
+        domain: domainInput.value,
+        upstreamScheme: upstreamSchemeSelect.value || 'http',
+        upstreamHost: upstreamHostInput.value || '127.0.0.1',
+        upstreamPort: readNum(upstreamPortInput.value, 3000),
+        healthPath: healthPathInput.value || '/health',
+        https: httpsInput.checked,
+        websocket: websocketInput.checked,
+        cors: corsInput.checked,
+        corsOrigin: corsOriginInput.value || '*',
+        gzip: gzipInput.checked,
+        brotli: brotliInput.checked,
+        securityHeaders: securityHeadersInput.checked,
+        hsts: hstsInput.checked,
+        rateLimitRps: readNum(rateLimitInput.value, 20),
+        uploadMb: readNum(uploadMbInput.value, 50)
+      };
+    }
+
+    function updateMeta(state) {
+      const serverName = state.server === 'nginx' ? 'Nginx' : state.server === 'caddy' ? 'Caddy' : 'Traefik';
+      const appName = appPresetMap.get(state.app)?.label ?? 'Custom App';
+      configMeta.textContent = `${serverName} for ${appName} -> ${state.upstreamScheme}://${state.upstreamHost}:${Math.round(state.upstreamPort)} | Upload ${Math.max(1, Math.round(state.uploadMb))}MB`;
+    }
+
+    function renderHardeningHint(state) {
+      const warnings = [];
+      if (!state.https) warnings.push('HTTPS is disabled. Traffic and credentials are exposed in transit.');
+      if (!state.securityHeaders) warnings.push('Security headers are disabled. Browser hardening is reduced.');
+      if (state.https && !state.hsts) warnings.push('HSTS is disabled while HTTPS is on. Downgrade protection is weaker.');
+      if (state.rateLimitRps <= 0) warnings.push('Rate limit is disabled. Bot and brute-force exposure is higher.');
+      if (!state.gzip && !state.brotli) warnings.push('Compression is disabled. Bandwidth and TTFB will be worse.');
+      if (state.cors && state.corsOrigin.trim() === '*') warnings.push('CORS origin is wildcard (*). Consider narrowing it for production APIs.');
+
+      if (!warnings.length) {
+        hardeningHint.innerHTML = '<span class="text-emerald-300">Hardening profile looks strong.</span> HTTPS, headers, rate limiting, and compression are all enabled.';
+        return;
+      }
+
+      hardeningHint.innerHTML = `<span class="text-amber-200">Hardening warnings:</span> ${warnings.join(' ')}`;
+    }
+
+    function render() {
+      const state = readState();
+      const output = generateConfig(state);
+      configOutput.innerHTML = escapeHtml(output);
+      updateMeta(state);
+      renderHardeningHint(state);
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('server', state.server);
+      url.searchParams.set('app', state.app);
+      url.searchParams.set('port', String(Math.round(state.upstreamPort)));
+      url.searchParams.set('upstream', state.upstreamScheme);
+      history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    }
+
+    function setPreset(app) {
+      const preset = appPresetMap.get(app);
+      if (!preset) return;
+      appSelect.value = preset.id;
+      upstreamPortInput.value = String(preset.defaultPort);
+      websocketInput.checked = preset.defaultWebSocket;
+      corsInput.checked = preset.defaultCors;
+      render();
+    }
+
+    function initFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const server = params.get('server');
+      const app = params.get('app');
+      const port = params.get('port');
+      if (server && ['nginx', 'caddy', 'traefik'].includes(server)) serverSelect.value = server;
+      if (app && appPresetMap.has(app)) setPreset(app);
+      if (port) upstreamPortInput.value = String(Math.max(1, readNum(port, 3000)));
+      const upstreamScheme = params.get('upstream');
+      if (upstreamScheme && ['http', 'https'].includes(upstreamScheme)) upstreamSchemeSelect.value = upstreamScheme;
+    }
+
+    function renderPresetButtons() {
+      presetButtons.innerHTML = '';
+      appPresets
+        .filter((preset) => preset.id !== 'custom')
+        .forEach((preset) => {
+          const btn = document.createElement('button');
+          btn.className = 'rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:text-white';
+          btn.textContent = preset.label;
+          btn.addEventListener('click', () => setPreset(preset.id));
+          presetButtons.appendChild(btn);
+        });
+    }
+
+    [
+      serverSelect,
+      appSelect,
+      domainInput,
+      upstreamSchemeSelect,
+      upstreamHostInput,
+      upstreamPortInput,
+      uploadMbInput,
+      corsOriginInput,
+      healthPathInput,
+      rateLimitInput,
+      httpsInput,
+      websocketInput,
+      corsInput,
+      gzipInput,
+      brotliInput,
+      securityHeadersInput,
+      hstsInput
+    ].forEach((node) => {
+      node.addEventListener('input', () => {
+        if (node === appSelect) {
+          const app = appSelect.value;
+          const preset = appPresetMap.get(app);
+          if (preset) {
+            upstreamPortInput.value = String(preset.defaultPort);
+            websocketInput.checked = preset.defaultWebSocket;
+            corsInput.checked = preset.defaultCors;
+          }
+        }
+        render();
+      });
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const text = configOutput.textContent || defaultOutput;
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+      }, 1200);
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const state = readState();
+      const text = configOutput.textContent || defaultOutput;
+      const extension = state.server === 'nginx' ? 'conf' : state.server === 'caddy' ? 'Caddyfile' : 'yaml';
+      const filename = state.server === 'caddy'
+        ? `Caddyfile-${state.app}`
+        : `${state.server}-${state.app}-reverse-proxy.${extension}`;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    renderPresetButtons();
+    initFromQuery();
+    render();
+  </script>
+</Layout>

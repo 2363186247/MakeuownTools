@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {
+  defaultOptionsFor,
+  generateReverseProxyConfig,
+  getPresetById,
+  getReverseProxySeoEntries,
+  type ProxyApp,
+  type ProxyServer
+} from '../../data/reverseProxySeo';
+
+export function getStaticPaths() {
+  return getReverseProxySeoEntries().map((entry) => ({
+    params: { server: entry.server, app: entry.app },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const server = entry.server as ProxyServer;
+const app = entry.app as ProxyApp;
+
+const preset = getPresetById(app);
+const defaults = defaultOptionsFor(app, server);
+const generated = generateReverseProxyConfig(defaults);
+
+const related = getReverseProxySeoEntries()
+  .filter((item) => !(item.server === entry.server && item.app === entry.app))
+  .slice(0, 8);
+---
+
+<Layout title={entry.title} description={entry.description} canonical={`/reverse-proxy/${entry.server}-for-${entry.app}/`}>
+  <main class="mx-auto w-full max-w-6xl px-6 py-12 md:px-8 md:py-16">
+    <a href="/reverse-proxy/" class="mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white/30 hover:bg-white/10">
+      <span>←</span>
+      <span>Back to Generator</span>
+    </a>
+
+    <header class="rounded-3xl border border-white/15 bg-white/[0.03] p-7 md:p-9">
+      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-cyan-100">
+        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        Long-Tail Reverse Proxy Page
+      </p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">{entry.title.replace(' | Config Generator', '')}</h1>
+      <p class="mt-4 text-sm leading-7 text-zinc-300 md:text-base">{entry.description}</p>
+      <p class="mt-4 text-sm text-zinc-400">Preset: {preset.label} · Upstream Port: {preset.defaultPort} · HTTPS + Upload 50MB baseline</p>
+    </header>
+
+    <section class="mt-7 rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 to-blue-500/8 p-6 md:p-8">
+      <div class="mb-3 flex items-center justify-between gap-3">
+        <h2 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-cyan-100">
+          <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M8 14h8M10 11h4"/></svg>
+          Generated {server === 'nginx' ? 'Nginx Config' : 'Caddyfile'}
+        </h2>
+        <a href={`/reverse-proxy/?server=${server}&app=${app}&port=${preset.defaultPort}`} class="rounded-lg border border-cyan-200/35 bg-cyan-100/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-100/20">Open Interactive Editor</a>
+      </div>
+      <pre class="max-h-[560px] overflow-auto rounded-2xl border border-white/10 bg-black/40 p-4 text-[12px] leading-6 text-zinc-100"><code>{generated}</code></pre>
+    </section>
+
+    <section class="mt-7 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">Deployment Checklist</h3>
+      <ul class="grid gap-2 text-sm text-zinc-300 md:grid-cols-2">
+        <li class="rounded-xl border border-white/10 bg-black/30 px-3 py-2">Set DNS A/AAAA record to your reverse proxy host.</li>
+        <li class="rounded-xl border border-white/10 bg-black/30 px-3 py-2">Open inbound ports 80 and 443 on firewall/security group.</li>
+        <li class="rounded-xl border border-white/10 bg-black/30 px-3 py-2">Validate upstream health endpoint before routing live traffic.</li>
+        <li class="rounded-xl border border-white/10 bg-black/30 px-3 py-2">Enable log rotation and monitor 4xx/5xx error spikes.</li>
+      </ul>
+    </section>
+
+    <section class="mt-7 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h3 class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">Related Reverse Proxy Pages</h3>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {related.map((item) => (
+          <a href={`/reverse-proxy/${item.server}-for-${item.app}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+            {item.title.replace(' | Config Generator', '')}
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+</Layout>
