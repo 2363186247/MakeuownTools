@@ -673,7 +673,7 @@ export function getReverseProxySeoEntries(): ReverseProxySeoEntry[] {
   return servers.flatMap((server) => apps.map((app) => ({
     server,
     app,
-    slug: `${server}-reverse-proxy-for-${app}`,
+    slug: `${server}-for-${app}`,
     title: `${server === 'nginx' ? 'Nginx' : 'Caddy'} Reverse Proxy for ${app === 'node' ? 'Node.js' : app === 'python' ? 'Python' : app === 'react' ? 'React' : 'Ghost'} | Config Generator`,
     description: `Generate production-ready ${server === 'nginx' ? 'Nginx' : 'Caddy'} reverse proxy configuration for ${app === 'node' ? 'Node.js' : app === 'python' ? 'Python' : app === 'react' ? 'React frontend' : 'Ghost CMS'} with HTTPS, CORS, websocket, compression, and upload limits.`
   })));
