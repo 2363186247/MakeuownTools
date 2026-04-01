@@ -794,8 +794,14 @@ import Layout from '../../../layouts/Layout.astro';
     renderQuickPicks();
     renderRecentModels();
 
-    setMode('inference');
+    const queryParams = new URLSearchParams(window.location.search);
+    const modelParam = queryParams.get('model');
+    const modeParam = queryParams.get('mode');
+    if (modelParam) modelIdInputEl.value = modelParam;
+
+    setMode(modeParam === 'training' ? 'training' : 'inference');
     render();
+    if (modelParam) fetchModelConfig();
   </script>
 
   <script>

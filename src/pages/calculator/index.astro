@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import filaments from '../../data/filaments.json';
 import satisfactoryData from '../../data/satisfactory.json';
+import { getComparisonEntries, getScenarioEntries } from '../../data/nasRaidSeo';
+import { getSolarComparisonEntries, getSolarKeywordEntriesByCategory, getSolarScenarioEntries } from '../../data/offGridSolarSeo';
 
 type Material = { id: string; name: string };
 type Diameter = { id: string; name: string; common?: boolean };
@@ -38,6 +40,40 @@ const quickLaunch = [
 const satFeatured = satData.mvp_targets.slice(0, 4)
 	.map((id) => satData.items.find((item) => item.id === id))
 	.filter((item): item is SatisfactoryItem => Boolean(item));
+
+const nasScenarios = getScenarioEntries();
+const nasComparisons = getComparisonEntries();
+const solarScenarios = getSolarScenarioEntries();
+const solarComparisons = getSolarComparisonEntries();
+const solarRegionKeywords = getSolarKeywordEntriesByCategory('region');
+
+const popularShortcuts = {
+	ai: [
+		{ label: 'Qwen 7B VRAM', href: '/calculator/vram/?model=Qwen/Qwen2.5-7B-Instruct' },
+		{ label: 'Llama 8B VRAM', href: '/calculator/vram/?model=meta-llama/Meta-Llama-3-8B-Instruct' },
+		{ label: 'Training / LoRA Mode', href: '/calculator/vram/?mode=training' }
+	],
+	storage: [
+		{ label: '4x 8TB RAID5', href: `/calculator/nas-raid/${nasScenarios.find((e) => e.drives === 4 && e.sizeTb === 8 && e.level === 'raid5')?.slug ?? '4x-8tb-raid5-calculator'}/` },
+		{ label: 'RAID10 vs RAID5', href: `/calculator/nas-raid/${nasComparisons.find((e) => e.left === 'raid10' && e.right === 'raid5')?.slug ?? 'raid10-vs-raid5-storage-capacity'}/` },
+		{ label: 'UK RAID-Z2', href: '/calculator/nas-raid/uk-6x-12tb-raidz2-calculator/' }
+	],
+	power: [
+		{ label: '12V Fridge + Microwave', href: `/calculator/off-grid-solar/${solarScenarios.find((e) => e.voltage === 12 && e.autonomyDays === 1)?.slug ?? ''}/` },
+		{ label: '12V vs 24V vs 48V', href: `/calculator/off-grid-solar/${solarComparisons[0]?.slug ?? ''}/` },
+		{ label: 'Arizona 24V Profile', href: `/calculator/off-grid-solar/${solarRegionKeywords.find((e) => e.keywordKey === 'arizona' && e.voltage === 24)?.slug ?? ''}/` }
+	],
+	fabrication: [
+		{ label: filamentFeatured[0]?.name ?? 'PLA Profile', href: filamentFeatured[0]?.href ?? '/calculator/3d-printing/' },
+		{ label: filamentFeatured[1]?.name ?? 'PETG Profile', href: filamentFeatured[1]?.href ?? '/calculator/3d-printing/' },
+		{ label: 'All Material Profiles', href: '/calculator/3d-printing/' }
+	],
+	game: [
+		{ label: satFeatured[0]?.name ?? 'Core Item Plan', href: satFeatured[0] ? `/calculator/satisfactory/${satFeatured[0].id}` : '/calculator/satisfactory/' },
+		{ label: satFeatured[1]?.name ?? 'Automation Plan', href: satFeatured[1] ? `/calculator/satisfactory/${satFeatured[1].id}` : '/calculator/satisfactory/' },
+		{ label: 'All Satisfactory Items', href: '/calculator/satisfactory/' }
+	]
+} as const;
 ---
 
 <Layout
@@ -150,6 +186,14 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 					Open VRAM Calculator
 					<span>→</span>
 				</a>
+				<div class="mt-4">
+					<p class="mb-2 text-[11px] uppercase tracking-[0.14em] text-cyan-200/80">Popular Queries</p>
+					<div class="flex flex-wrap gap-2">
+						{popularShortcuts.ai.map((shortcut) => (
+							<a href={shortcut.href} data-tool-link data-tool-name={shortcut.label} class="rounded-full border border-cyan-200/35 bg-cyan-100/10 px-2.5 py-1 text-[11px] font-semibold text-cyan-100 transition hover:bg-cyan-100/20">{shortcut.label}</a>
+						))}
+					</div>
+				</div>
 			</article>
 
 			<article data-domain="storage" class="group calculator-card rounded-3xl border border-sky-300/25 bg-gradient-to-br from-sky-300/12 to-indigo-500/10 p-6 shadow-2xl shadow-sky-900/15 transition hover:border-sky-200/40 md:p-7">
@@ -165,6 +209,14 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 					Open NAS / RAID Calculator
 					<span>→</span>
 				</a>
+				<div class="mt-4">
+					<p class="mb-2 text-[11px] uppercase tracking-[0.14em] text-sky-200/80">Popular Queries</p>
+					<div class="flex flex-wrap gap-2">
+						{popularShortcuts.storage.map((shortcut) => (
+							<a href={shortcut.href} data-tool-link data-tool-name={shortcut.label} class="rounded-full border border-sky-200/35 bg-sky-100/10 px-2.5 py-1 text-[11px] font-semibold text-sky-100 transition hover:bg-sky-100/20">{shortcut.label}</a>
+						))}
+					</div>
+				</div>
 			</article>
 
 			<article data-domain="power" class="group calculator-card rounded-3xl border border-amber-300/25 bg-gradient-to-br from-amber-300/12 to-yellow-500/10 p-6 shadow-2xl shadow-amber-900/15 transition hover:border-amber-200/40 md:p-7">
@@ -180,6 +232,14 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 					Open Off-Grid Calculator
 					<span>→</span>
 				</a>
+				<div class="mt-4">
+					<p class="mb-2 text-[11px] uppercase tracking-[0.14em] text-amber-200/80">Popular Queries</p>
+					<div class="flex flex-wrap gap-2">
+						{popularShortcuts.power.filter((shortcut) => shortcut.href).map((shortcut) => (
+							<a href={shortcut.href} data-tool-link data-tool-name={shortcut.label} class="rounded-full border border-amber-200/35 bg-amber-100/10 px-2.5 py-1 text-[11px] font-semibold text-amber-100 transition hover:bg-amber-100/20">{shortcut.label}</a>
+						))}
+					</div>
+				</div>
 			</article>
 
 			<article data-domain="fabrication" class="group calculator-card rounded-3xl border border-emerald-300/25 bg-gradient-to-br from-emerald-300/12 to-lime-500/10 p-6 shadow-2xl shadow-emerald-900/15 transition hover:border-emerald-200/40 md:p-7">
@@ -205,6 +265,14 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 						</li>
 					))}
 				</ul>
+				<div class="mt-4">
+					<p class="mb-2 text-[11px] uppercase tracking-[0.14em] text-emerald-200/80">Popular Queries</p>
+					<div class="flex flex-wrap gap-2">
+						{popularShortcuts.fabrication.map((shortcut) => (
+							<a href={shortcut.href} data-tool-link data-tool-name={shortcut.label} class="rounded-full border border-emerald-200/35 bg-emerald-100/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-100 transition hover:bg-emerald-100/20">{shortcut.label}</a>
+						))}
+					</div>
+				</div>
 			</article>
 
 			<article data-domain="game" class="group calculator-card rounded-3xl border border-amber-300/25 bg-gradient-to-br from-amber-300/12 to-orange-500/10 p-6 shadow-2xl shadow-amber-900/15 transition hover:border-amber-200/40 md:p-7">
@@ -230,6 +298,14 @@ const satFeatured = satData.mvp_targets.slice(0, 4)
 						</li>
 					))}
 				</ul>
+				<div class="mt-4">
+					<p class="mb-2 text-[11px] uppercase tracking-[0.14em] text-amber-200/80">Popular Queries</p>
+					<div class="flex flex-wrap gap-2">
+						{popularShortcuts.game.map((shortcut) => (
+							<a href={shortcut.href} data-tool-link data-tool-name={shortcut.label} class="rounded-full border border-amber-200/35 bg-amber-100/10 px-2.5 py-1 text-[11px] font-semibold text-amber-100 transition hover:bg-amber-100/20">{shortcut.label}</a>
+						))}
+					</div>
+				</div>
 			</article>
 		</section>
 
