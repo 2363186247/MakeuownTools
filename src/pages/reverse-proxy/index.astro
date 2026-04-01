@@ -3,12 +3,19 @@ import Layout from '../../layouts/Layout.astro';
 import {
   REVERSE_PROXY_APP_PRESETS,
   REVERSE_PROXY_SERVERS,
+  DATABASE_OPTIONS,
+  CACHE_OPTIONS,
+  PROTECTION_PRESETS,
   defaultOptionsFor,
   generateReverseProxyComposeBundle,
   generateReverseProxyConfig,
   getReverseProxySeoEntries,
+  applyProtectionPreset,
   type ProxyApp,
-  type ProxyServer
+  type ProxyServer,
+  type DatabaseType,
+  type CacheType,
+  type ProtectionPreset
 } from '../../data/reverseProxySeo';
 
 const defaultOptions = defaultOptionsFor('node', 'nginx');
@@ -107,6 +114,50 @@ const featuredEntries = seoEntries.slice(0, 8);
           </label>
 
           <label>
+            <span class="mb-1 block text-xs text-zinc-400">Database</span>
+            <select id="dbSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50">
+              {DATABASE_OPTIONS.map((db) => (
+                <option value={db.id} selected={db.id === defaultOptions.selectedDb}>{db.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span class="mb-1 block text-xs text-zinc-400">Cache/Session Store</span>
+            <select id="cacheSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50">
+              {CACHE_OPTIONS.map((cache) => (
+                <option value={cache.id} selected={cache.id === defaultOptions.selectedCache}>{cache.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div class="mt-6 border-t border-white/10 pt-6">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">Protection Strategy</h3>
+          <div class="grid gap-2">
+            {Object.entries(PROTECTION_PRESETS).map(([k, v]) => {
+              const presetKey = k as ProtectionPreset;
+              return (
+                <label class="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 p-3 cursor-pointer transition hover:border-cyan-300/50 hover:bg-black/40">
+                  <input 
+                    type="radio" 
+                    id={`preset${presetKey}`}
+                    name="protectionPreset" 
+                    value={presetKey}
+                    checked={presetKey === defaultOptions.protectionPreset}
+                    class="mt-0.5"
+                  />
+                  <div class="flex-1">
+                    <div class="text-xs font-semibold text-white">{v.label}</div>
+                    <div class="text-xs text-zinc-400">{v.description}</div>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+          <label>
             <span class="mb-1 block text-xs text-zinc-400">Rate Limit (req/s)</span>
             <input id="rateLimitInput" type="number" min="0" max="5000" value="20" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
           </label>
@@ -180,6 +231,8 @@ const featuredEntries = seoEntries.slice(0, 8);
   </main>
 
   <script id="proxyPresetsData" type="application/json" is:inline>{JSON.stringify(REVERSE_PROXY_APP_PRESETS)}</script>
+  <script id="proxyDbsData" type="application/json" is:inline>{JSON.stringify(DATABASE_OPTIONS)}</script>
+  <script id="proxyCachesData" type="application/json" is:inline>{JSON.stringify(CACHE_OPTIONS)}</script>
   <script id="proxyDefaultOutputData" type="application/json" is:inline>{JSON.stringify(generateReverseProxyConfig(defaultOptions))}</script>
   <script id="proxyDefaultBundleData" type="application/json" is:inline>{JSON.stringify(generateReverseProxyComposeBundle(defaultOptions))}</script>
 
@@ -206,6 +259,8 @@ const featuredEntries = seoEntries.slice(0, 8);
     const cloudflareInput = document.getElementById('cloudflareInput');
     const fail2banInput = document.getElementById('fail2banInput');
     const limitConnInput = document.getElementById('limitConnInput');
+    const dbSelect = document.getElementById('dbSelect');
+    const cacheSelect = document.getElementById('cacheSelect');
     const configOutput = document.getElementById('configOutput');
     const configMeta = document.getElementById('configMeta');
     const bundleOutput = document.getElementById('bundleOutput');
@@ -238,6 +293,8 @@ const featuredEntries = seoEntries.slice(0, 8);
       !(cloudflareInput instanceof HTMLInputElement) ||
       !(fail2banInput instanceof HTMLInputElement) ||
       !(limitConnInput instanceof HTMLInputElement) ||
+      !(dbSelect instanceof HTMLSelectElement) ||
+      !(cacheSelect instanceof HTMLSelectElement) ||
       !(configOutput instanceof HTMLElement) ||
       !(configMeta instanceof HTMLElement) ||
       !(bundleOutput instanceof HTMLElement) ||
@@ -368,7 +425,10 @@ const featuredEntries = seoEntries.slice(0, 8);
         protectionCloudflare: cloudflareInput.checked,
         protectionFail2ban: fail2banInput.checked,
         protectionLimitConn: limitConnInput.checked,
-        uploadMb: readNum(uploadMbInput.value, 50)
+        uploadMb: readNum(uploadMbInput.value, 50),
+        selectedDb: dbSelect.value || 'none',
+        selectedCache: cacheSelect.value || 'none',
+        protectionPreset: (document.querySelector('input[name="protectionPreset"]:checked') as HTMLInputElement)?.value || 'compatible'
       };
     }
 
@@ -412,7 +472,39 @@ const featuredEntries = seoEntries.slice(0, 8);
     }
 
     function render() {
-      const state = readState();
+      let state = readState();
+      
+      // Apply protection preset if selected
+      const selectedPreset = (document.querySelector('input[name="protectionPreset"]:checked') as HTMLInputElement)?.value;
+      if (selectedPreset === 'balanced' || selectedPreset === 'strict') {
+        const presetConfigs = {
+          balanced: {
+            rateLimitRps: 10,
+            protectionFail2ban: true,
+            protectionLimitConn: true
+          },
+          strict: {
+            rateLimitRps: 5,
+            protectionCloudflare: true,
+            protectionFail2ban: true,
+            protectionLimitConn: true
+          }
+        };
+        
+        if (presetConfigs[selectedPreset]) {
+          state = { ...state, ...presetConfigs[selectedPreset] };
+          // Update UI to reflect preset changes
+          if (selectedPreset === 'balanced') {
+            rateLimitInput.value = '10';
+            fail2banInput.checked = true;
+          } else if (selectedPreset === 'strict') {
+            rateLimitInput.value = '5';
+            cloudflareInput.checked = true;
+            fail2banInput.checked = true;
+          }
+        }
+      }
+      
       const output = generateConfig(state);
       const bundle = generateComposeBundle(state);
       configOutput.innerHTML = escapeHtml(output);
@@ -483,7 +575,9 @@ const featuredEntries = seoEntries.slice(0, 8);
       hstsInput,
       cloudflareInput,
       fail2banInput,
-      limitConnInput
+      limitConnInput,
+      dbSelect,
+      cacheSelect
     ].forEach((node) => {
       node.addEventListener('input', () => {
         if (node === appSelect) {
@@ -497,6 +591,11 @@ const featuredEntries = seoEntries.slice(0, 8);
         }
         render();
       });
+    });
+
+    // Add listeners for protection preset radios
+    document.querySelectorAll('input[name="protectionPreset"]').forEach((radio) => {
+      radio.addEventListener('change', () => render());
     });
 
     copyBtn.addEventListener('click', async () => {

@@ -1,6 +1,9 @@
 export type ProxyServer = 'nginx' | 'caddy' | 'traefik';
 export type ProxySeoServer = 'nginx' | 'caddy';
 export type ProxyApp = 'react' | 'node' | 'python' | 'ghost' | 'custom';
+export type DatabaseType = 'none' | 'mysql' | 'postgres' | 'mariadb' | 'mongodb';
+export type CacheType = 'none' | 'redis' | 'memcached';
+export type ProtectionPreset = 'compatible' | 'balanced' | 'strict';
 
 export type ReverseProxyAppPreset = {
   id: ProxyApp;
@@ -32,6 +35,11 @@ export type ReverseProxyOptions = {
   protectionFail2ban: boolean;
   protectionLimitConn: boolean;
   uploadMb: number;
+  // Multi-service topology
+  selectedDb: DatabaseType;
+  selectedCache: CacheType;
+  // Protection presets
+  protectionPreset: ProtectionPreset;
 };
 
 export type ReverseProxySeoEntry = {
@@ -91,6 +99,35 @@ export const REVERSE_PROXY_SERVERS: { id: ProxyServer; label: string }[] = [
   { id: 'traefik', label: 'Traefik' }
 ];
 
+export const DATABASE_OPTIONS: { id: DatabaseType; label: string; port: number }[] = [
+  { id: 'none', label: 'No Database', port: 0 },
+  { id: 'mysql', label: 'MySQL 8.0', port: 3306 },
+  { id: 'postgres', label: 'PostgreSQL 16', port: 5432 },
+  { id: 'mariadb', label: 'MariaDB 11', port: 3306 },
+  { id: 'mongodb', label: 'MongoDB 7', port: 27017 }
+];
+
+export const CACHE_OPTIONS: { id: CacheType; label: string; port: number }[] = [
+  { id: 'none', label: 'No Cache', port: 0 },
+  { id: 'redis', label: 'Redis 7', port: 6379 },
+  { id: 'memcached', label: 'Memcached 1.6', port: 11211 }
+];
+
+export const PROTECTION_PRESETS: Record<ProtectionPreset, { label: string; description: string }> = {
+  compatible: {
+    label: '🟢 Compatible (Recommended)',
+    description: 'Balanced security and compatibility. HSTS 6 months, 20 req/s, standard headers.'
+  },
+  balanced: {
+    label: '🟡 Balanced (Prod)',
+    description: 'Enhanced security. HSTS 1 year, 10 req/s, strict CSP and XFO headers.'
+  },
+  strict: {
+    label: '🔴 Strict (High-Traffic)',
+    description: 'Maximum security. HSTS 2 years, 5 req/s, fail2ban + Cloudflare + limit_conn.'
+  }
+};
+
 function boolToOnOff(value: boolean): 'on' | 'off' {
   return value ? 'on' : 'off';
 }
@@ -125,8 +162,43 @@ export function defaultOptionsFor(app: ProxyApp = 'node', server: ProxyServer = 
     protectionCloudflare: false,
     protectionFail2ban: false,
     protectionLimitConn: true,
-    uploadMb: 50
+    uploadMb: 50,
+    selectedDb: 'none',
+    selectedCache: 'none',
+    protectionPreset: 'compatible'
   };
+}
+
+// Apply protection preset to options
+export function applyProtectionPreset(options: ReverseProxyOptions, preset: ProtectionPreset): ReverseProxyOptions {
+  const presetConfig: Record<ProtectionPreset, Partial<ReverseProxyOptions>> = {
+    compatible: {
+      rateLimitRps: 20,
+      hsts: true,
+      securityHeaders: true,
+      protectionCloudflare: false,
+      protectionFail2ban: false,
+      protectionLimitConn: true
+    },
+    balanced: {
+      rateLimitRps: 10,
+      hsts: true,
+      securityHeaders: true,
+      protectionCloudflare: false,
+      protectionFail2ban: true,
+      protectionLimitConn: true
+    },
+    strict: {
+      rateLimitRps: 5,
+      hsts: true,
+      securityHeaders: true,
+      protectionCloudflare: true,
+      protectionFail2ban: true,
+      protectionLimitConn: true
+    }
+  };
+
+  return { ...options, ...presetConfig[preset], protectionPreset: preset };
 }
 
 export function generateNginxConfig(options: ReverseProxyOptions): string {
@@ -397,6 +469,73 @@ export function generateReverseProxyConfig(options: ReverseProxyOptions): string
 export function generateReverseProxyComposeBundle(options: ReverseProxyOptions): string {
   const serviceName = `${options.app}-app`;
   const networkName = 'edge';
+  
+  // Build database service configuration
+  let dbService: string[] = [];
+  if (options.selectedDb !== 'none') {
+    const dbPort = DATABASE_OPTIONS.find(d => d.id === options.selectedDb)?.port || 3306;
+    const dbImage = {
+      mysql: 'mysql:8.0',
+      postgres: 'postgres:16-alpine',
+      mariadb: 'mariadb:11',
+      mongodb: 'mongo:7'
+    }[options.selectedDb] || 'mysql:8.0';
+    
+    const dbName = options.selectedDb;
+    dbService = [
+      `  ${dbName}:`,
+      `    image: ${dbImage}`,
+      '    expose:',
+      `      - "${dbPort}"`,
+      ...(options.selectedDb !== 'mongodb' ? [
+        '    environment:',
+        ...(options.selectedDb === 'postgres' ? [
+          '      POSTGRES_PASSWORD: changeme',
+          '      POSTGRES_DB: app'
+        ] : [
+          '      MYSQL_ROOT_PASSWORD: changeme',
+          '      MYSQL_DATABASE: app'
+        ])
+      ] : []),
+      '    networks:',
+      `      - ${networkName}`,
+      '    volumes:',
+      `      - ${dbName}_data:/data`
+    ];
+  }
+  
+  // Build cache service configuration
+  let cacheService: string[] = [];
+  if (options.selectedCache !== 'none') {
+    const cachePort = CACHE_OPTIONS.find(c => c.id === options.selectedCache)?.port || 6379;
+    const cacheImage = {
+      redis: 'redis:7-alpine',
+      memcached: 'memcached:1.6-alpine'
+    }[options.selectedCache] || 'redis:7-alpine';
+    
+    const cacheName = options.selectedCache;
+    cacheService = [
+      `  ${cacheName}:`,
+      `    image: ${cacheImage}`,
+      '    expose:',
+      `      - "${cachePort}"`,
+      '    networks:',
+      `      - ${networkName}`
+    ];
+  }
+
+  // Build depends_on for proxy
+  const proxyDependencies = [serviceName, ...(options.selectedDb !== 'none' ? [options.selectedDb] : []), ...(options.selectedCache !== 'none' ? [options.selectedCache] : []), ...(options.protectionFail2ban ? ['fail2ban'] : [])];
+  
+  // Build volumes list
+  const volumes: string[] = [];
+  if (options.selectedDb !== 'none') volumes.push(`  ${options.selectedDb}_data:`);
+  if (options.server !== 'traefik') {
+    if (options.server === 'caddy') {
+      volumes.push('  caddy_data:');
+      volumes.push('  caddy_config:');
+    }
+  }
 
   if (options.server === 'nginx') {
     return [
@@ -411,16 +550,15 @@ export function generateReverseProxyComposeBundle(options: ReverseProxyOptions):
       '      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro',
       ...(options.https ? ['      - ./certbot/www:/var/www/certbot', '      - ./certbot/conf:/etc/letsencrypt'] : []),
       '    depends_on:',
-      `      - ${serviceName}`,
-      ...(options.protectionFail2ban ? ['      - fail2ban'] : []),
+      ...proxyDependencies.map(dep => `      - ${dep}`),
       '    networks:',
       `      - ${networkName}`,
       `  ${serviceName}:`,
       '    image: your-app-image:latest',
       '    expose:',
       `      - "${Math.max(1, options.upstreamPort)}"`,
-      '    networks:',
-      `      - ${networkName}`,
+      ...dbService,
+      ...cacheService,
       ...(options.https
         ? [
             '  certbot:',
@@ -449,7 +587,9 @@ export function generateReverseProxyComposeBundle(options: ReverseProxyOptions):
         : []),
       'networks:',
       `  ${networkName}:`,
-      '    driver: bridge'
+      '    driver: bridge',
+      ...(volumes.length ? ['volumes:'] : []),
+      ...volumes
     ].join('\n');
   }
 
@@ -467,7 +607,7 @@ export function generateReverseProxyComposeBundle(options: ReverseProxyOptions):
       '      - caddy_data:/data',
       '      - caddy_config:/config',
       '    depends_on:',
-      `      - ${serviceName}`,
+      ...proxyDependencies.map(dep => `      - ${dep}`),
       '    networks:',
       `      - ${networkName}`,
       `  ${serviceName}:`,
@@ -476,15 +616,19 @@ export function generateReverseProxyComposeBundle(options: ReverseProxyOptions):
       `      - "${Math.max(1, options.upstreamPort)}"`,
       '    networks:',
       `      - ${networkName}`,
+      ...dbService,
+      ...cacheService,
+      'networks:',
+      `  ${networkName}:`,
+      '    driver: bridge',
       'volumes:',
       '  caddy_data:',
       '  caddy_config:',
-      'networks:',
-      `  ${networkName}:`,
-      '    driver: bridge'
+      ...volumes.filter(v => !v.includes('caddy'))
     ].join('\n');
   }
 
+  // Traefik
   return [
     'version: "3.9"',
     'services:',
@@ -503,7 +647,7 @@ export function generateReverseProxyComposeBundle(options: ReverseProxyOptions):
     '      - ./dynamic.yml:/etc/traefik/dynamic.yml:ro',
     ...(options.https ? ['      - ./letsencrypt:/letsencrypt'] : []),
     '    depends_on:',
-    `      - ${serviceName}`,
+    ...proxyDependencies.map(dep => `      - ${dep}`),
     '    networks:',
     `      - ${networkName}`,
     `  ${serviceName}:`,
@@ -512,9 +656,13 @@ export function generateReverseProxyComposeBundle(options: ReverseProxyOptions):
     `      - "${Math.max(1, options.upstreamPort)}"`,
     '    networks:',
     `      - ${networkName}`,
+    ...dbService,
+    ...cacheService,
     'networks:',
     `  ${networkName}:`,
-    '    driver: bridge'
+    '    driver: bridge',
+    ...(volumes.length ? ['volumes:'] : []),
+    ...volumes
   ].join('\n');
 }
 
