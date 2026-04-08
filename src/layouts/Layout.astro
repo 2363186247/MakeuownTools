@@ -1,5 +1,28 @@
 ---
 import '../styles/global.css';
+import services from '../data/services.json';
+import filaments from '../data/filaments.json';
+import satisfactoryData from '../data/satisfactory.json';
+import { getComparisonEntries, getKeywordComparisonEntries, getKeywordScenarioEntries, getScenarioEntries } from '../data/nasRaidSeo';
+import { getSolarComparisonEntries, getSolarKeywordEntriesByCategory, getSolarScenarioEntries } from '../data/offGridSolarSeo';
+import { getReverseProxySeoEntries } from '../data/reverseProxySeo';
+
+type Service = { id: string; name: string; supported_dbs: string[]; image?: string };
+type Database = { id: string; name: string };
+type Proxy = { id: string; name: string };
+type Material = { id: string; name: string };
+type Diameter = { id: string; name: string; common?: boolean };
+type SatisfactoryItem = { id: string; name: string };
+
+type ServicesData = { apps: Service[]; databases: Database[]; proxies: Proxy[] };
+type FilamentsData = { materials: Material[]; diameters: Diameter[] };
+type SatisfactoryDataset = { items: SatisfactoryItem[]; mvp_targets: string[] };
+
+type LinkItem = { href: string; label: string };
+
+const servicesData = services as ServicesData;
+const filamentsData = filaments as FilamentsData;
+const satisfactory = satisfactoryData as SatisfactoryDataset;
 
 type Props = {
   title: string;
@@ -17,20 +40,214 @@ const {
   includeBackground = true
 } = Astro.props as Props;
 
-const canonicalHref = canonical
+const canonicalUrl = canonical
   ? (typeof canonical === 'string' ? new URL(canonical, Astro.site) : canonical)
   : new URL(Astro.url.pathname, Astro.site);
+
+const metaDescription = description ?? 'Production-ready calculators and generators for Docker, reverse proxy, storage, AI, and engineering workflows.';
+const socialImageUrl = new URL('/favicon.svg', Astro.site);
+const isToolPath = Astro.url.pathname.startsWith('/calculator/') || Astro.url.pathname.startsWith('/docker/') || Astro.url.pathname.startsWith('/reverse-proxy/');
+
+const nasRaidScenarioEntries = getScenarioEntries();
+const nasRaidComparisonEntries = getComparisonEntries();
+const nasRaidKeywordScenarioEntries = getKeywordScenarioEntries();
+const nasRaidKeywordComparisonEntries = getKeywordComparisonEntries();
+const solarScenarioEntries = getSolarScenarioEntries();
+const solarComparisonEntries = getSolarComparisonEntries();
+const solarRegionEntries = getSolarKeywordEntriesByCategory('region');
+const reverseProxySeoEntries = getReverseProxySeoEntries();
+
+const commonDiameter = filamentsData.diameters.find((diameter) => diameter.common) ?? filamentsData.diameters[0];
+const featuredMaterialLinks: LinkItem[] = filamentsData.materials.slice(0, 3).map((material) => ({
+  href: `/calculator/3d-printing/${material.id}-${commonDiameter.id}`,
+  label: `${material.name} · ${commonDiameter.name}`
+}));
+
+const featuredDockerLinks: LinkItem[] = servicesData.apps.slice(0, 3).flatMap((app) => {
+  const database = servicesData.databases.find((item) => app.supported_dbs.includes(item.id));
+  const proxy = servicesData.proxies[0];
+  if (!database || !proxy) return [];
+  return [{ href: `/docker/${app.id}-${database.id}-${proxy.id}/`, label: `${app.name} + ${database.name} + ${proxy.name}` }];
+});
+
+const topSatisfactoryItems = satisfactory.mvp_targets.slice(0, 3)
+  .map((id) => satisfactory.items.find((item) => item.id === id))
+  .filter((item): item is SatisfactoryItem => Boolean(item))
+  .map((item) => ({ href: `/calculator/satisfactory/${item.id}`, label: item.name }));
+
+function pickLinksForPathname(pathname: string): LinkItem[] {
+  if (pathname.startsWith('/calculator/nas-raid/')) {
+    const scenarioLinks = nasRaidScenarioEntries.slice(0, 3).map((entry) => ({ href: `/calculator/nas-raid/${entry.slug}/`, label: entry.title.replace(' | NAS Capacity', '') }));
+    const comparisonLinks = nasRaidComparisonEntries.slice(0, 2).map((entry) => ({ href: `/calculator/nas-raid/${entry.slug}/`, label: entry.title }));
+    const keywordLinks = [...nasRaidKeywordScenarioEntries, ...nasRaidKeywordComparisonEntries].slice(0, 2).map((entry) => ({ href: `/calculator/nas-raid/${entry.slug}/`, label: entry.title }));
+    return [...scenarioLinks, ...comparisonLinks, ...keywordLinks];
+  }
+
+  if (pathname.startsWith('/calculator/off-grid-solar/')) {
+    const scenarioLinks = solarScenarioEntries.slice(0, 3).map((entry) => ({ href: `/calculator/off-grid-solar/${entry.slug}/`, label: entry.title }));
+    const comparisonLinks = solarComparisonEntries.slice(0, 2).map((entry) => ({ href: `/calculator/off-grid-solar/${entry.slug}/`, label: entry.title }));
+    const regionLinks = solarRegionEntries.slice(0, 2).map((entry) => ({ href: `/calculator/off-grid-solar/${entry.slug}/`, label: entry.title }));
+    return [...scenarioLinks, ...comparisonLinks, ...regionLinks];
+  }
+
+  if (pathname.startsWith('/calculator/3d-printing/')) {
+    return [
+      ...featuredMaterialLinks,
+      { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+      { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+      { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' }
+    ];
+  }
+
+  if (pathname.startsWith('/calculator/satisfactory/')) {
+    return [
+      ...topSatisfactoryItems,
+      { href: '/calculator/satisfactory/', label: 'Satisfactory Production Calculator' },
+      { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+      { href: '/docker/', label: 'Docker Compose Generator Hub' }
+    ];
+  }
+
+  if (pathname.startsWith('/docker/')) {
+    return [
+      ...featuredDockerLinks,
+      { href: '/docker/', label: 'Docker Compose Generator Hub' },
+      { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },
+      { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' }
+    ];
+  }
+
+  if (pathname.startsWith('/reverse-proxy/')) {
+    return [
+      ...reverseProxySeoEntries.slice(0, 6).map((entry) => ({ href: `/reverse-proxy/${entry.server}-for-${entry.app}/`, label: entry.title.replace(' | Config Generator', '') })),
+      { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },
+      { href: '/docker/', label: 'Docker Compose Generator Hub' },
+      { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' }
+    ];
+  }
+
+  if (pathname.startsWith('/calculator/vram/')) {
+    return [
+      { href: '/calculator/vram/?model=meta-llama/Meta-Llama-3-8B-Instruct', label: 'Llama 3 8B VRAM calculator' },
+      { href: '/calculator/vram/?model=Qwen/Qwen2.5-7B-Instruct', label: 'Qwen 7B VRAM calculator' },
+      { href: '/calculator/vram/?mode=training', label: 'LoRA training VRAM calculator' },
+      { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+      { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },
+      { href: '/docker/', label: 'Docker Compose Generator Hub' }
+    ];
+  }
+
+  return [
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' }
+  ];
+}
+
+const popularSearchLinks = isToolPath ? pickLinksForPathname(Astro.url.pathname) : [];
+
+const relatedToolGroups = {
+  vram: [
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },
+    { href: '/calculator/', label: 'Calculator Hub' }
+  ],
+  nasRaid: [
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/', label: 'Calculator Hub' }
+  ],
+  printing: [
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/calculator/', label: 'Calculator Hub' },
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' }
+  ],
+  solar: [
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/calculator/', label: 'Calculator Hub' },
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' }
+  ],
+  docker: [
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/', label: 'Calculator Hub' }
+  ],
+  reverseProxy: [
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/calculator/', label: 'Calculator Hub' }
+  ],
+  default: [
+    { href: '/calculator/vram/', label: 'LLM VRAM Estimator Pro' },
+    { href: '/calculator/nas-raid/', label: 'NAS RAID Storage Calculator' },
+    { href: '/calculator/3d-printing/', label: '3D Printing Filament Navigator' },
+    { href: '/calculator/off-grid-solar/', label: 'Off-Grid Solar Calculator' },
+    { href: '/docker/', label: 'Docker Compose Generator Hub' },
+    { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' }
+  ]
+} as const;
+
+const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
+  ? relatedToolGroups.vram
+  : Astro.url.pathname.startsWith('/calculator/nas-raid/')
+    ? relatedToolGroups.nasRaid
+    : Astro.url.pathname.startsWith('/calculator/3d-printing/')
+      ? relatedToolGroups.printing
+      : Astro.url.pathname.startsWith('/calculator/off-grid-solar/')
+        ? relatedToolGroups.solar
+        : Astro.url.pathname.startsWith('/docker/')
+          ? relatedToolGroups.docker
+          : Astro.url.pathname.startsWith('/reverse-proxy/')
+            ? relatedToolGroups.reverseProxy
+            : relatedToolGroups.default;
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    {description && <meta name="description" content={description} />}
+    <meta name="title" content={title} />
+    <meta name="description" content={metaDescription} />
     <meta name="google-site-verification" content="xxGFCr12kZ-UHYt3HzhmkN4lqPvZRTMc91ftmIXsXik" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href={canonicalHref} />
+
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:image" content={socialImageUrl} />
+
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={metaDescription} />
+    <meta property="twitter:image" content={socialImageUrl} />
     <slot name="head" />
   </head>
 
@@ -43,5 +260,42 @@ const canonicalHref = canonical
     )}
 
     <slot />
+
+    {isToolPath && popularSearchLinks.length > 0 && (
+      <aside class="mx-auto mt-10 w-full max-w-7xl px-6 md:px-8">
+        <div class="rounded-3xl border border-white/12 bg-white/[0.03] p-5 md:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-cyan-100">Popular Search Scenarios</h2>
+              <p class="mt-2 text-sm text-zinc-300">These anchor texts connect crawlers to the exact long-tail use cases people search for.</p>
+            </div>
+            <span class="text-xs uppercase tracking-[0.14em] text-zinc-500">Long-tail anchors</span>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {popularSearchLinks.map((link) => (
+              <a href={link.href} class="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-300/20 hover:text-white">
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+    )}
+
+    {isToolPath && (
+      <aside class="mx-auto mt-12 w-full max-w-7xl px-6 pb-12 md:px-8">
+        <div class="rounded-3xl border border-white/12 bg-white/[0.03] p-5 md:p-7">
+          <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-cyan-100">Related Tools</h2>
+          <p class="mt-2 text-sm text-zinc-300">Explore more calculators to improve internal linking depth and help crawlers discover long-tail pages faster.</p>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {relatedToolsLinks.map((link) => (
+              <a href={link.href} class="rounded-xl border border-white/12 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+    )}
   </body>
 </html>

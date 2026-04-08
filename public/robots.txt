@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://makeuowntools.dpdns.org/sitemap-index.xml
