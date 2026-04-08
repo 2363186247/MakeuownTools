@@ -45,6 +45,10 @@ const canonicalUrl = canonical
   : new URL(Astro.url.pathname, Astro.site);
 
 const metaDescription = description ?? 'Production-ready calculators and generators for Docker, reverse proxy, storage, AI, and engineering workflows.';
+const seoTitle = title.length > 60 ? `${title.slice(0, 57).trimEnd()}...` : title;
+const seoDescription = metaDescription.length < 120
+  ? `${metaDescription} Browse related calculators and long-tail pages from this tool hub.`
+  : metaDescription;
 const socialImageUrl = new URL('/favicon.svg', Astro.site);
 const isToolPath = Astro.url.pathname.startsWith('/calculator/') || Astro.url.pathname.startsWith('/docker/') || Astro.url.pathname.startsWith('/reverse-proxy/');
 
@@ -59,7 +63,7 @@ const reverseProxySeoEntries = getReverseProxySeoEntries();
 
 const commonDiameter = filamentsData.diameters.find((diameter) => diameter.common) ?? filamentsData.diameters[0];
 const featuredMaterialLinks: LinkItem[] = filamentsData.materials.slice(0, 3).map((material) => ({
-  href: `/calculator/3d-printing/${material.id}-${commonDiameter.id}`,
+  href: `/calculator/3d-printing/${material.id}-${commonDiameter.id}/`,
   label: `${material.name} · ${commonDiameter.name}`
 }));
 
@@ -73,7 +77,7 @@ const featuredDockerLinks: LinkItem[] = servicesData.apps.slice(0, 3).flatMap((a
 const topSatisfactoryItems = satisfactory.mvp_targets.slice(0, 3)
   .map((id) => satisfactory.items.find((item) => item.id === id))
   .filter((item): item is SatisfactoryItem => Boolean(item))
-  .map((item) => ({ href: `/calculator/satisfactory/${item.id}`, label: item.name }));
+  .map((item) => ({ href: `/calculator/satisfactory/${item.id}/`, label: item.name }));
 
 function pickLinksForPathname(pathname: string): LinkItem[] {
   if (pathname.startsWith('/calculator/nas-raid/')) {
@@ -229,9 +233,9 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
-    <meta name="title" content={title} />
-    <meta name="description" content={metaDescription} />
+    <title>{seoTitle}</title>
+    <meta name="title" content={seoTitle} />
+    <meta name="description" content={seoDescription} />
     <meta name="google-site-verification" content="xxGFCr12kZ-UHYt3HzhmkN4lqPvZRTMc91ftmIXsXik" />
     <meta name="robots" content="index, follow" />
 
@@ -239,14 +243,14 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={metaDescription} />
+    <meta property="og:title" content={seoTitle} />
+    <meta property="og:description" content={seoDescription} />
     <meta property="og:image" content={socialImageUrl} />
 
     <meta property="twitter:card" content="summary" />
     <meta property="twitter:url" content={canonicalUrl} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={metaDescription} />
+    <meta property="twitter:title" content={seoTitle} />
+    <meta property="twitter:description" content={seoDescription} />
     <meta property="twitter:image" content={socialImageUrl} />
     <slot name="head" />
   </head>

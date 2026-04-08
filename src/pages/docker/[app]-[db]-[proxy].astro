@@ -77,6 +77,27 @@ const proxyExtraBlock = proxy.id === 'traefik'
   ? `\n    command:\n      - --providers.docker=true\n      - --entrypoints.web.address=:80\n      - --entrypoints.websecure.address=:443\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock:ro`
   : '';
 
+const relatedStacks = [
+  ...services.apps
+    .filter((entry) => entry.id !== app.id)
+    .slice(0, 3)
+    .flatMap((entry) => {
+      const compatibleDb = services.databases.find((candidate) => entry.supported_dbs.includes(candidate.id));
+      if (!compatibleDb) return [];
+      return [{
+        label: `${entry.name} + ${compatibleDb.name} + ${proxy.name}`,
+        href: `/docker/${entry.id}-${compatibleDb.id}-${proxy.id}/`
+      }];
+    }),
+  ...services.proxies
+    .filter((entry) => entry.id !== proxy.id)
+    .slice(0, 2)
+    .map((entry) => ({
+      label: `${app.name} + ${db.name} + ${entry.name}`,
+      href: `/docker/${app.id}-${db.id}-${entry.id}/`
+    }))
+].slice(0, 6);
+
 // Compose YAML is generated from template strings.
 // Keep indentation aligned so the output remains valid YAML.
 const composeYml = `
@@ -116,8 +137,8 @@ volumes:
 ---
 
 <Layout
-  title={`${app.name} + ${db.name} + ${proxy.name} • Docker Compose`}
-  description={`Production-ready docker-compose.yml for ${app.name}, ${db.name}, and ${proxy.name}.`}
+  title={`${app.name} + ${db.name} + ${proxy.name} Docker Compose`}
+  description={`Generate a production-ready docker-compose.yml for ${app.name}, ${db.name}, and ${proxy.name}.`}
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20">
       <!-- Header -->
@@ -218,6 +239,17 @@ volumes:
       <div class="mt-8 pt-8 border-t border-zinc-700/30 text-center text-sm text-zinc-400">
         <p>Customize <span class="font-mono text-zinc-300">APP_DB_*</span> and <span class="font-mono text-zinc-300">DB_*</span> variables in your <span class="font-mono text-zinc-300">.env</span> file.</p>
       </div>
+
+      <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Related Docker Compose Stacks</h3>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {relatedStacks.map((stack) => (
+            <a href={stack.href} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+              {stack.label}
+            </a>
+          ))}
+        </div>
+      </section>
   </main>
 
   <script>

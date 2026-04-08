@@ -75,11 +75,15 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
   name: defaultRecipe.machine,
   power_mw: 0
 };
+const relatedItems = allItems
+  .filter((entry) => entry.id !== item.id)
+  .filter((entry) => entry.category === item.category || entry.machine === item.machine)
+  .slice(0, 6);
 ---
 
 <Layout
-  title={`${item.name} Production Calculator | Satisfactory Tools`}
-  description={`Reverse-calculate machine count, total power, and full input chain to produce ${item.name} in Satisfactory.`}
+  title={`${item.name} Calculator | Satisfactory`}
+  description={`Calculate machine count, total power, and the full input chain for ${item.name} in Satisfactory.`}
 >
   <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
     <a
@@ -220,6 +224,17 @@ const defaultMachine = machines[defaultRecipe.machine] ?? {
         </div>
       </section>
     </div>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h3 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Related Satisfactory Calculators</h3>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {relatedItems.map((entry) => (
+          <a href={`/calculator/satisfactory/${entry.id}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            {entry.name}
+          </a>
+        ))}
+      </div>
+    </section>
   </main>
 
   <script define:vars={{ rootItemId: item.id, allItems, machinesData: machines, initialRecipeId: defaultRecipe.id, initialTarget: defaultRecipe.output_per_min }}>

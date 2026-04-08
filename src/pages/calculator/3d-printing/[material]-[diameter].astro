@@ -59,10 +59,14 @@ const bedTemp = material.bed_temp_c;
 const data = filaments as FilamentData;
 const densityText = `${material.density} ${data.units.density}`;
 const diameterText = `${diameter.value} ${data.units.diameter}`;
+const relatedCombos = [
+  ...data.materials.filter((entry) => entry.id !== material.id).slice(0, 3).map((entry) => ({ href: `/calculator/3d-printing/${entry.id}-${diameter.id}/`, label: `${entry.name} · ${diameter.name}` })),
+  ...data.diameters.filter((entry) => entry.id !== diameter.id).slice(0, 3).map((entry) => ({ href: `/calculator/3d-printing/${material.id}-${entry.id}/`, label: `${material.name} · ${entry.name}` }))
+].slice(0, 6);
 ---
 
 <Layout
-  title={`${material.name} ${diameter.name} Filament Length Calculator`}
+  title={`${material.name} ${diameter.name} Filament Calc`}
   description={`Calculate exact filament length for ${material.name} (${diameter.name}) by spool weight with recommended printing settings.`}
 >
   <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
@@ -203,6 +207,17 @@ const diameterText = `${diameter.value} ${data.units.diameter}`;
             </ul>
           </div>
         </aside>
+      </section>
+
+      <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Related Filament Profiles</h3>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {relatedCombos.map((item) => (
+            <a href={item.href} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-emerald-300/40 hover:text-white">
+              {item.label}
+            </a>
+          ))}
+        </div>
       </section>
   </main>
 

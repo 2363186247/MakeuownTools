@@ -79,7 +79,7 @@ const tierMax = Math.max(...items.map((item) => item.tier));
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {items.map(item => (
-        <a href={`/calculator/satisfactory/${item.id}`} class="group p-5 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/[0.08] hover:border-amber-500/30 transition duration-300 relative overflow-hidden">
+        <a href={`/calculator/satisfactory/${item.id}/`} class="group p-5 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/[0.08] hover:border-amber-500/30 transition duration-300 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/10 group-hover:to-orange-500/5 transition duration-500"></div>
           <div class="relative flex justify-between items-start mb-2">
             <h2 class="font-semibold text-zinc-100 text-lg">{item.name}</h2>

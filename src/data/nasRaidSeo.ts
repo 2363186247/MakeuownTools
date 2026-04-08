@@ -162,7 +162,7 @@ export function getScenarioEntries(): ScenarioEntry[] {
           sizeTb,
           reservePct: DEFAULT_RESERVE,
           level,
-          title: `${drives}x ${sizeTb}TB ${label} Calculator | NAS Capacity`,
+          title: `${drives}x ${sizeTb}TB ${label} NAS Calculator`,
           description: `Estimate usable capacity, fault tolerance, and efficiency for ${drives}x ${sizeTb}TB in ${label} with reserve best practices.`
         });
       });
@@ -178,7 +178,7 @@ export function getComparisonEntries(): ComparisonEntry[] {
     slug: makeComparisonSlug(left, right),
     left,
     right,
-    title: `${RAID_LABEL[left]} vs ${RAID_LABEL[right]} Storage Capacity Calculator`,
+    title: `${RAID_LABEL[left]} vs ${RAID_LABEL[right]} Capacity Calculator`,
     description: `Compare usable capacity, fault tolerance, and efficiency between ${RAID_LABEL[left]} and ${RAID_LABEL[right]} for NAS and homelab arrays.`
   }));
 }
@@ -206,7 +206,7 @@ export function getKeywordScenarioEntries(): ScenarioEntry[] {
         keywordKind: modifier.kind,
         keywordKey: modifier.key,
         keywordLabel: modifier.label,
-        title: `${labelPrefix}${entry.drives}x ${entry.sizeTb}TB ${RAID_LABEL[entry.level]} Calculator`,
+        title: `${labelPrefix}${entry.drives}x ${entry.sizeTb}TB ${RAID_LABEL[entry.level]} NAS Calculator`,
         description: `Estimate usable capacity, fault tolerance, and efficiency ${audienceHint} using ${entry.drives}x ${entry.sizeTb}TB in ${RAID_LABEL[entry.level]}.`
       });
     });
@@ -231,7 +231,7 @@ export function getKeywordComparisonEntries(): ComparisonEntry[] {
         keywordKind: modifier.kind,
         keywordKey: modifier.key,
         keywordLabel: modifier.label,
-        title: `${modifier.label} ${RAID_LABEL[entry.left]} vs ${RAID_LABEL[entry.right]} Storage Calculator`,
+        title: `${modifier.label} ${RAID_LABEL[entry.left]} vs ${RAID_LABEL[entry.right]} Calculator`,
         description: `Compare usable capacity, fault tolerance, and efficiency between ${RAID_LABEL[entry.left]} and ${RAID_LABEL[entry.right]} for ${audienceHint}.`
       });
     });

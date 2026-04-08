@@ -82,7 +82,7 @@ const featuredReverseProxy = {
 };
 const featuredFilament = filamentsData.materials.slice(0, 2).map((material) => ({
   name: `${material.name} · ${preferredDiameter.name}`,
-  href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}`
+  href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}/`
 }));
 
 const featuredSatisfactory = satData.mvp_targets.slice(0, 2)
@@ -90,7 +90,7 @@ const featuredSatisfactory = satData.mvp_targets.slice(0, 2)
   .filter((item): item is SatisfactoryItem => Boolean(item))
   .map((item) => ({
     name: item.name,
-    href: `/calculator/satisfactory/${item.id}`
+    href: `/calculator/satisfactory/${item.id}/`
   }));
 
 const featuredCalculator = [featuredVram, featuredNasRaid, featuredOffGrid, ...featuredFilament, ...featuredSatisfactory];
@@ -112,14 +112,14 @@ const longTailAnchors = {
     { href: '/calculator/off-grid-solar/arizona-24v-off-grid-solar-battery-calculator/', label: 'Arizona off-grid solar calculator' }
   ],
   fabrication: [
-    { href: '/calculator/3d-printing/pla-1-75mm', label: 'PLA filament length calculator' },
-    { href: '/calculator/3d-printing/petg-1-75mm', label: 'PETG filament length calculator' },
+    { href: '/calculator/3d-printing/pla-1-75mm/', label: 'PLA filament length calculator' },
+    { href: '/calculator/3d-printing/petg-1-75mm/', label: 'PETG filament length calculator' },
     { href: '/calculator/3d-printing/', label: '3D printing filament navigator' }
   ],
   game: [
     { href: '/calculator/satisfactory/', label: 'Satisfactory production calculator' },
-    { href: '/calculator/satisfactory/heavy-modular-frame', label: 'Heavy Modular Frame calculator' },
-    { href: '/calculator/satisfactory/computer', label: 'Computer production planner' }
+    { href: '/calculator/satisfactory/heavy-modular-frame/', label: 'Heavy Modular Frame calculator' },
+    { href: '/calculator/satisfactory/computer/', label: 'Computer production planner' }
   ]
 } as const;
 ---

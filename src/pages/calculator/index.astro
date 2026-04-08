@@ -26,7 +26,7 @@ const satData = satisfactoryData as SatisfactoryDataset;
 const preferredDiameter = filamentData.diameters.find((d) => d.common) ?? filamentData.diameters[0];
 const filamentFeatured = filamentData.materials.slice(0, 3).map((material) => ({
 	name: `${material.name} · ${preferredDiameter.name}`,
-	href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}`
+	href: `/calculator/3d-printing/${material.id}-${preferredDiameter.id}/`
 }));
 
 const quickLaunch = [
@@ -69,8 +69,8 @@ const popularShortcuts = {
 		{ label: 'All Material Profiles', href: '/calculator/3d-printing/' }
 	],
 	game: [
-		{ label: satFeatured[0]?.name ?? 'Core Item Plan', href: satFeatured[0] ? `/calculator/satisfactory/${satFeatured[0].id}` : '/calculator/satisfactory/' },
-		{ label: satFeatured[1]?.name ?? 'Automation Plan', href: satFeatured[1] ? `/calculator/satisfactory/${satFeatured[1].id}` : '/calculator/satisfactory/' },
+		{ label: satFeatured[0]?.name ?? 'Core Item Plan', href: satFeatured[0] ? `/calculator/satisfactory/${satFeatured[0].id}/` : '/calculator/satisfactory/' },
+		{ label: satFeatured[1]?.name ?? 'Automation Plan', href: satFeatured[1] ? `/calculator/satisfactory/${satFeatured[1].id}/` : '/calculator/satisfactory/' },
 		{ label: 'All Satisfactory Items', href: '/calculator/satisfactory/' }
 	]
 } as const;
@@ -291,7 +291,7 @@ const popularShortcuts = {
 				<ul class="mt-5 space-y-2 text-sm text-zinc-200">
 					{satFeatured.map((item) => (
 						<li>
-							<a href={`/calculator/satisfactory/${item.id}`} class="inline-flex items-center gap-2 text-zinc-200 transition hover:text-white">
+							<a href={`/calculator/satisfactory/${item.id}/`} class="inline-flex items-center gap-2 text-zinc-200 transition hover:text-white">
 								<span class="h-1.5 w-1.5 rounded-full bg-amber-200"></span>
 								<span>{item.name}</span>
 							</a>

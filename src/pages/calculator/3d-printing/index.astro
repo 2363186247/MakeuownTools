@@ -11,7 +11,7 @@ const data = filaments as FilamentData;
 const combos: Combo[] = [];
 data.materials.forEach(m => {
   data.diameters.forEach(d => {
-    combos.push({ material: m, diameter: d, href: `/calculator/3d-printing/${m.id}-${d.id}` });
+    combos.push({ material: m, diameter: d, href: `/calculator/3d-printing/${m.id}-${d.id}/` });
   });
 });
 ---

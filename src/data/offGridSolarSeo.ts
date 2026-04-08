@@ -221,7 +221,7 @@ function scenarioTitle(appliances: AppliancePreset[], voltage: SolarVoltage, sun
     .slice(0, 2)
     .map((a) => `${a.powerW}W ${a.name.split('(')[0].trim()}`)
     .join(' + ');
-  return `${head} ${voltage}V Solar Battery Calculator (${sunHours} Sun Hours, ${autonomyDays}-Day Backup)`;
+  return `${head} ${voltage}V Solar Calculator`;
 }
 
 export function getSolarScenarioEntries(): SolarScenarioEntry[] {
@@ -257,7 +257,7 @@ export function getSolarComparisonEntries(): SolarComparisonEntry[] {
     return {
       type: 'comparison',
       slug: comparisonSlug(voltage, profile),
-      title: `12V vs 24V vs 48V Off-Grid Solar Battery Calculator (${appliances[0]?.powerW ?? 0}W Load Profile)`,
+      title: `${voltage}V Solar Comparison Calculator`,
       description: 'Compare required battery Ah and panel watts across 12V, 24V, and 48V architectures for the same appliance load profile.',
       voltage,
       compareBy: 'voltage',
@@ -276,7 +276,7 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
         entries.push({
           type: 'keyword',
           slug: keywordScenarioSlug(`off-grid-solar-${region.key}-profile-${profileIndex + 1}`, appliances, voltage, region.sunHours, region.autonomyDays),
-          title: `${region.label} ${voltage}V Off-Grid Solar Battery Calculator (${region.sunHours} Sun Hours)`,
+          title: `${region.label} ${voltage}V Solar Calculator`,
           description: `Size battery Ah and panel watts for ${region.label} conditions at ${voltage}V using ${region.sunHours} peak sun hours and ${region.autonomyDays}-day backup assumptions.`,
           voltage,
           batteryChemistry: 'lifepo4',
@@ -298,7 +298,7 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
       entries.push({
         type: 'keyword',
         slug: keywordScenarioSlug(`off-grid-solar-${chemistry.key}`, appliances, voltage, 4.5, chemistry.key === 'agm' ? 2 : 1),
-        title: `${chemistry.label} ${voltage}V Solar Battery Calculator (RV Load Profile)`,
+        title: `${chemistry.label} ${voltage}V Solar Calculator`,
         description: `Estimate Ah, panel watts, and inverter baseline for ${chemistry.label} chemistry at ${voltage}V with a realistic RV appliance stack.`,
         voltage,
         batteryChemistry: chemistry.key,
@@ -319,7 +319,7 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
       entries.push({
         type: 'keyword',
         slug: keywordScenarioSlug(`off-grid-solar-${brand.key}`, appliances, voltage, brand.sunHours, brand.autonomyDays),
-        title: `${brand.label} ${voltage}V Off-Grid Solar Sizing Calculator`,
+        title: `${brand.label} ${voltage}V Solar Calculator`,
         description: `Compute battery Ah and panel watts for ${brand.label} style appliance usage at ${voltage}V with ${brand.sunHours} sun hours.`,
         voltage,
         batteryChemistry: brand.chemistry,
