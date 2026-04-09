@@ -1,0 +1,60 @@
+name: Submit URLs to IndexNow
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: URL source type
+        required: true
+        default: dist-sitemap
+        type: choice
+        options:
+          - dist-sitemap
+          - url-file
+      url_file:
+        description: Path to URL list file when source=url-file
+        required: false
+        default: ''
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  submit-indexnow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site for sitemap source
+        if: ${{ github.event_name == 'push' || inputs.source == 'dist-sitemap' }}
+        run: npm run build
+
+      - name: Submit URLs to IndexNow (dist sitemap)
+        if: ${{ github.event_name == 'push' || inputs.source == 'dist-sitemap' }}
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          INDEXNOW_KEY_LOCATION: ${{ secrets.INDEXNOW_KEY_LOCATION }}
+          SITE_URL: https://makeuowntools.dpdns.org
+        run: npm run indexnow:submit:dist
+
+      - name: Submit URLs to IndexNow (url file)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.source == 'url-file' }}
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          INDEXNOW_KEY_LOCATION: ${{ secrets.INDEXNOW_KEY_LOCATION }}
+          SITE_URL: https://makeuowntools.dpdns.org
+        run: node scripts/indexnow_submit.mjs --source=url-file --url-file=${{ inputs.url_file }}
