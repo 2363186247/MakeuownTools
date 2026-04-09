@@ -49,6 +49,7 @@ const seoTitle = title.length > 60 ? `${title.slice(0, 57).trimEnd()}...` : titl
 const seoDescription = metaDescription.length < 120
   ? `${metaDescription} Browse related calculators and long-tail pages from this tool hub.`
   : metaDescription;
+const robotsContent = Astro.url.searchParams.size > 0 ? 'noindex, follow' : 'index, follow';
 const socialImageUrl = new URL('/favicon.svg', Astro.site);
 const isToolPath = Astro.url.pathname.startsWith('/calculator/') || Astro.url.pathname.startsWith('/docker/') || Astro.url.pathname.startsWith('/reverse-proxy/');
 
@@ -237,7 +238,7 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
     <meta name="title" content={seoTitle} />
     <meta name="description" content={seoDescription} />
     <meta name="google-site-verification" content="xxGFCr12kZ-UHYt3HzhmkN4lqPvZRTMc91ftmIXsXik" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={robotsContent} />
 
     <link rel="canonical" href={canonicalUrl} />
 

@@ -13,6 +13,7 @@ yarn-error.log*
 pnpm-debug.log*
 logs/indexnow/
 logs/canonical-audit/
+logs/seo-audit/
 
 
 # environment variables

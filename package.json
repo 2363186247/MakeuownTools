@@ -13,7 +13,8 @@
     "indexnow:keygen": "node scripts/indexnow_generate_key.mjs",
     "indexnow:submit": "node scripts/indexnow_submit.mjs",
     "indexnow:submit:dist": "node scripts/indexnow_submit.mjs --source=dist-sitemap",
-    "seo:audit:canonical": "node scripts/seo_canonical_audit.mjs"
+    "seo:audit:canonical": "node scripts/seo_canonical_audit.mjs",
+    "seo:audit": "node scripts/seo_audit.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",

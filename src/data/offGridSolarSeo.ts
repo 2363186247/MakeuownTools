@@ -216,26 +216,44 @@ function pickAppliances(ids: string[]): AppliancePreset[] {
     .filter((item): item is AppliancePreset => Boolean(item));
 }
 
-function scenarioTitle(appliances: AppliancePreset[], voltage: SolarVoltage, sunHours: number, autonomyDays: number): string {
-  const head = appliances
+function applianceSummary(appliances: AppliancePreset[]): string {
+  return appliances
     .slice(0, 2)
-    .map((a) => `${a.powerW}W ${a.name.split('(')[0].trim()}`)
+    .map((a) => a.name.split('(')[0].trim())
     .join(' + ');
-  return `${head} ${voltage}V Solar Calculator`;
+}
+
+function scenarioTitle(appliances: AppliancePreset[], voltage: SolarVoltage, sunHours: number, autonomyDays: number, groupIndex: number): string {
+  const head = applianceSummary(appliances);
+  return `${head} ${voltage}V Solar G${groupIndex + 1} (${sunHours}h/${autonomyDays}d)`;
+}
+
+function scenarioDescription(appliances: AppliancePreset[], voltage: SolarVoltage, sunHours: number, autonomyDays: number, groupIndex: number): string {
+  const head = applianceSummary(appliances);
+  return `Group ${groupIndex + 1}: calculate daily Wh, LiFePO4 battery Ah, and solar panel watts for ${head} at ${voltage}V with ${sunHours}h sun and ${autonomyDays}-day autonomy.`;
+}
+
+function comparisonTitle(voltage: SolarVoltage, profile: number): string {
+  return `${voltage}V Solar Compare · P${profile}`;
+}
+
+function comparisonDescription(appliances: AppliancePreset[], profile: number): string {
+  const head = applianceSummary(appliances);
+  return `Profile ${profile}: compare battery Ah and panel watts for ${head} across 12V, 24V, and 48V architectures.`;
 }
 
 export function getSolarScenarioEntries(): SolarScenarioEntry[] {
   const entries: SolarScenarioEntry[] = [];
 
-  SCENARIO_GROUPS.forEach((appliances) => {
+  SCENARIO_GROUPS.forEach((appliances, groupIndex) => {
     VOLTAGES.forEach((voltage) => {
       SUN_HOURS.forEach((sunHours) => {
         AUTONOMY_DAYS.forEach((autonomyDays) => {
           entries.push({
             type: 'scenario',
             slug: scenarioSlug(appliances, voltage, sunHours, autonomyDays),
-            title: scenarioTitle(appliances, voltage, sunHours, autonomyDays),
-            description: `Calculate daily Wh, LiFePO4 battery Ah, and solar panel watts for ${voltage}V off-grid systems using a ${sunHours}h solar window and ${autonomyDays}-day autonomy target.`,
+            title: scenarioTitle(appliances, voltage, sunHours, autonomyDays, groupIndex),
+            description: scenarioDescription(appliances, voltage, sunHours, autonomyDays, groupIndex),
             voltage,
             batteryChemistry: 'lifepo4',
             appliances,
@@ -257,8 +275,8 @@ export function getSolarComparisonEntries(): SolarComparisonEntry[] {
     return {
       type: 'comparison',
       slug: comparisonSlug(voltage, profile),
-      title: `${voltage}V Solar Comparison Calculator`,
-      description: 'Compare required battery Ah and panel watts across 12V, 24V, and 48V architectures for the same appliance load profile.',
+      title: comparisonTitle(voltage, profile),
+      description: comparisonDescription(appliances, profile),
       voltage,
       compareBy: 'voltage',
       appliances
@@ -276,8 +294,8 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
         entries.push({
           type: 'keyword',
           slug: keywordScenarioSlug(`off-grid-solar-${region.key}-profile-${profileIndex + 1}`, appliances, voltage, region.sunHours, region.autonomyDays),
-          title: `${region.label} ${voltage}V Solar Calculator`,
-          description: `Size battery Ah and panel watts for ${region.label} conditions at ${voltage}V using ${region.sunHours} peak sun hours and ${region.autonomyDays}-day backup assumptions.`,
+          title: `${region.label} ${voltage}V Solar · Profile ${profileIndex + 1}`,
+          description: `Profile ${profileIndex + 1}: size battery Ah and panel watts for ${region.label} conditions at ${voltage}V using ${region.sunHours} peak sun hours and ${region.autonomyDays}-day backup assumptions.`,
           voltage,
           batteryChemistry: 'lifepo4',
           appliances,
