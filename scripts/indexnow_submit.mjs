@@ -298,6 +298,7 @@ async function main() {
     await writeLog(logPath, 'batch_submit', {
       index: i + 1,
       size: batch.length,
+      sampleUrls: batch.slice(0, 5),
     });
 
     const result = await submitBatch(payload, options.retries, logPath);
@@ -306,6 +307,11 @@ async function main() {
       console.log(`Batch ${i + 1}/${batches.length} submitted successfully (${batch.length} URLs).`);
     } else {
       console.error(`Batch ${i + 1}/${batches.length} failed: ${result.body}`);
+      await writeLog(logPath, 'batch_failed_urls', {
+        index: i + 1,
+        failedCount: batch.length,
+        failedUrls: batch,
+      });
     }
   }
 
