@@ -79,6 +79,14 @@ const relatedItems = allItems
   .filter((entry) => entry.id !== item.id)
   .filter((entry) => entry.category === item.category || entry.machine === item.machine)
   .slice(0, 6);
+const currentItemIndex = allItems.findIndex((entry) => entry.id === item.id);
+const hasItemRing = currentItemIndex !== -1;
+const prevItem = hasItemRing
+  ? allItems[(currentItemIndex - 1 + allItems.length) % allItems.length]
+  : null;
+const nextItem = hasItemRing
+  ? allItems[(currentItemIndex + 1) % allItems.length]
+  : null;
 ---
 
 <Layout
@@ -235,6 +243,26 @@ const relatedItems = allItems
         ))}
       </div>
     </section>
+
+    {hasItemRing && prevItem && nextItem && (
+      <section class="mt-8 rounded-3xl border border-amber-300/20 bg-amber-500/[0.06] p-6 md:p-8">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-100">Production Ring Navigation</h3>
+        <div class="grid gap-3 md:grid-cols-2">
+          <a
+            href={`/calculator/satisfactory/${prevItem.id}/`}
+            class="rounded-xl border border-amber-200/20 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-amber-200/40 hover:text-white"
+          >
+            ← Previous: {prevItem.name}
+          </a>
+          <a
+            href={`/calculator/satisfactory/${nextItem.id}/`}
+            class="rounded-xl border border-amber-200/20 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-amber-200/40 hover:text-white"
+          >
+            Next: {nextItem.name} →
+          </a>
+        </div>
+      </section>
+    )}
   </main>
 
   <script define:vars={{ rootItemId: item.id, allItems, machinesData: machines, initialRecipeId: defaultRecipe.id, initialTarget: defaultRecipe.output_per_min }}>

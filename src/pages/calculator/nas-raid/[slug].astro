@@ -21,6 +21,15 @@ export function getStaticPaths() {
 type Props = { entry: NasRaidSeoEntry };
 const { entry } = Astro.props as Props;
 
+const allNasEntries = getNasRaidSeoEntries();
+const currentNasIndex = allNasEntries.findIndex((item) => item.slug === entry.slug);
+const prevNasEntry = currentNasIndex >= 0
+  ? allNasEntries[(currentNasIndex - 1 + allNasEntries.length) % allNasEntries.length]
+  : null;
+const nextNasEntry = currentNasIndex >= 0
+  ? allNasEntries[(currentNasIndex + 1) % allNasEntries.length]
+  : null;
+
 const popularScenarios = getScenarioEntries().slice(0, 16);
 
 function fmtTb(value: number): string {
@@ -546,6 +555,20 @@ const faqJsonLd = {
         ))}
       </div>
     </section>
+
+    {(prevNasEntry && nextNasEntry) && (
+      <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Sequential Long-Tail Navigation</h2>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <a href={`/calculator/nas-raid/${prevNasEntry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+            ← Previous: {prevNasEntry.title}
+          </a>
+          <a href={`/calculator/nas-raid/${nextNasEntry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+            Next: {nextNasEntry.title} →
+          </a>
+        </div>
+      </section>
+    )}
 
     <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">FAQ</h2>

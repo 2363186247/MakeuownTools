@@ -23,6 +23,15 @@ export function getStaticPaths() {
 type Props = { entry: OffGridSeoEntry };
 const { entry } = Astro.props as Props;
 
+const allSolarEntries = getOffGridSolarSeoEntries();
+const currentSolarIndex = allSolarEntries.findIndex((item) => item.slug === entry.slug);
+const prevSolarEntry = currentSolarIndex >= 0
+  ? allSolarEntries[(currentSolarIndex - 1 + allSolarEntries.length) % allSolarEntries.length]
+  : null;
+const nextSolarEntry = currentSolarIndex >= 0
+  ? allSolarEntries[(currentSolarIndex + 1) % allSolarEntries.length]
+  : null;
+
 const pageTitle = entry.title;
 const pageDescription = entry.description;
 const siteOrigin = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://makeyourowntools.com';
@@ -144,10 +153,9 @@ if (entry.type === 'comparison') {
   faqItems = rotateTake(comparisonFaqPool, 4, hashSeed(entry.slug));
 }
 
-const related = [
-  ...getSolarKeywordEntries().slice(0, 12),
-  ...getSolarScenarioEntries().slice(0, 12)
-].slice(0, 18);
+const relatedSeed = hashSeed(entry.slug);
+const relatedPool = allSolarEntries.filter((item) => item.slug !== entry.slug);
+const related = rotateTake(relatedPool, 18, relatedSeed);
 
 const keywordGuides: Record<string, { title: string; lines: string[] }> = {
   region: {
@@ -343,13 +351,29 @@ const faqJsonLd = {
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {related.map((item) => (
           <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            {'keywordCategory' in item
+            {item.type === 'keyword'
               ? `${item.keywordLabel} · ${item.voltage}V · ${item.sunHours}h sun`
-              : `${item.voltage}V · ${item.sunHours}h sun · ${item.autonomyDays} day`}
+              : item.type === 'scenario'
+                ? `${item.voltage}V · ${item.sunHours}h sun · ${item.autonomyDays} day`
+                : `${item.compareBy === 'sun-hours' ? 'Sun-Hours Compare' : 'Voltage Compare'} · ${item.appliances.length} loads`}
           </a>
         ))}
       </div>
     </section>
+
+    {(prevSolarEntry && nextSolarEntry) && (
+      <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Sequential Long-Tail Navigation</h2>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <a href={`/calculator/off-grid-solar/${prevSolarEntry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            ← Previous: {prevSolarEntry.title}
+          </a>
+          <a href={`/calculator/off-grid-solar/${nextSolarEntry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            Next: {nextSolarEntry.title} →
+          </a>
+        </div>
+      </section>
+    )}
 
     <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">FAQ</h2>
