@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import satisfactoryData from '../../../data/satisfactory.json';
+import { pickSeoTitle } from '../../../data/seoExperiment';
 
 type SatisfactoryItem = {
   id: string;
@@ -21,11 +22,15 @@ const categoryCounts = items.reduce<Record<string, number>>((acc, item) => {
 
 const categoryEntries = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
 const tierMax = Math.max(...items.map((item) => item.tier));
+const satisfactoryHubTitle = pickSeoTitle(
+  'Satisfactory Production Calculator Hub | Recipes, Power, Inputs',
+  'Satisfactory Factory Calculator Hub | Machine Count, Power, Inputs'
+);
 ---
 
 <Layout
-  title="Satisfactory Production Calculators | Make Your Own Tools"
-  description="Reverse calculate factory layouts, power requirements, and raw materials for Satisfactory."
+  title={satisfactoryHubTitle}
+  description="Plan Satisfactory factories by target item with machine counts, power demand, and full upstream ingredient chains."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-14 md:px-8 md:py-20">
     <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">

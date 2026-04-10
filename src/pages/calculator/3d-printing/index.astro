@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import filaments from '../../../data/filaments.json';
+import { pickSeoTitle } from '../../../data/seoExperiment';
 
 type Material = { id: string; name: string };
 type Diameter = { id: string; name: string };
@@ -14,11 +15,16 @@ data.materials.forEach(m => {
     combos.push({ material: m, diameter: d, href: `/calculator/3d-printing/${m.id}-${d.id}/` });
   });
 });
+
+const filamentHubTitle = pickSeoTitle(
+  '3D Printing Filament Calculator Hub | Material and Diameter Profiles',
+  'Filament Length Calculator Hub | PLA, PETG, ABS by Diameter'
+);
 ---
 
 <Layout
-  title="3D Printing Calculators | Make Your Own Tools"
-  description="Browse all material and diameter combinations for the 3D printing filament length calculator."
+  title={filamentHubTitle}
+  description="Open dedicated filament calculators by material and diameter to estimate spool length, print settings, and profile-specific recommendations."
 >
   <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
       <a

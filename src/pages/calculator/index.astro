@@ -4,6 +4,7 @@ import filaments from '../../data/filaments.json';
 import satisfactoryData from '../../data/satisfactory.json';
 import { getComparisonEntries, getScenarioEntries } from '../../data/nasRaidSeo';
 import { getSolarComparisonEntries, getSolarKeywordEntriesByCategory, getSolarScenarioEntries } from '../../data/offGridSolarSeo';
+import { pickSeoTitle } from '../../data/seoExperiment';
 
 type Material = { id: string; name: string };
 type Diameter = { id: string; name: string; common?: boolean };
@@ -74,11 +75,16 @@ const popularShortcuts = {
 		{ label: 'All Satisfactory Items', href: '/calculator/satisfactory/' }
 	]
 } as const;
+
+const hubTitle = pickSeoTitle(
+	'Engineering Calculator Hub | VRAM, NAS RAID, Solar, 3D Printing',
+	'All-in-One Engineering Calculators | VRAM, RAID, Solar, Satisfactory'
+);
 ---
 
 <Layout
-	title="Calculator Hub | Make Your Own Tools"
-	description="Unified calculator hub for 3D printing planning and Satisfactory factory production modeling."
+	title={hubTitle}
+	description="Launch VRAM, NAS RAID, off-grid solar, 3D printing filament, and Satisfactory production calculators from one engineering calculator hub."
 >
 	<main class="mx-auto w-full max-w-7xl px-6 py-12 md:px-8 md:py-16">
 		<a href="/" class="mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white/30 hover:bg-white/10">

@@ -7,16 +7,21 @@ import {
   getKeywordScenarioEntries,
   getScenarioEntries
 } from '../../../data/nasRaidSeo';
+import { pickSeoTitle } from '../../../data/seoExperiment';
 
 const seoScenarios = getScenarioEntries().slice(0, 20);
 const seoComparisons = getComparisonEntries();
 const keywordScenarios = getKeywordScenarioEntries().slice(0, 24);
 const keywordComparisons = getKeywordComparisonEntries().slice(0, 16);
+const nasHubTitle = pickSeoTitle(
+  'NAS RAID Calculator | Usable TB, Parity, Fault Tolerance',
+  'RAID Capacity Calculator for NAS | RAID 5/6/10 and RAID-Z'
+);
 ---
 
 <Layout
-  title="NAS & RAID Storage Calculator | Make Your Own Tools"
-  description="Calculate usable storage, fault tolerance, and efficiency for RAID and RAID-Z arrays before buying disks."
+  title={nasHubTitle}
+  description="Calculate usable TB, parity overhead, and drive-failure tolerance for RAID 0/1/5/6/10 and ZFS RAID-Z before you buy disks."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
     <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">

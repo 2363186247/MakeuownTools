@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import filaments from '../../../data/filaments.json';
+import { pickSeoTitle } from '../../../data/seoExperiment';
 
 type TempRange = { min: number; max: number; recommended: number };
 type Material = {
@@ -63,11 +64,16 @@ const relatedCombos = [
   ...data.materials.filter((entry) => entry.id !== material.id).slice(0, 3).map((entry) => ({ href: `/calculator/3d-printing/${entry.id}-${diameter.id}/`, label: `${entry.name} · ${diameter.name}` })),
   ...data.diameters.filter((entry) => entry.id !== diameter.id).slice(0, 3).map((entry) => ({ href: `/calculator/3d-printing/${material.id}-${entry.id}/`, label: `${material.name} · ${entry.name}` }))
 ].slice(0, 6);
+const pageTitle = pickSeoTitle(
+  `${material.name} ${diameter.name} Filament Length Calculator`,
+  `${material.name} ${diameter.name} Spool Length Calculator`
+);
+const pageDescription = `Calculate filament length for ${material.name} (${diameter.name}) from spool weight, with density-based conversion and print setup recommendations.`;
 ---
 
 <Layout
-  title={`${material.name} ${diameter.name} Filament Calc`}
-  description={`Calculate exact filament length for ${material.name} (${diameter.name}) by spool weight with recommended printing settings.`}
+  title={pageTitle}
+  description={pageDescription}
 >
   <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
       <a

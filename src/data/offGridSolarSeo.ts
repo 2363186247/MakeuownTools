@@ -1,3 +1,5 @@
+import { pickSeoTitle } from './seoExperiment';
+
 export type AppliancePreset = {
   id: string;
   name: string;
@@ -225,21 +227,27 @@ function applianceSummary(appliances: AppliancePreset[]): string {
 
 function scenarioTitle(appliances: AppliancePreset[], voltage: SolarVoltage, sunHours: number, autonomyDays: number, groupIndex: number): string {
   const head = applianceSummary(appliances);
-  return `${head} ${voltage}V Solar G${groupIndex + 1} (${sunHours}h/${autonomyDays}d)`;
+  return pickSeoTitle(
+    `${head} ${voltage}V Solar Calculator P${groupIndex + 1} (${sunHours}h/${autonomyDays}d)`,
+    `${head} ${voltage}V Battery and Solar Sizing P${groupIndex + 1}`
+  );
 }
 
 function scenarioDescription(appliances: AppliancePreset[], voltage: SolarVoltage, sunHours: number, autonomyDays: number, groupIndex: number): string {
   const head = applianceSummary(appliances);
-  return `Group ${groupIndex + 1}: calculate daily Wh, LiFePO4 battery Ah, and solar panel watts for ${head} at ${voltage}V with ${sunHours}h sun and ${autonomyDays}-day autonomy.`;
+  return `Group ${groupIndex + 1}: estimate daily Wh, battery Ah, and panel watts for ${head} at ${voltage}V with ${sunHours} peak sun hours and ${autonomyDays}-day autonomy.`;
 }
 
 function comparisonTitle(voltage: SolarVoltage, profile: number): string {
-  return `${voltage}V Solar Compare · P${profile}`;
+  return pickSeoTitle(
+    `12V vs 24V vs 48V Solar Calculator | Profile ${profile}`,
+    `Off-Grid Solar Voltage Comparison | Profile ${profile}`
+  );
 }
 
 function comparisonDescription(appliances: AppliancePreset[], profile: number): string {
   const head = applianceSummary(appliances);
-  return `Profile ${profile}: compare battery Ah and panel watts for ${head} across 12V, 24V, and 48V architectures.`;
+  return `Profile ${profile}: compare battery Ah and panel watts for ${head} across 12V, 24V, and 48V system architectures.`;
 }
 
 export function getSolarScenarioEntries(): SolarScenarioEntry[] {
@@ -294,8 +302,11 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
         entries.push({
           type: 'keyword',
           slug: keywordScenarioSlug(`off-grid-solar-${region.key}-profile-${profileIndex + 1}`, appliances, voltage, region.sunHours, region.autonomyDays),
-          title: `${region.label} ${voltage}V Solar · Profile ${profileIndex + 1}`,
-          description: `Profile ${profileIndex + 1}: size battery Ah and panel watts for ${region.label} conditions at ${voltage}V using ${region.sunHours} peak sun hours and ${region.autonomyDays}-day backup assumptions.`,
+          title: pickSeoTitle(
+            `${region.label} ${voltage}V Off-Grid Solar Calculator P${profileIndex + 1}`,
+            `${region.label} ${voltage}V RV Solar Battery Sizing P${profileIndex + 1}`
+          ),
+          description: `Profile ${profileIndex + 1}: size battery Ah and panel watts for ${region.label} conditions at ${voltage}V using ${region.sunHours} peak sun hours and ${region.autonomyDays}-day backup.`,
           voltage,
           batteryChemistry: 'lifepo4',
           appliances,
@@ -316,8 +327,11 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
       entries.push({
         type: 'keyword',
         slug: keywordScenarioSlug(`off-grid-solar-${chemistry.key}`, appliances, voltage, 4.5, chemistry.key === 'agm' ? 2 : 1),
-        title: `${chemistry.label} ${voltage}V Solar Calculator`,
-        description: `Estimate Ah, panel watts, and inverter baseline for ${chemistry.label} chemistry at ${voltage}V with a realistic RV appliance stack.`,
+        title: pickSeoTitle(
+          `${chemistry.label} ${voltage}V Solar Calculator`,
+          `${chemistry.label} ${voltage}V Battery and Solar Sizing`
+        ),
+        description: `Estimate battery Ah, panel watts, and inverter baseline for ${chemistry.label} chemistry at ${voltage}V with a realistic RV appliance stack.`,
         voltage,
         batteryChemistry: chemistry.key,
         appliances,
@@ -337,8 +351,11 @@ export function getSolarKeywordEntries(): SolarKeywordEntry[] {
       entries.push({
         type: 'keyword',
         slug: keywordScenarioSlug(`off-grid-solar-${brand.key}`, appliances, voltage, brand.sunHours, brand.autonomyDays),
-        title: `${brand.label} ${voltage}V Solar Calculator`,
-        description: `Compute battery Ah and panel watts for ${brand.label} style appliance usage at ${voltage}V with ${brand.sunHours} sun hours.`,
+        title: pickSeoTitle(
+          `${brand.label} ${voltage}V Solar Calculator`,
+          `${brand.label} ${voltage}V RV Solar Battery Planner`
+        ),
+        description: `Compute battery Ah and panel watts for ${brand.label} usage at ${voltage}V with ${brand.sunHours} peak sun hours and ${brand.autonomyDays}-day autonomy.`,
         voltage,
         batteryChemistry: brand.chemistry,
         appliances,

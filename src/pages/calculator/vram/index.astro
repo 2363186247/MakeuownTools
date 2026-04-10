@@ -1,10 +1,16 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import { pickSeoTitle } from '../../../data/seoExperiment';
+
+const vramTitle = pickSeoTitle(
+  'LLM VRAM Calculator | Inference & LoRA GPU Memory Estimator',
+  'GPU Memory Calculator for LLMs | VRAM for Inference and LoRA'
+);
 ---
 
 <Layout
-  title="LLM VRAM Calculator | Make Your Own Tools"
-  description="Fetch real Hugging Face model configs and estimate VRAM for inference and LoRA scenarios with hardware matching."
+  title={vramTitle}
+  description="Estimate GPU memory for LLM inference and LoRA training using live Hugging Face configs, context length, quantization, and hardware matching."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
     <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">

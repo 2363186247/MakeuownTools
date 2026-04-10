@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import satisfactoryData from '../../../data/satisfactory.json';
+import { pickSeoTitle } from '../../../data/seoExperiment';
 
 type Ingredient = {
   name: string;
@@ -87,11 +88,16 @@ const prevItem = hasItemRing
 const nextItem = hasItemRing
   ? allItems[(currentItemIndex + 1) % allItems.length]
   : null;
+const pageTitle = pickSeoTitle(
+  `${item.name} Satisfactory Calculator | Machines and Power`,
+  `${item.name} Production Calculator | Satisfactory`
+);
+const pageDescription = `Calculate machine count, power draw, and full input dependency chain for ${item.name} in Satisfactory.`;
 ---
 
 <Layout
-  title={`${item.name} Calculator | Satisfactory`}
-  description={`Calculate machine count, total power, and the full input chain for ${item.name} in Satisfactory.`}
+  title={pageTitle}
+  description={pageDescription}
 >
   <main class="mx-auto w-full max-w-6xl px-6 py-10 md:px-8 md:py-14">
     <a

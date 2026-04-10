@@ -17,15 +17,20 @@ import {
   type CacheType,
   type ProtectionPreset
 } from '../../data/reverseProxySeo';
+import { pickSeoTitle } from '../../data/seoExperiment';
 
 const defaultOptions = defaultOptionsFor('node', 'nginx');
 const seoEntries = getReverseProxySeoEntries();
 const featuredEntries = seoEntries.slice(0, 8);
+const reverseProxyHubTitle = pickSeoTitle(
+  'Reverse Proxy Config Generator | Nginx, Caddy, Traefik Templates',
+  'Nginx, Caddy, Traefik Config Generator | HTTPS Reverse Proxy Builder'
+);
 ---
 
 <Layout
-  title="Reverse Proxy Config Generator | Nginx, Caddy, Traefik"
-  description="Generate production-ready reverse proxy config for Nginx, Caddy, and Traefik with HTTPS, CORS, websocket, compression, and upload limits."
+  title={reverseProxyHubTitle}
+  description="Generate Nginx, Caddy, or Traefik reverse proxy configs with HTTPS, WebSocket, CORS, rate limits, and downloadable Docker Compose bundles."
   canonical="/reverse-proxy/"
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-12 md:px-8 md:py-16">

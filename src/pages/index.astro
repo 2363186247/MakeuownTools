@@ -6,6 +6,7 @@ import satisfactoryData from '../data/satisfactory.json';
 import { NAS_RAID_TOTAL_ROUTES } from '../data/nasRaidSeo';
 import { OFFGRID_SOLAR_TOTAL_ROUTES } from '../data/offGridSolarSeo';
 import { REVERSE_PROXY_TOTAL_ROUTES } from '../data/reverseProxySeo';
+import { pickSeoTitle } from '../data/seoExperiment';
 
 type App = {
   id: string;
@@ -122,11 +123,16 @@ const longTailAnchors = {
     { href: '/calculator/satisfactory/computer/', label: 'Computer production planner' }
   ]
 } as const;
+
+const homeTitle = pickSeoTitle(
+  'Free Dev Calculators & Generators | Docker, NAS RAID, LLM VRAM',
+  'Docker Compose, NAS RAID, LLM VRAM Calculators | Free Tool Hub'
+);
 ---
 
 <Layout
-  title="Make Your Own Tools | Docker & Calculator Utilities"
-  description="Premium utility hub for Docker Compose generation and multi-domain calculators including 3D printing and Satisfactory planning."
+  title={homeTitle}
+  description="Free engineering tool hub for Docker Compose generation, reverse proxy config, and calculators for LLM VRAM, NAS RAID, off-grid solar, 3D printing, and Satisfactory."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-12 md:px-8 md:py-16">
       <section class="mb-10 grid items-start gap-8 lg:grid-cols-[1.2fr_0.8fr]">

@@ -1,3 +1,5 @@
+import { pickSeoTitle } from './seoExperiment';
+
 export type ProxyServer = 'nginx' | 'caddy' | 'traefik';
 export type ProxySeoServer = 'nginx' | 'caddy';
 export type ProxyApp = 'react' | 'node' | 'python' | 'ghost' | 'custom';
@@ -670,13 +672,32 @@ export function getReverseProxySeoEntries(): ReverseProxySeoEntry[] {
   const apps: Array<Exclude<ProxyApp, 'custom'>> = ['react', 'node', 'python', 'ghost'];
   const servers: ProxySeoServer[] = ['nginx', 'caddy'];
 
-  return servers.flatMap((server) => apps.map((app) => ({
-    server,
-    app,
-    slug: `${server}-for-${app}`,
-    title: `${server === 'nginx' ? 'Nginx' : 'Caddy'} Reverse Proxy for ${app === 'node' ? 'Node.js' : app === 'python' ? 'Python' : app === 'react' ? 'React' : 'Ghost'} | Config Generator`,
-    description: `Generate production-ready ${server === 'nginx' ? 'Nginx' : 'Caddy'} reverse proxy configuration for ${app === 'node' ? 'Node.js' : app === 'python' ? 'Python' : app === 'react' ? 'React frontend' : 'Ghost CMS'} with HTTPS, CORS, websocket, compression, and upload limits.`
-  })));
+  return servers.flatMap((server) => apps.map((app) => {
+    const serverLabel = server === 'nginx' ? 'Nginx' : 'Caddy';
+    const appLabel = app === 'node'
+      ? 'Node.js'
+      : app === 'python'
+        ? 'Python'
+        : app === 'react'
+          ? 'React'
+          : 'Ghost';
+    const appWorkload = app === 'react'
+      ? 'React frontend'
+      : app === 'ghost'
+        ? 'Ghost CMS'
+        : appLabel;
+
+    return {
+      server,
+      app,
+      slug: `${server}-for-${app}`,
+      title: pickSeoTitle(
+        `${serverLabel} Reverse Proxy for ${appLabel} | HTTPS Config`,
+        `${serverLabel} Config for ${appLabel} Reverse Proxy`
+      ),
+      description: `Generate production-ready ${serverLabel} reverse proxy config for ${appWorkload} with HTTPS, CORS, WebSocket, compression, and upload limit controls.`
+    };
+  }));
 }
 
 export const REVERSE_PROXY_BASE_ROUTES = 1;

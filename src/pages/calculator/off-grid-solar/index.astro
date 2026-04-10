@@ -1,15 +1,20 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { getSolarKeywordEntriesByCategory } from '../../../data/offGridSolarSeo';
+import { pickSeoTitle } from '../../../data/seoExperiment';
 
 const regionKeywords = getSolarKeywordEntriesByCategory('region').slice(0, 9);
 const chemistryKeywords = getSolarKeywordEntriesByCategory('chemistry').slice(0, 9);
 const brandKeywords = getSolarKeywordEntriesByCategory('brand').slice(0, 9);
+const solarHubTitle = pickSeoTitle(
+  'Off-Grid Solar Calculator | Battery Ah, Panel Watts, 12V/24V/48V',
+  'RV Solar and Battery Sizing Calculator | 12V 24V 48V Planner'
+);
 ---
 
 <Layout
-  title="RV Off-Grid Solar & Battery Sizing Calculator | 12V 24V 48V"
-  description="Calculate daily energy use, LiFePO4 battery bank Ah, and solar panel wattage for RV and off-grid setups across 12V, 24V, and 48V systems."
+  title={solarHubTitle}
+  description="Size off-grid systems for RV and cabin loads: daily Wh, battery Ah, solar panel watts, and inverter baseline across 12V, 24V, and 48V."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
     <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">

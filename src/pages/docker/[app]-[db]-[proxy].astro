@@ -2,6 +2,7 @@
 // src/pages/docker/[app]-[db]-[proxy].astro
 import Layout from '../../layouts/Layout.astro';
 import services from '../../data/services.json';
+import { pickSeoTitle } from '../../data/seoExperiment';
 
 type App = (typeof services.apps)[number];
 type Database = (typeof services.databases)[number];
@@ -131,6 +132,11 @@ const prevStack = hasStackRing
 const nextStack = hasStackRing
   ? allStacks[(currentStackIndex + 1) % allStacks.length]
   : null;
+const pageTitle = pickSeoTitle(
+  `${app.name} + ${db.name} + ${proxy.name} Docker Compose YAML`,
+  `${app.name} Docker Compose with ${db.name} + ${proxy.name}`
+);
+const pageDescription = `Generate a production-ready docker-compose.yml for ${app.name} with ${db.name} and ${proxy.name}, including env variables, ports, and dependency wiring.`;
 
 // Compose YAML is generated from template strings.
 // Keep indentation aligned so the output remains valid YAML.
@@ -171,8 +177,8 @@ volumes:
 ---
 
 <Layout
-  title={`${app.name} + ${db.name} + ${proxy.name} Docker Compose`}
-  description={`Generate a production-ready docker-compose.yml for ${app.name}, ${db.name}, and ${proxy.name}.`}
+  title={pageTitle}
+  description={pageDescription}
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20">
       <!-- Header -->

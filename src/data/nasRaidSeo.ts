@@ -1,3 +1,5 @@
+import { pickSeoTitle } from './seoExperiment';
+
 export type RaidLevel = 'raid0' | 'raid1' | 'raid5' | 'raid6' | 'raid10' | 'raidz1' | 'raidz2' | 'raidz3';
 
 export type KeywordKind = 'brand' | 'region';
@@ -162,8 +164,11 @@ export function getScenarioEntries(): ScenarioEntry[] {
           sizeTb,
           reservePct: DEFAULT_RESERVE,
           level,
-          title: `${drives}x ${sizeTb}TB ${label} NAS Calculator`,
-          description: `Estimate usable capacity, fault tolerance, and efficiency for ${drives}x ${sizeTb}TB in ${label} with reserve best practices.`
+          title: pickSeoTitle(
+            `${drives}x ${sizeTb}TB ${label} NAS Calculator | Usable TB`,
+            `${drives}x ${sizeTb}TB ${label} RAID Capacity Calculator`
+          ),
+          description: `Estimate usable TB, parity overhead, and fault tolerance for ${drives}x ${sizeTb}TB in ${label}. Includes reserve planning for NAS and homelab arrays.`
         });
       });
     });
@@ -178,8 +183,11 @@ export function getComparisonEntries(): ComparisonEntry[] {
     slug: makeComparisonSlug(left, right),
     left,
     right,
-    title: `${RAID_LABEL[left]} vs ${RAID_LABEL[right]} Capacity Calculator`,
-    description: `Compare usable capacity, fault tolerance, and efficiency between ${RAID_LABEL[left]} and ${RAID_LABEL[right]} for NAS and homelab arrays.`
+    title: pickSeoTitle(
+      `${RAID_LABEL[left]} vs ${RAID_LABEL[right]} Calculator | NAS Capacity`,
+      `${RAID_LABEL[left]} vs ${RAID_LABEL[right]} RAID Comparison`
+    ),
+    description: `Compare usable TB, parity cost, and fault tolerance between ${RAID_LABEL[left]} and ${RAID_LABEL[right]} for NAS and homelab arrays.`
   }));
 }
 
@@ -193,9 +201,7 @@ export function getKeywordScenarioEntries(): ScenarioEntry[] {
   const entries: ScenarioEntry[] = [];
   base.forEach((entry) => {
     KEYWORD_MODIFIERS.forEach((modifier) => {
-      const labelPrefix = modifier.kind === 'brand'
-        ? `${modifier.label} `
-        : `${modifier.label} `;
+      const labelPrefix = `${modifier.label} `;
       const audienceHint = modifier.kind === 'brand'
         ? `for ${modifier.label} NAS users`
         : `for ${modifier.label} homelab buyers`;
@@ -206,8 +212,11 @@ export function getKeywordScenarioEntries(): ScenarioEntry[] {
         keywordKind: modifier.kind,
         keywordKey: modifier.key,
         keywordLabel: modifier.label,
-        title: `${labelPrefix}${entry.drives}x ${entry.sizeTb}TB ${RAID_LABEL[entry.level]} NAS Calculator`,
-        description: `Estimate usable capacity, fault tolerance, and efficiency ${audienceHint} using ${entry.drives}x ${entry.sizeTb}TB in ${RAID_LABEL[entry.level]}.`
+        title: pickSeoTitle(
+          `${labelPrefix}${entry.drives}x ${entry.sizeTb}TB ${RAID_LABEL[entry.level]} NAS Calculator`,
+          `${labelPrefix}${RAID_LABEL[entry.level]} ${entry.drives}x ${entry.sizeTb}TB RAID Planner`
+        ),
+        description: `Estimate usable TB, parity, and fault tolerance ${audienceHint} using ${entry.drives}x ${entry.sizeTb}TB in ${RAID_LABEL[entry.level]}.`
       });
     });
   });
@@ -231,8 +240,11 @@ export function getKeywordComparisonEntries(): ComparisonEntry[] {
         keywordKind: modifier.kind,
         keywordKey: modifier.key,
         keywordLabel: modifier.label,
-        title: `${modifier.label} ${RAID_LABEL[entry.left]} vs ${RAID_LABEL[entry.right]} Calculator`,
-        description: `Compare usable capacity, fault tolerance, and efficiency between ${RAID_LABEL[entry.left]} and ${RAID_LABEL[entry.right]} for ${audienceHint}.`
+        title: pickSeoTitle(
+          `${modifier.label} ${RAID_LABEL[entry.left]} vs ${RAID_LABEL[entry.right]} Calculator`,
+          `${modifier.label} NAS ${RAID_LABEL[entry.left]} vs ${RAID_LABEL[entry.right]}`
+        ),
+        description: `Compare usable TB, parity, and failure tolerance between ${RAID_LABEL[entry.left]} and ${RAID_LABEL[entry.right]} for ${audienceHint}.`
       });
     });
   });

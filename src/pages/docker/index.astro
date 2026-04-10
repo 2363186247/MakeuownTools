@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import services from '../../data/services.json';
+import { pickSeoTitle } from '../../data/seoExperiment';
 
 type App = (typeof services.apps)[number];
 type Database = (typeof services.databases)[number];
@@ -33,11 +34,15 @@ const appGroups = services.apps
   .filter((group) => group.combinations.length > 0);
 
 const totalCombinations = combinations.length;
+const dockerHubTitle = pickSeoTitle(
+  'Docker Compose Generator | App + Database + Reverse Proxy Presets',
+  'Production Docker Compose Generator | Prebuilt App/DB/Proxy Stacks'
+);
 ---
 
 <Layout
-  title="The Ultimate Docker Compose Generator"
-  description={`Generate ${totalCombinations} production-ready docker-compose presets for popular self-hosted apps with compatible databases and reverse proxies.`}
+  title={dockerHubTitle}
+  description={`Generate ${totalCombinations} valid Docker Compose stacks with app, database, and reverse proxy presets, then open each route with ready-to-edit production YAML.`}
   canonical="/docker/"
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-14 md:px-8 md:py-20">
