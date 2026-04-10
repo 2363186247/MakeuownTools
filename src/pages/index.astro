@@ -4,7 +4,7 @@ import services from '../data/services.json';
 import filaments from '../data/filaments.json';
 import satisfactoryData from '../data/satisfactory.json';
 import { NAS_RAID_TOTAL_ROUTES } from '../data/nasRaidSeo';
-import { OFFGRID_SOLAR_TOTAL_ROUTES } from '../data/offGridSolarSeo';
+import { OFFGRID_SOLAR_TOTAL_ROUTES, getSolarComparisonEntries, getSolarKeywordEntriesByCategory, getSolarScenarioEntries } from '../data/offGridSolarSeo';
 import { REVERSE_PROXY_TOTAL_ROUTES } from '../data/reverseProxySeo';
 import { pickSeoTitle } from '../data/seoExperiment';
 
@@ -95,12 +95,15 @@ const featuredSatisfactory = satData.mvp_targets.slice(0, 2)
   }));
 
 const featuredCalculator = [featuredVram, featuredNasRaid, featuredOffGrid, ...featuredFilament, ...featuredSatisfactory];
+const solarScenarios = getSolarScenarioEntries();
+const solarComparisons = getSolarComparisonEntries();
+const solarRegionKeywords = getSolarKeywordEntriesByCategory('region');
 
 const longTailAnchors = {
   ai: [
-    { href: '/calculator/vram/?model=meta-llama/Meta-Llama-3-8B-Instruct', label: 'Llama 3 8B VRAM calculator' },
-    { href: '/calculator/vram/?model=Qwen/Qwen2.5-7B-Instruct', label: 'Qwen 7B VRAM calculator' },
-    { href: '/calculator/vram/?mode=training', label: 'LoRA training VRAM calculator' }
+    { href: '/calculator/vram/', label: 'Llama 3 8B VRAM calculator' },
+    { href: '/calculator/vram/', label: 'Qwen 7B VRAM calculator' },
+    { href: '/calculator/vram/', label: 'LoRA training VRAM calculator' }
   ],
   storage: [
     { href: '/calculator/nas-raid/4x-8tb-raid5-calculator/', label: '4x 8TB RAID 5 calculator' },
@@ -108,9 +111,9 @@ const longTailAnchors = {
     { href: '/calculator/nas-raid/uk-6x-12tb-raidz2-calculator/', label: 'UK RAID-Z2 calculator' }
   ],
   power: [
-    { href: '/calculator/off-grid-solar/60w-24h-plus-1000w-10m-12v-3sunh-1day-off-grid-solar-battery-calculator/', label: '12V fridge and microwave solar calculator' },
-    { href: '/calculator/off-grid-solar/12v-vs-24v-vs-48v-off-grid-solar-battery-calculator-24v-profile-2/', label: '12V vs 24V vs 48V solar calculator' },
-    { href: '/calculator/off-grid-solar/arizona-24v-off-grid-solar-battery-calculator/', label: 'Arizona off-grid solar calculator' }
+    { href: `/calculator/off-grid-solar/${solarScenarios.find((entry) => entry.voltage === 12 && entry.autonomyDays === 1)?.slug ?? ''}/`, label: '12V fridge and microwave solar calculator' },
+    { href: `/calculator/off-grid-solar/${solarComparisons[0]?.slug ?? ''}/`, label: '12V vs 24V vs 48V solar calculator' },
+    { href: `/calculator/off-grid-solar/${solarRegionKeywords.find((entry) => entry.keywordKey === 'arizona' && entry.voltage === 24)?.slug ?? ''}/`, label: 'Arizona off-grid solar calculator' }
   ],
   fabrication: [
     { href: '/calculator/3d-printing/pla-1-75mm/', label: 'PLA filament length calculator' },

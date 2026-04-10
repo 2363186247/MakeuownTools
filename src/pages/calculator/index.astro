@@ -50,9 +50,9 @@ const solarRegionKeywords = getSolarKeywordEntriesByCategory('region');
 
 const popularShortcuts = {
 	ai: [
-		{ label: 'Qwen 7B VRAM', href: '/calculator/vram/?model=Qwen/Qwen2.5-7B-Instruct' },
-		{ label: 'Llama 8B VRAM', href: '/calculator/vram/?model=meta-llama/Meta-Llama-3-8B-Instruct' },
-		{ label: 'Training / LoRA Mode', href: '/calculator/vram/?mode=training' }
+		{ label: 'Qwen 7B VRAM', href: '/calculator/vram/' },
+		{ label: 'Llama 8B VRAM', href: '/calculator/vram/' },
+		{ label: 'Training / LoRA Mode', href: '/calculator/vram/' }
 	],
 	storage: [
 		{ label: '4x 8TB RAID5', href: `/calculator/nas-raid/${nasScenarios.find((e) => e.drives === 4 && e.sizeTb === 8 && e.level === 'raid5')?.slug ?? '4x-8tb-raid5-calculator'}/` },
