@@ -1,0 +1,125 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import { RAID_LABEL, calculateNasRaid, type RaidLevel } from '../../../../data/nasRaidSeo';
+import { pickSeoTitle } from '../../../../data/seoExperiment';
+
+const baselines = [
+  { label: '4x 8TB (entry homelab)', drives: 4, sizeTb: 8, reservePct: 10 },
+  { label: '8x 12TB (growing NAS)', drives: 8, sizeTb: 12, reservePct: 10 }
+] as const;
+
+const levels: RaidLevel[] = ['raid1', 'raid5', 'raid6', 'raid10', 'raidz1', 'raidz2', 'raidz3'];
+
+const levelNotes: Record<RaidLevel, string> = {
+  raid0: 'Maximum capacity and speed with zero fault tolerance.',
+  raid1: 'High redundancy with low capacity efficiency.',
+  raid5: 'Balanced capacity for smaller arrays, but rebuild stress can rise on large drives.',
+  raid6: 'Dual parity improves resilience for medium and large arrays.',
+  raid10: 'Strong random I/O and rebuild behavior; capacity overhead is significant.',
+  raidz1: 'Single parity option commonly used for smaller ZFS pools.',
+  raidz2: 'Dual parity ZFS baseline for safer medium-to-large pools.',
+  raidz3: 'Triple parity for large pools with long rebuild windows.'
+};
+
+function fmtTb(value: number): string {
+  return `${value.toFixed(1)} TB`;
+}
+
+const matrixRows = levels.map((level) => ({
+  level,
+  note: levelNotes[level],
+  results: baselines.map((baseline) => calculateNasRaid(level, baseline.drives, baseline.sizeTb, baseline.reservePct))
+}));
+
+const conclusions = [
+  'For medium and large arrays, dual-parity layouts (RAID 6 / RAID-Z2) usually offer the best safety-to-capacity balance.',
+  'RAID 10 provides strong rebuild behavior but gives up substantial usable capacity.',
+  'RAID 5 and RAID-Z1 can maximize usable space in smaller arrays, but risk profile increases with larger drive sizes.',
+  'All matrix values here apply a consistent 10% reserve policy for fair comparison.'
+];
+
+const pageTitle = pickSeoTitle(
+  'NAS RAID Capacity Matrix | Usable TB and Tolerance by RAID Level',
+  'RAID Capacity Matrix for NAS | Usable TB by Mode'
+);
+---
+
+<Layout
+  title={pageTitle}
+  description="Citation-ready NAS RAID matrix comparing usable TB, tolerance, and efficiency across RAID and RAID-Z levels under consistent assumptions."
+  canonical="/calculator/nas-raid/reference/raid-capacity-matrix/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>NAS Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">Week 5 Citation Asset</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">NAS RAID Capacity Matrix</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        This matrix is built for direct reference in architecture proposals. All levels are compared using the same drive baselines and reserve policy.
+      </p>
+    </header>
+
+    <section class="rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">Directly Quotable Conclusions</h2>
+      <ul class="space-y-2 text-sm leading-7 text-zinc-200">
+        {conclusions.map((item) => (
+          <li class="rounded-xl border border-white/10 bg-black/25 px-4 py-3">{item}</li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">RAID Level Matrix</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[1040px] text-left text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+              <th class="py-3">Mode</th>
+              {baselines.map((baseline) => (
+                <th class="py-3">{baseline.label}</th>
+              ))}
+              <th class="py-3">Planning Note</th>
+            </tr>
+          </thead>
+          <tbody class="text-zinc-200">
+            {matrixRows.map((row) => (
+              <tr class="border-b border-white/5">
+                <td class="py-3 font-medium text-white">{RAID_LABEL[row.level]}</td>
+                {row.results.map((result) => (
+                  <td class="py-3">
+                    {result.valid ? (
+                      <div class="space-y-1">
+                        <p class="font-mono text-sky-200">Usable: {fmtTb(result.usableAfterReserve)}</p>
+                        <p class="text-xs text-zinc-400">Tolerance: {result.tolerance}</p>
+                        <p class="text-xs text-zinc-400">Efficiency: {result.efficiency.toFixed(1)}%</p>
+                      </div>
+                    ) : (
+                      <span class="text-zinc-500">Not valid for this drive count</span>
+                    )}
+                  </td>
+                ))}
+                <td class="py-3">{row.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">NAS Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
+        <a href="/calculator/nas-raid/reference/planning-quick-reference/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Planning Quick Reference</a>
+        <a href="/calculator/nas-raid/compare/raid-level-comparison/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Comparison Page</a>
+        <a href="/calculator/nas-raid/decision/raid-level-selector/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Selector</a>
+        <a href="/calculator/nas-raid/faq/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS FAQ</a>
+        <a href="/calculator/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Calculator Hub</a>
+      </div>
+    </section>
+  </main>
+</Layout>

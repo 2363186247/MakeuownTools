@@ -1,0 +1,153 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import { RAID_LABEL, getScenarioEntries, type RaidLevel } from '../../../../data/nasRaidSeo';
+import { pickSeoTitle } from '../../../../data/seoExperiment';
+
+type Priority = 'capacity' | 'balanced' | 'resilience';
+
+type GuidanceRow = {
+  drives: number;
+  priority: Priority;
+  level: RaidLevel;
+  reason: string;
+};
+
+const guidanceRows: GuidanceRow[] = [
+  { drives: 4, priority: 'capacity', level: 'raid5', reason: 'Maximize usable TB when budget is tight and backup exists.' },
+  { drives: 4, priority: 'balanced', level: 'raid5', reason: 'Balanced starter layout for many home NAS deployments.' },
+  { drives: 4, priority: 'resilience', level: 'raid10', reason: 'Better rebuild behavior and random I/O consistency.' },
+  { drives: 6, priority: 'capacity', level: 'raid5', reason: 'High usable capacity with moderate parity overhead.' },
+  { drives: 6, priority: 'balanced', level: 'raid6', reason: 'Dual parity improves failure safety at moderate cost.' },
+  { drives: 6, priority: 'resilience', level: 'raid6', reason: 'Safer rebuild profile for larger arrays.' },
+  { drives: 8, priority: 'capacity', level: 'raid5', reason: 'Capacity-heavy option for non-critical archival data.' },
+  { drives: 8, priority: 'balanced', level: 'raidz2', reason: 'Common safe default for medium ZFS pools.' },
+  { drives: 8, priority: 'resilience', level: 'raidz2', reason: 'Dual parity plus strong long-term pool safety.' }
+];
+
+const scenarios = getScenarioEntries();
+
+function pickScenario(drives: number, level: RaidLevel) {
+  return scenarios.find((entry) => entry.drives === drives && entry.level === level && entry.sizeTb === 8)
+    ?? scenarios.find((entry) => entry.drives === drives && entry.level === level)
+    ?? null;
+}
+
+const rowsWithLinks = guidanceRows.map((row) => ({
+  ...row,
+  scenario: pickScenario(row.drives, row.level)
+}));
+
+const priorityLabel: Record<Priority, string> = {
+  capacity: 'Capacity First',
+  balanced: 'Balanced',
+  resilience: 'Resilience First'
+};
+
+const purchaseChecklist = [
+  'Define required usable TB target before selecting drive size and count.',
+  'Choose parity level first, then validate total spend against growth plan.',
+  'Reserve at least one tested backup path before production data cutover.',
+  'Plan rebuild-time operational impact and replacement SLA in advance.'
+];
+
+const migrationChecklist = [
+  'Document current pool fill ratio and snapshot policy before migration.',
+  'Benchmark one pilot workload after migration to verify expected behavior.',
+  'Set alert thresholds for SMART health and pool free-space floor.',
+  'Run one restore drill and capture measured recovery time.'
+];
+
+const pageTitle = pickSeoTitle(
+  'NAS RAID Planning Quick Reference | Drive Count to RAID Choice',
+  'NAS RAID Cheat Sheet | Planning and Migration Guardrails'
+);
+---
+
+<Layout
+  title={pageTitle}
+  description="Citation-ready NAS planning quick reference with drive-count guidance, recommended RAID levels, and purchase-to-migration checklists."
+  canonical="/calculator/nas-raid/reference/planning-quick-reference/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>NAS Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">Week 5 Citation Asset</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">NAS RAID Planning Quick Reference</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        A practical sheet for purchase planning and migration reviews. Teams can cite this page for decision rationale and process checkpoints.
+      </p>
+    </header>
+
+    <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Drive Count to RAID Guidance</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[980px] text-left text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+              <th class="py-3">Drive Count</th>
+              <th class="py-3">Priority</th>
+              <th class="py-3">Recommended RAID</th>
+              <th class="py-3">Scenario Link</th>
+              <th class="py-3">Rationale</th>
+            </tr>
+          </thead>
+          <tbody class="text-zinc-200">
+            {rowsWithLinks.map((row) => (
+              <tr class="border-b border-white/5">
+                <td class="py-3 font-medium text-white">{row.drives}</td>
+                <td class="py-3">{priorityLabel[row.priority]}</td>
+                <td class="py-3 font-mono text-sky-200">{RAID_LABEL[row.level]}</td>
+                <td class="py-3">
+                  {row.scenario ? (
+                    <a href={`/calculator/nas-raid/${row.scenario.slug}/`} class="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+                      Open {row.scenario.drives}x {row.scenario.sizeTb}TB
+                    </a>
+                  ) : (
+                    <span class="text-xs text-zinc-500">No direct route</span>
+                  )}
+                </td>
+                <td class="py-3">{row.reason}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8 grid gap-6 lg:grid-cols-2">
+      <article class="rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">Pre-Purchase Checklist</h2>
+        <ul class="space-y-2 text-sm leading-7 text-zinc-200">
+          {purchaseChecklist.map((item) => (
+            <li class="rounded-xl border border-white/10 bg-black/25 px-4 py-3">{item}</li>
+          ))}
+        </ul>
+      </article>
+
+      <article class="rounded-3xl border border-emerald-300/20 bg-emerald-500/[0.06] p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-emerald-100">Migration and Validation Checklist</h2>
+        <ul class="space-y-2 text-sm leading-7 text-zinc-200">
+          {migrationChecklist.map((item) => (
+            <li class="rounded-xl border border-white/10 bg-black/25 px-4 py-3">{item}</li>
+          ))}
+        </ul>
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">NAS Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
+        <a href="/calculator/nas-raid/reference/raid-capacity-matrix/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Capacity Matrix</a>
+        <a href="/calculator/nas-raid/compare/raid-level-comparison/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Comparison Page</a>
+        <a href="/calculator/nas-raid/decision/raid-level-selector/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Selector</a>
+        <a href="/calculator/nas-raid/faq/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS FAQ</a>
+        <a href="/calculator/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Calculator Hub</a>
+      </div>
+    </section>
+  </main>
+</Layout>
