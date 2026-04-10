@@ -1,0 +1,153 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import {
+  RAID_LABEL,
+  getComparisonEntries,
+  getScenarioEntries,
+  type RaidLevel,
+  type ScenarioEntry
+} from '../../../../data/nasRaidSeo';
+
+type Priority = 'capacity' | 'balanced' | 'resilience';
+
+type DecisionCell = {
+  drives: number;
+  priority: Priority;
+  level: RaidLevel;
+  scenario: ScenarioEntry | null;
+};
+
+const scenarios = getScenarioEntries();
+const scenarioByLevelAndDrives = new Map<string, ScenarioEntry>();
+
+for (const scenario of scenarios) {
+  const key = `${scenario.level}-${scenario.drives}`;
+  if (!scenarioByLevelAndDrives.has(key)) {
+    scenarioByLevelAndDrives.set(key, scenario);
+  }
+}
+
+function recommendLevel(drives: number, priority: Priority): RaidLevel {
+  if (priority === 'capacity') {
+    if (drives >= 3) return 'raid5';
+    return 'raid1';
+  }
+
+  if (priority === 'balanced') {
+    if (drives >= 8) return 'raidz2';
+    if (drives >= 6) return 'raid6';
+    if (drives >= 4) return 'raid5';
+    return 'raid1';
+  }
+
+  if (drives >= 10) return 'raidz2';
+  if (drives >= 6) return 'raid6';
+  if (drives >= 4) return 'raid10';
+  return 'raid1';
+}
+
+const drivesOptions = [4, 6, 8, 10, 12];
+const priorities: Priority[] = ['capacity', 'balanced', 'resilience'];
+
+const decisionRows: DecisionCell[] = drivesOptions.flatMap((drives) => (
+  priorities.map((priority) => {
+    const level = recommendLevel(drives, priority);
+    const scenario = scenarioByLevelAndDrives.get(`${level}-${drives}`) ?? null;
+    return { drives, priority, level, scenario };
+  })
+));
+
+const comparisonLinks = getComparisonEntries().slice(0, 10);
+
+const priorityLabel: Record<Priority, string> = {
+  capacity: 'Capacity First',
+  balanced: 'Balanced',
+  resilience: 'Resilience First'
+};
+---
+
+<Layout
+  title="RAID Decision Guide | Pick the Right NAS RAID Level"
+  description="Decision page for selecting RAID levels by drive count and planning priority with direct links to relevant scenario calculators."
+  canonical="/calculator/nas-raid/decision/raid-level-selector/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>NAS Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">Cluster Decision Page</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">RAID Level Selector</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        Choose drive count and planning priority, then jump directly to a matching scenario page for concrete usable capacity and tolerance values.
+      </p>
+    </header>
+
+    <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Decision Matrix</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[860px] text-left text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+              <th class="py-3">Drive Count</th>
+              <th class="py-3">Priority</th>
+              <th class="py-3">Suggested Mode</th>
+              <th class="py-3">Scenario Link</th>
+            </tr>
+          </thead>
+          <tbody class="text-zinc-200">
+            {decisionRows.map((row) => (
+              <tr class="border-b border-white/5">
+                <td class="py-3 font-medium text-white">{row.drives} drives</td>
+                <td class="py-3">{priorityLabel[row.priority]}</td>
+                <td class="py-3 font-mono text-sky-200">{RAID_LABEL[row.level]}</td>
+                <td class="py-3">
+                  {row.scenario ? (
+                    <a href={`/calculator/nas-raid/${row.scenario.slug}/`} class="rounded-lg border border-white/10 bg-black/25 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+                      Open {row.scenario.drives}x {row.scenario.sizeTb}TB
+                    </a>
+                  ) : (
+                    <span class="text-xs text-zinc-500">No direct scenario</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Recommended Next Checks</h2>
+      <ol class="space-y-2 text-sm leading-7 text-zinc-300">
+        <li>1. Confirm usable capacity target with reserve margin.</li>
+        <li>2. Compare your selected mode against one safer and one denser alternative.</li>
+        <li>3. Validate rebuild risk assumptions for your drive size and replacement time.</li>
+        <li>4. Lock backup policy before final hardware purchase.</li>
+      </ol>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Comparison Deep Links</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {comparisonLinks.map((entry) => (
+          <a href={`/calculator/nas-raid/${entry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+            {RAID_LABEL[entry.left]} vs {RAID_LABEL[entry.right]}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">NAS Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
+        <a href="/calculator/nas-raid/compare/raid-level-comparison/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Comparison Page</a>
+        <a href="/calculator/nas-raid/faq/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">FAQ Page</a>
+        <a href="/calculator/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Calculator Hub</a>
+      </div>
+    </section>
+  </main>
+</Layout>

@@ -1,0 +1,125 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import services from '../../../data/services.json';
+
+type App = (typeof services.apps)[number];
+type Database = (typeof services.databases)[number];
+type Proxy = (typeof services.proxies)[number];
+
+type ComparisonRow = {
+  app: App;
+  db: Database;
+  links: Array<{ proxy: Proxy; href: string }>;
+};
+
+const proxyHighlights: Record<string, string[]> = {
+  nginx: [
+    'Highest config flexibility and mature ecosystem',
+    'Strong manual tuning for caching and custom routing',
+    'Best fit for teams that want explicit config control'
+  ],
+  caddy: [
+    'Automatic HTTPS with minimal configuration',
+    'Fast onboarding for small and medium deployments',
+    'Great default choice when operations bandwidth is limited'
+  ],
+  traefik: [
+    'Dynamic discovery for container environments',
+    'Label-driven routing scales well with many services',
+    'Best fit for multi-service and frequent deployment changes'
+  ]
+};
+
+const comparisonRows: ComparisonRow[] = services.apps
+  .slice(0, 8)
+  .flatMap((app) => {
+    const db = services.databases.find((candidate) => app.supported_dbs.includes(candidate.id));
+    if (!db) return [];
+
+    return [{
+      app,
+      db,
+      links: services.proxies.map((proxy) => ({
+        proxy,
+        href: `/docker/${app.id}-${db.id}-${proxy.id}/`
+      }))
+    }];
+  });
+---
+
+<Layout
+  title="Docker Reverse Proxy Comparison | Nginx vs Caddy vs Traefik"
+  description="Compare reverse proxy choices for Docker Compose stacks and open direct stack routes for Nginx, Caddy, and Traefik."
+  canonical="/docker/compare/reverse-proxy-comparison/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/docker/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>Docker Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-cyan-400/35 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100">Cluster Compare Page</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">Nginx vs Caddy vs Traefik for Docker Compose</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        Use this page to compare ingress trade-offs, then jump directly to stack detail pages where app, database, and proxy are already wired together.
+      </p>
+    </header>
+
+    <section class="grid gap-4 md:grid-cols-3">
+      {services.proxies.map((proxy) => (
+        <article class="rounded-2xl border border-white/10 bg-black/30 p-5">
+          <h2 class="text-lg font-semibold text-white">{proxy.name}</h2>
+          <p class="mt-1 text-xs font-mono text-zinc-500">{proxy.image}</p>
+          <ul class="mt-4 space-y-2 text-sm text-zinc-300">
+            {(proxyHighlights[proxy.id] ?? []).map((line) => (
+              <li>{line}</li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Stack Route Matrix</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[900px] text-left text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+              <th class="py-3">Application</th>
+              <th class="py-3">Database</th>
+              {services.proxies.map((proxy) => (
+                <th class="py-3">{proxy.name}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody class="text-zinc-200">
+            {comparisonRows.map((row) => (
+              <tr class="border-b border-white/5">
+                <td class="py-3 font-medium text-white">{row.app.name}</td>
+                <td class="py-3">{row.db.name}</td>
+                {row.links.map((item) => (
+                  <td class="py-3">
+                    <a href={item.href} class="rounded-lg border border-white/10 bg-black/25 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+                      Open {item.proxy.name} Stack
+                    </a>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-cyan-300/20 bg-cyan-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-cyan-100">Docker Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/docker/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">Docker Hub</a>
+        <a href="/docker/decision/stack-selector/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">Decision Page</a>
+        <a href="/docker/faq/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">FAQ Page</a>
+        <a href="/reverse-proxy/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">Reverse Proxy Generator</a>
+      </div>
+    </section>
+  </main>
+</Layout>

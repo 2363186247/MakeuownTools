@@ -1,0 +1,115 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import { RAID_LABEL, getComparisonEntries, getScenarioEntries } from '../../../../data/nasRaidSeo';
+
+const faqItems = [
+  {
+    question: 'Is RAID a backup strategy?',
+    answer: 'No. RAID improves availability and fault tolerance, but it does not protect against accidental deletion, ransomware, or site-level incidents. Keep external backups.'
+  },
+  {
+    question: 'When is RAID 6 or RAID-Z2 better than RAID 5?',
+    answer: 'As drive size and array width grow, rebuild windows become longer. Dual-parity modes reduce risk during rebuild and are usually safer for medium to large pools.'
+  },
+  {
+    question: 'Why does reserve percentage matter in capacity planning?',
+    answer: 'Operating too close to full capacity harms performance and recovery behavior. Reserve headroom leaves room for metadata, snapshots, and rebuild operations.'
+  },
+  {
+    question: 'How should I choose between RAID 10 and parity RAID?',
+    answer: 'RAID 10 usually offers better random I/O and rebuild behavior, while parity RAID often offers better usable capacity. Choose based on workload profile and resilience goals.'
+  },
+  {
+    question: 'Can I mix drive sizes in one array?',
+    answer: 'You can, but effective capacity is usually constrained by the smallest drives in many layouts. Mixed-size strategies require careful platform-specific planning.'
+  },
+  {
+    question: 'What should I validate before buying disks?',
+    answer: 'Validate usable TB target, fault tolerance requirement, growth plan, power budget, and replacement lead time. Then lock a RAID mode that still works after the next upgrade cycle.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
+
+const scenarioLinks = getScenarioEntries().slice(0, 12);
+const comparisonLinks = getComparisonEntries().slice(0, 8);
+---
+
+<Layout
+  title="NAS RAID FAQ | Capacity, Fault Tolerance, and Planning"
+  description="Frequently asked NAS and RAID planning questions about usable capacity, reserve policy, redundancy, and migration strategy."
+  canonical="/calculator/nas-raid/faq/"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>NAS Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">Cluster FAQ Page</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">NAS & RAID FAQ</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        Practical answers for storage planning decisions before procurement, migration, and long-term homelab operation.
+      </p>
+    </header>
+
+    <section class="space-y-3">
+      {faqItems.map((item) => (
+        <article class="rounded-2xl border border-white/10 bg-black/30 p-5">
+          <h2 class="text-sm font-semibold text-white md:text-base">{item.question}</h2>
+          <p class="mt-2 text-sm leading-7 text-zinc-300">{item.answer}</p>
+        </article>
+      ))}
+    </section>
+
+    <section class="mt-8 grid gap-6 lg:grid-cols-2">
+      <article class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Scenario Links</h2>
+        <div class="grid gap-2 sm:grid-cols-2">
+          {scenarioLinks.map((entry) => (
+            <a href={`/calculator/nas-raid/${entry.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+              {entry.drives}x {entry.sizeTb}TB {RAID_LABEL[entry.level]}
+            </a>
+          ))}
+        </div>
+      </article>
+
+      <article class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Comparison Links</h2>
+        <div class="space-y-2">
+          {comparisonLinks.map((entry) => (
+            <a href={`/calculator/nas-raid/${entry.slug}/`} class="block rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
+              {RAID_LABEL[entry.left]} vs {RAID_LABEL[entry.right]}
+            </a>
+          ))}
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">NAS Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
+        <a href="/calculator/nas-raid/compare/raid-level-comparison/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Comparison Page</a>
+        <a href="/calculator/nas-raid/decision/raid-level-selector/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Decision Page</a>
+        <a href="/calculator/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Calculator Hub</a>
+      </div>
+    </section>
+  </main>
+</Layout>

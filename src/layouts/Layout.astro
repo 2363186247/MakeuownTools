@@ -85,7 +85,14 @@ function pickLinksForPathname(pathname: string): LinkItem[] {
     const scenarioLinks = nasRaidScenarioEntries.slice(0, 3).map((entry) => ({ href: `/calculator/nas-raid/${entry.slug}/`, label: entry.title.replace(' | NAS Capacity', '') }));
     const comparisonLinks = nasRaidComparisonEntries.slice(0, 2).map((entry) => ({ href: `/calculator/nas-raid/${entry.slug}/`, label: entry.title }));
     const keywordLinks = [...nasRaidKeywordScenarioEntries, ...nasRaidKeywordComparisonEntries].slice(0, 2).map((entry) => ({ href: `/calculator/nas-raid/${entry.slug}/`, label: entry.title }));
-    return [...scenarioLinks, ...comparisonLinks, ...keywordLinks];
+    return [
+      { href: '/calculator/nas-raid/compare/raid-level-comparison/', label: 'RAID level comparison guide' },
+      { href: '/calculator/nas-raid/decision/raid-level-selector/', label: 'RAID level selector decision page' },
+      { href: '/calculator/nas-raid/faq/', label: 'NAS RAID FAQ' },
+      ...scenarioLinks,
+      ...comparisonLinks,
+      ...keywordLinks
+    ];
   }
 
   if (pathname.startsWith('/calculator/off-grid-solar/')) {
@@ -115,6 +122,9 @@ function pickLinksForPathname(pathname: string): LinkItem[] {
 
   if (pathname.startsWith('/docker/')) {
     return [
+      { href: '/docker/compare/reverse-proxy-comparison/', label: 'Nginx vs Caddy vs Traefik comparison' },
+      { href: '/docker/decision/stack-selector/', label: 'Docker stack selector decision page' },
+      { href: '/docker/faq/', label: 'Docker Compose FAQ' },
       ...featuredDockerLinks,
       { href: '/docker/', label: 'Docker Compose Generator Hub' },
       { href: '/reverse-proxy/', label: 'Reverse Proxy Config Generator' },

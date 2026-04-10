@@ -1,0 +1,108 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import {
+  RAID_LABEL,
+  calculateNasRaid,
+  getComparisonEntries,
+  getScenarioEntries,
+  type RaidLevel
+} from '../../../../data/nasRaidSeo';
+
+const levels: RaidLevel[] = ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'raidz1', 'raidz2', 'raidz3'];
+const baselineRows = levels.map((level) => ({
+  level,
+  result: calculateNasRaid(level, 8, 12, 10)
+}));
+
+const comparisonLinks = getComparisonEntries().slice(0, 12);
+const scenarioLinks = getScenarioEntries()
+  .filter((entry) => [4, 6, 8].includes(entry.drives) && [8, 12, 16].includes(entry.sizeTb))
+  .slice(0, 12);
+
+function fmtTb(value: number): string {
+  return `${value.toFixed(2)} TB`;
+}
+---
+
+<Layout
+  title="RAID Level Comparison | RAID 5 vs RAID 6 vs RAID 10 vs RAID-Z"
+  description="Compare RAID and RAID-Z levels on usable capacity, fault tolerance, and efficiency using consistent baseline assumptions."
+  canonical="/calculator/nas-raid/compare/raid-level-comparison/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>NAS Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">Cluster Compare Page</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">RAID Level Comparison</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        One baseline, multiple RAID modes. This page compares capacity efficiency and tolerance before you open specific long-tail scenario pages.
+      </p>
+    </header>
+
+    <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Baseline Matrix (8 x 12TB, 10% reserve)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[720px] text-left text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+              <th class="py-3">Mode</th>
+              <th class="py-3">Usable</th>
+              <th class="py-3">Tolerance</th>
+              <th class="py-3">Efficiency</th>
+              <th class="py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody class="text-zinc-200">
+            {baselineRows.map((row) => (
+              <tr class="border-b border-white/5">
+                <td class="py-3 font-medium text-white">{RAID_LABEL[row.level]}</td>
+                <td class="py-3 font-mono text-sky-200">{row.result.valid ? fmtTb(row.result.usableAfterReserve) : 'N/A'}</td>
+                <td class="py-3">{row.result.valid ? row.result.tolerance : 'N/A'}</td>
+                <td class="py-3 font-mono">{row.result.valid ? `${row.result.efficiency.toFixed(1)}%` : 'N/A'}</td>
+                <td class="py-3 text-xs text-zinc-400">{row.result.valid ? 'Valid' : `Needs ${row.result.min}+ drives`}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8 grid gap-6 lg:grid-cols-2">
+      <article class="rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Comparison Deep Links</h2>
+        <div class="space-y-2">
+          {comparisonLinks.map((entry) => (
+            <a href={`/calculator/nas-raid/${entry.slug}/`} class="block rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+              {RAID_LABEL[entry.left]} vs {RAID_LABEL[entry.right]}
+            </a>
+          ))}
+        </div>
+      </article>
+
+      <article class="rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Scenario Deep Links</h2>
+        <div class="grid gap-2 sm:grid-cols-2">
+          {scenarioLinks.map((entry) => (
+            <a href={`/calculator/nas-raid/${entry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-emerald-300/40 hover:text-white">
+              {entry.drives}x {entry.sizeTb}TB {RAID_LABEL[entry.level]}
+            </a>
+          ))}
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">NAS Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
+        <a href="/calculator/nas-raid/decision/raid-level-selector/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Decision Page</a>
+        <a href="/calculator/nas-raid/faq/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">FAQ Page</a>
+        <a href="/calculator/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">Calculator Hub</a>
+      </div>
+    </section>
+  </main>
+</Layout>

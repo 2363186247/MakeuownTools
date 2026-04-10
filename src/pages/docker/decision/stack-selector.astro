@@ -1,0 +1,115 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import services from '../../../data/services.json';
+
+type App = (typeof services.apps)[number];
+type Database = (typeof services.databases)[number];
+type Proxy = (typeof services.proxies)[number];
+
+type DecisionRow = {
+  scenario: string;
+  recommendedProxy: Proxy;
+  fallbackProxy: Proxy;
+  app: App;
+  db: Database;
+  recommendedHref: string;
+  fallbackHref: string;
+};
+
+function pickProxy(id: string): Proxy {
+  return services.proxies.find((proxy) => proxy.id === id) ?? services.proxies[0];
+}
+
+function pickCompatibleDb(app: App): Database {
+  return services.databases.find((db) => app.supported_dbs.includes(db.id)) ?? services.databases[0];
+}
+
+const scenarios: Array<{ scenario: string; appId: string; recommendedProxyId: string; fallbackProxyId: string }> = [
+  { scenario: 'Single-node blog or CMS with quick TLS setup', appId: 'ghost', recommendedProxyId: 'caddy', fallbackProxyId: 'nginx' },
+  { scenario: 'Content platform with future traffic tuning needs', appId: 'wordpress', recommendedProxyId: 'nginx', fallbackProxyId: 'caddy' },
+  { scenario: 'Internal git service with dynamic route growth', appId: 'gitea', recommendedProxyId: 'traefik', fallbackProxyId: 'nginx' },
+  { scenario: 'BI dashboard and data service for team analytics', appId: 'metabase', recommendedProxyId: 'nginx', fallbackProxyId: 'traefik' },
+  { scenario: 'Headless CMS with multiple runtime services', appId: 'directus', recommendedProxyId: 'traefik', fallbackProxyId: 'caddy' },
+  { scenario: 'Knowledge base platform with low ops overhead', appId: 'wikijs', recommendedProxyId: 'caddy', fallbackProxyId: 'nginx' }
+];
+
+const decisionRows: DecisionRow[] = scenarios.flatMap((scenario) => {
+  const app = services.apps.find((item) => item.id === scenario.appId);
+  if (!app) return [];
+
+  const db = pickCompatibleDb(app);
+  const recommendedProxy = pickProxy(scenario.recommendedProxyId);
+  const fallbackProxy = pickProxy(scenario.fallbackProxyId);
+
+  return [{
+    scenario: scenario.scenario,
+    recommendedProxy,
+    fallbackProxy,
+    app,
+    db,
+    recommendedHref: `/docker/${app.id}-${db.id}-${recommendedProxy.id}/`,
+    fallbackHref: `/docker/${app.id}-${db.id}-${fallbackProxy.id}/`
+  }];
+});
+---
+
+<Layout
+  title="Docker Stack Decision Guide | Choose App, DB, and Proxy"
+  description="Decision page for selecting a Docker Compose stack path with recommended and fallback proxy choices by deployment scenario."
+  canonical="/docker/decision/stack-selector/"
+>
+  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+    <a href="/docker/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+      <span>&larr;</span>
+      <span>Docker Hub</span>
+    </a>
+
+    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+      <p class="mb-3 inline-flex items-center rounded-full border border-cyan-400/35 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100">Cluster Decision Page</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">Docker Stack Selector</h1>
+      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
+        Pick a deployment scenario, open the recommended stack route, and keep a fallback route ready for rollback or proxy strategy changes.
+      </p>
+    </header>
+
+    <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Decision Matrix</h2>
+      <div class="space-y-3">
+        {decisionRows.map((row) => (
+          <article class="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <h3 class="text-sm font-semibold text-white">{row.scenario}</h3>
+            <p class="mt-2 text-xs uppercase tracking-[0.12em] text-zinc-500">Target stack: {row.app.name} + {row.db.name}</p>
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+              <a href={row.recommendedHref} class="rounded-xl border border-emerald-300/25 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100 transition hover:bg-emerald-400/20">
+                Recommended: {row.recommendedProxy.name}
+              </a>
+              <a href={row.fallbackHref} class="rounded-xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100 transition hover:bg-amber-400/20">
+                Fallback: {row.fallbackProxy.name}
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Decision Workflow</h2>
+      <ol class="space-y-2 text-sm leading-7 text-zinc-300">
+        <li>1. Choose app + database pair based on official compatibility and your team experience.</li>
+        <li>2. Start with the recommended proxy route for your operating model.</li>
+        <li>3. Open the comparison page to validate ingress trade-offs before production rollout.</li>
+        <li>4. Keep a fallback stack route documented for quick rollback.</li>
+      </ol>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-cyan-300/20 bg-cyan-500/[0.06] p-6 md:p-8">
+      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-cyan-100">Docker Cluster Navigation</h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/docker/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">Docker Hub</a>
+        <a href="/docker/compare/reverse-proxy-comparison/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">Comparison Page</a>
+        <a href="/docker/faq/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">FAQ Page</a>
+        <a href="/reverse-proxy/" class="rounded-xl border border-cyan-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-cyan-200/45 hover:text-white">Reverse Proxy Generator</a>
+      </div>
+    </section>
+  </main>
+</Layout>
