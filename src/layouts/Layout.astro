@@ -318,21 +318,44 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
       </aside>
     )}
 
-    <script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
-    <script>
-      const kofiWidgetOverlay = (window as Window & {
-        kofiWidgetOverlay?: {
-          draw: (username: string, options: Record<string, string>) => void;
-        };
-      }).kofiWidgetOverlay;
+    <script is:inline>
+      const initKofiWidget = () => {
+        const existingWidget = window.kofiWidgetOverlay;
 
-      if (kofiWidgetOverlay) {
-        kofiWidgetOverlay.draw('makeuowntools', {
-          'type': 'floating-chat',
-          'floating-chat.donateButton.text': '☕ Buy me a coffee',
-          'floating-chat.donateButton.background-color': '#323842',
-          'floating-chat.donateButton.text-color': '#fff'
-        });
+        if (existingWidget) {
+          existingWidget.draw('makeuowntools', {
+            'type': 'floating-chat',
+            'floating-chat.donateButton.text': '☕ Buy me a coffee',
+            'floating-chat.donateButton.background-color': '#323842',
+            'floating-chat.donateButton.text-color': '#fff'
+          });
+          return;
+        }
+
+        if (document.querySelector('script[data-kofi-widget]')) {
+          return;
+        }
+
+        const widgetScript = document.createElement('script');
+        widgetScript.src = 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js';
+        widgetScript.async = true;
+        widgetScript.setAttribute('data-kofi-widget', 'true');
+        widgetScript.onload = () => {
+          window.kofiWidgetOverlay?.draw('makeuowntools', {
+            'type': 'floating-chat',
+            'floating-chat.donateButton.text': '☕ Buy me a coffee',
+            'floating-chat.donateButton.background-color': '#323842',
+            'floating-chat.donateButton.text-color': '#fff'
+          });
+        };
+
+        document.head.appendChild(widgetScript);
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initKofiWidget, { once: true });
+      } else {
+        initKofiWidget();
       }
     </script>
   </body>
