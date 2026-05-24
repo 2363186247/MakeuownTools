@@ -381,21 +381,7 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
         window.setTimeout(() => window.clearInterval(start), 5000);
       };
 
-      const openKofiWidget = () => {
-        const widgetIframes = Array.from(document.querySelectorAll('iframe.floatingchat-container'));
-
-        for (const iframe of widgetIframes) {
-          const contentDocument = iframe.contentDocument;
-          const donateButton = contentDocument?.querySelector('[id$="-donate-button"]');
-
-          if (donateButton && donateButton.classList.contains('closed')) {
-            donateButton.click();
-            return true;
-          }
-        }
-
-        return false;
-      };
+      // Removed automatic open behavior: do not programmatically click the donate button on load.
 
       const initKofiWidget = () => {
         const existingWidget = window.kofiWidgetOverlay;
@@ -404,7 +390,6 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
           existingWidget.draw('makeuowntools', kofiWidgetOptions);
           window.setTimeout(() => {
             forceKofiWidgetLayout();
-            openKofiWidget();
           }, 350);
           return;
         }
@@ -422,7 +407,6 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
 
           window.setTimeout(() => {
             forceKofiWidgetLayout();
-            openKofiWidget();
           }, 350);
         };
 
