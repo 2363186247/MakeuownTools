@@ -317,5 +317,23 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
         </div>
       </aside>
     )}
+
+    <script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+    <script>
+      const kofiWidgetOverlay = (window as Window & {
+        kofiWidgetOverlay?: {
+          draw: (username: string, options: Record<string, string>) => void;
+        };
+      }).kofiWidgetOverlay;
+
+      if (kofiWidgetOverlay) {
+        kofiWidgetOverlay.draw('makeuowntools', {
+          'type': 'floating-chat',
+          'floating-chat.donateButton.text': '☕ Buy me a coffee',
+          'floating-chat.donateButton.background-color': '#323842',
+          'floating-chat.donateButton.text-color': '#fff'
+        });
+      }
+    </script>
   </body>
 </html>
