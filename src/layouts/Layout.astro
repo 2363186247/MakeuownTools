@@ -268,6 +268,31 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
     <meta property="twitter:title" content={seoTitle} />
     <meta property="twitter:description" content={seoDescription} />
     <meta property="twitter:image" content={socialImageUrl} />
+    <style is:inline>
+      :global(.floatingchat-container-wrap),
+      :global(.floatingchat-container-wrap-mobi) {
+        width: 260px !important;
+        height: 76px !important;
+        overflow: hidden !important;
+      }
+
+      :global(iframe.floatingchat-container),
+      :global(iframe.floatingchat-container-mobi) {
+        width: 260px !important;
+        height: 76px !important;
+        overflow: hidden !important;
+      }
+
+      :global(iframe.floatingchat-container) {
+        left: 24px !important;
+        bottom: 24px !important;
+      }
+
+      :global(iframe.floatingchat-container-mobi) {
+        left: 24px !important;
+        bottom: 24px !important;
+      }
+    </style>
     <slot name="head" />
   </head>
 
@@ -319,16 +344,68 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
     )}
 
     <script is:inline>
+      const kofiWidgetOptions = {
+        'type': 'floating-chat',
+        'floating-chat.donateButton.text': 'Buy me a coffee',
+        'floating-chat.donateButton.background-color': '#323842',
+        'floating-chat.donateButton.text-color': '#fff',
+        'floating-chat.core.position.bottom-left': 'position: fixed; bottom: 24px; left: 24px; width: 220px; height: 72px;'
+      };
+
+      const tuneKofiWidgetLayout = () => {
+        const wrappers = Array.from(document.querySelectorAll('.floatingchat-container-wrap, .floatingchat-container-wrap-mobi'));
+        const widgetIframes = Array.from(document.querySelectorAll('iframe.floatingchat-container, iframe.floatingchat-container-mobi'));
+
+        for (const wrapper of wrappers) {
+          wrapper.style.setProperty('width', '260px', 'important');
+          wrapper.style.setProperty('height', '76px', 'important');
+          wrapper.style.setProperty('min-width', '260px', 'important');
+          wrapper.style.setProperty('max-width', '260px', 'important');
+          wrapper.style.setProperty('overflow', 'hidden', 'important');
+          wrapper.style.setProperty('right', 'auto', 'important');
+        }
+
+        for (const iframe of widgetIframes) {
+          iframe.style.setProperty('width', '260px', 'important');
+          iframe.style.setProperty('height', '76px', 'important');
+          iframe.style.setProperty('min-width', '260px', 'important');
+          iframe.style.setProperty('max-width', '260px', 'important');
+          iframe.style.setProperty('overflow', 'hidden', 'important');
+          iframe.setAttribute('scrolling', 'no');
+        }
+      };
+
+      const forceKofiWidgetLayout = () => {
+        tuneKofiWidgetLayout();
+        const start = window.setInterval(tuneKofiWidgetLayout, 250);
+        window.setTimeout(() => window.clearInterval(start), 5000);
+      };
+
+      const openKofiWidget = () => {
+        const widgetIframes = Array.from(document.querySelectorAll('iframe.floatingchat-container'));
+
+        for (const iframe of widgetIframes) {
+          const contentDocument = iframe.contentDocument;
+          const donateButton = contentDocument?.querySelector('[id$="-donate-button"]');
+
+          if (donateButton && donateButton.classList.contains('closed')) {
+            donateButton.click();
+            return true;
+          }
+        }
+
+        return false;
+      };
+
       const initKofiWidget = () => {
         const existingWidget = window.kofiWidgetOverlay;
 
         if (existingWidget) {
-          existingWidget.draw('makeuowntools', {
-            'type': 'floating-chat',
-            'floating-chat.donateButton.text': '☕ Buy me a coffee',
-            'floating-chat.donateButton.background-color': '#323842',
-            'floating-chat.donateButton.text-color': '#fff'
-          });
+          existingWidget.draw('makeuowntools', kofiWidgetOptions);
+          window.setTimeout(() => {
+            forceKofiWidgetLayout();
+            openKofiWidget();
+          }, 350);
           return;
         }
 
@@ -341,12 +418,12 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
         widgetScript.async = true;
         widgetScript.setAttribute('data-kofi-widget', 'true');
         widgetScript.onload = () => {
-          window.kofiWidgetOverlay?.draw('makeuowntools', {
-            'type': 'floating-chat',
-            'floating-chat.donateButton.text': '☕ Buy me a coffee',
-            'floating-chat.donateButton.background-color': '#323842',
-            'floating-chat.donateButton.text-color': '#fff'
-          });
+          window.kofiWidgetOverlay?.draw('makeuowntools', kofiWidgetOptions);
+
+          window.setTimeout(() => {
+            forceKofiWidgetLayout();
+            openKofiWidget();
+          }, 350);
         };
 
         document.head.appendChild(widgetScript);
