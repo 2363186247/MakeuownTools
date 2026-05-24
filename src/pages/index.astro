@@ -137,8 +137,8 @@ const homeTitle = pickSeoTitle(
   title={homeTitle}
   description="Free engineering tool hub for Docker Compose generation, reverse proxy config, and calculators for LLM VRAM, NAS RAID, off-grid solar, 3D printing, and Satisfactory."
 >
-  <main class="mx-auto w-full max-w-7xl px-6 py-12 md:px-8 md:py-16">
-      <section class="mb-10 grid items-start gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+    <main class="mx-auto w-full max-w-7xl px-6 py-12 md:px-8 md:py-16">
+      <section class="glass-shell-strong mb-10 grid items-start gap-8 rounded-[2rem] p-6 md:p-8 lg:grid-cols-[1.2fr_0.8fr]">
         <div>
           <p class="mb-4 inline-flex items-center rounded-full border border-cyan-300/35 bg-cyan-300/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
             Utility Studio
@@ -151,16 +151,16 @@ const homeTitle = pickSeoTitle(
           </p>
         </div>
 
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-          <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <div class="glass-shell rounded-2xl p-4">
             <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Docker Routes</p>
             <p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={dockerRoutes}>0</p>
           </div>
-          <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+          <div class="glass-shell rounded-2xl p-4">
             <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Reverse Proxy Routes</p>
             <p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={reverseProxyRoutes}>0</p>
           </div>
-          <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+          <div class="glass-shell rounded-2xl p-4">
             <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Calculator Routes</p>
             <p class="mt-1 text-3xl font-semibold text-white" data-countup data-target={calculatorRoutes}>0</p>
           </div>
@@ -168,7 +168,7 @@ const homeTitle = pickSeoTitle(
       </section>
 
       <section class="grid gap-5 lg:grid-cols-3">
-        <article class="group rounded-3xl border border-cyan-300/25 bg-gradient-to-br from-cyan-300/12 to-blue-500/10 p-6 shadow-2xl shadow-cyan-900/15 transition hover:border-cyan-200/40 md:p-7">
+        <article class="group glass-shell-strong rounded-3xl border-cyan-300/20 p-6 transition hover:border-cyan-200/35 md:p-7">
           <div class="mb-4 flex items-center justify-between">
             <p class="text-xs uppercase tracking-[0.16em] text-cyan-100">Docker Compose Generator</p>
             <span class="rounded-full border border-cyan-200/35 bg-cyan-100/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-100">Live</span>
@@ -199,7 +199,7 @@ const homeTitle = pickSeoTitle(
           </ul>
         </article>
 
-        <article class="group rounded-3xl border border-sky-300/25 bg-gradient-to-br from-sky-300/12 to-indigo-500/10 p-6 shadow-2xl shadow-sky-900/15 transition hover:border-sky-200/40 md:p-7">
+        <article class="group glass-shell-strong rounded-3xl border-sky-300/20 p-6 transition hover:border-sky-200/35 md:p-7">
           <div class="mb-4 flex items-center justify-between">
             <p class="text-xs uppercase tracking-[0.16em] text-sky-100">Reverse Proxy Generator</p>
             <span class="rounded-full border border-sky-200/35 bg-sky-100/10 px-2.5 py-0.5 text-xs font-semibold text-sky-100">Live</span>
@@ -219,7 +219,7 @@ const homeTitle = pickSeoTitle(
           </ul>
         </article>
 
-        <article class="group rounded-3xl border border-emerald-300/25 bg-gradient-to-br from-emerald-300/12 to-lime-500/10 p-6 shadow-2xl shadow-emerald-900/15 transition hover:border-emerald-200/40 md:p-7">
+        <article class="group glass-shell-strong rounded-3xl border-emerald-300/20 p-6 transition hover:border-emerald-200/35 md:p-7">
           <div class="mb-4 flex items-center justify-between">
             <p class="text-xs uppercase tracking-[0.16em] text-emerald-100">Calculator Hub</p>
             <span class="rounded-full border border-emerald-200/35 bg-emerald-100/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-100">Live</span>
@@ -245,7 +245,7 @@ const homeTitle = pickSeoTitle(
         </article>
       </section>
 
-      <section class="mt-8 rounded-3xl border border-white/12 bg-white/[0.02] p-6 md:p-8">
+      <section class="glass-shell mt-8 rounded-3xl p-6 md:p-8">
         <div class="flex items-center justify-between gap-3">
           <div>
             <h2 class="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">Search Scenarios</h2>
@@ -256,7 +256,7 @@ const homeTitle = pickSeoTitle(
 
         <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
           {Object.entries(longTailAnchors).map(([domain, links]) => (
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div class="glass-shell rounded-2xl p-4">
               <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">{domain}</p>
               <div class="mt-3 flex flex-wrap gap-2">
                 {links.map((link) => (

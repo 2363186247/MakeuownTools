@@ -35,7 +35,7 @@ const filamentHubTitle = pickSeoTitle(
         <span>Home</span>
       </a>
 
-      <section class="mb-8 grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+      <section class="glass-shell-strong mb-8 grid gap-4 rounded-[2rem] p-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:p-8">
         <div>
           <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-300/35 bg-emerald-200/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-100">
             <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12v8H6z"/><path d="M8 8V5h8v3"/></svg>
@@ -47,7 +47,7 @@ const filamentHubTitle = pickSeoTitle(
           </p>
         </div>
 
-        <div class="rounded-2xl border border-white/15 bg-white/[0.04] p-4 backdrop-blur">
+        <div class="glass-shell rounded-2xl p-4">
           <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Available Presets</p>
           <p class="mt-1 text-3xl font-semibold text-white">{combos.length}</p>
         </div>
@@ -55,7 +55,7 @@ const filamentHubTitle = pickSeoTitle(
 
       <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {combos.map(combo => (
-          <a href={combo.href} class="group rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-white/[0.08]">
+          <a href={combo.href} class="group glass-shell rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-white/[0.08]">
             <div class="flex items-center justify-between">
               <h2 class="inline-flex items-center gap-2 font-semibold text-white"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18h16"/><path d="M6 18v-6h12v6"/></svg>{combo.material.name}</h2>
               <span class="rounded-md border border-white/15 bg-black/25 px-2 py-0.5 text-xs font-mono text-zinc-300">{combo.diameter.name}</span>
@@ -69,7 +69,7 @@ const filamentHubTitle = pickSeoTitle(
         ))}
       </section>
 
-      <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+      <section class="glass-shell mt-8 rounded-3xl p-6 md:p-8">
         <h3 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>Explore Other Calculators</h3>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <a href="/calculator/vram/" data-tool-link data-tool-name="LLM VRAM Calculator" class="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20">LLM VRAM Planning</a>
@@ -79,7 +79,7 @@ const filamentHubTitle = pickSeoTitle(
         </div>
       </section>
 
-      <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8" id="recentToolsSection">
+      <section class="glass-shell mt-8 rounded-3xl p-6 md:p-8" id="recentToolsSection">
         <div class="mb-4 flex items-center justify-between gap-3">
           <h3 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>Recently Visited Tools</h3>
           <button id="clearRecentTools" class="text-xs uppercase tracking-[0.12em] text-zinc-500 transition hover:text-zinc-300">Clear</button>

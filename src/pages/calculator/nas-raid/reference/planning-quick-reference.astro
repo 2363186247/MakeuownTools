@@ -69,12 +69,12 @@ const pageTitle = pickSeoTitle(
   canonical="/calculator/nas-raid/reference/planning-quick-reference/"
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
-    <a href="/calculator/nas-raid/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+    <a href="/calculator/nas-raid/" class="glass-shell mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
       <span>&larr;</span>
       <span>NAS Hub</span>
     </a>
 
-    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+    <header class="glass-shell-strong mb-8 rounded-3xl p-6 md:p-8">
       <p class="mb-3 inline-flex items-center rounded-full border border-sky-400/35 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-100">Week 5 Citation Asset</p>
       <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">NAS RAID Planning Quick Reference</h1>
       <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
@@ -82,7 +82,7 @@ const pageTitle = pickSeoTitle(
       </p>
     </header>
 
-    <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+    <section class="glass-shell rounded-3xl p-6 md:p-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Drive Count to RAID Guidance</h2>
       <div class="overflow-x-auto">
         <table class="w-full min-w-[980px] text-left text-sm">
@@ -103,7 +103,7 @@ const pageTitle = pickSeoTitle(
                 <td class="py-3 font-mono text-sky-200">{RAID_LABEL[row.level]}</td>
                 <td class="py-3">
                   {row.scenario ? (
-                    <a href={`/calculator/nas-raid/${row.scenario.slug}/`} class="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
+                    <a href={`/calculator/nas-raid/${row.scenario.slug}/`} class="glass-shell rounded-lg px-3 py-1.5 text-xs text-zinc-200 transition hover:border-sky-300/40 hover:text-white">
                       Open {row.scenario.drives}x {row.scenario.sizeTb}TB
                     </a>
                   ) : (
@@ -123,7 +123,7 @@ const pageTitle = pickSeoTitle(
         <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">Pre-Purchase Checklist</h2>
         <ul class="space-y-2 text-sm leading-7 text-zinc-200">
           {purchaseChecklist.map((item) => (
-            <li class="rounded-xl border border-white/10 bg-black/25 px-4 py-3">{item}</li>
+            <li class="glass-shell rounded-xl px-4 py-3">{item}</li>
           ))}
         </ul>
       </article>
@@ -132,7 +132,7 @@ const pageTitle = pickSeoTitle(
         <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-emerald-100">Migration and Validation Checklist</h2>
         <ul class="space-y-2 text-sm leading-7 text-zinc-200">
           {migrationChecklist.map((item) => (
-            <li class="rounded-xl border border-white/10 bg-black/25 px-4 py-3">{item}</li>
+            <li class="glass-shell rounded-xl px-4 py-3">{item}</li>
           ))}
         </ul>
       </article>
@@ -141,7 +141,7 @@ const pageTitle = pickSeoTitle(
     <section class="mt-8 rounded-3xl border border-sky-300/20 bg-sky-500/[0.06] p-6 md:p-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-sky-100">NAS Cluster Navigation</h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <a href="/calculator/nas-raid/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
+        <a href="/calculator/nas-raid/" class="glass-shell rounded-xl px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">NAS Hub</a>
         <a href="/calculator/nas-raid/reference/raid-capacity-matrix/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Capacity Matrix</a>
         <a href="/calculator/nas-raid/compare/raid-level-comparison/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Comparison Page</a>
         <a href="/calculator/nas-raid/decision/raid-level-selector/" class="rounded-xl border border-sky-200/25 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-sky-200/45 hover:text-white">RAID Selector</a>

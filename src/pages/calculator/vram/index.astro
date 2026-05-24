@@ -13,12 +13,12 @@ const vramTitle = pickSeoTitle(
   description="Estimate GPU memory for LLM inference and LoRA training using live Hugging Face configs, context length, quantization, and hardware matching."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
-    <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+    <a href="/calculator/" class="glass-shell mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
       <span>←</span>
       <span>All Calculators</span>
     </a>
 
-    <header class="mb-10">
+    <header class="glass-shell-strong mb-10 rounded-[2rem] p-6 md:p-8">
       <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-cyan-200">
         <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M12 5v14"/></svg>
         AI Infrastructure Console
@@ -30,7 +30,7 @@ const vramTitle = pickSeoTitle(
     </header>
 
     <div class="grid gap-6 lg:grid-cols-2">
-      <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8 lg:h-full">
+      <section class="glass-shell rounded-3xl p-6 md:p-8 lg:h-full">
           <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M12 3v18"/></svg>1. Model Source</h2>
 
           <label class="mb-4 block">
@@ -95,7 +95,7 @@ const vramTitle = pickSeoTitle(
           </div>
       </section>
 
-      <section class="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur md:p-8 lg:h-full">
+      <section class="glass-shell rounded-3xl p-6 md:p-8 lg:h-full">
           <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>2. Scenario</h2>
           <p class="mb-4 text-xs text-zinc-500">
             If you are unsure about some architecture parameters, you can leave them empty. We will estimate when possible, but accuracy may decrease.
@@ -185,7 +185,7 @@ const vramTitle = pickSeoTitle(
       </section>
 
       <section class="space-y-6 lg:col-span-2">
-        <div class="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 p-6 backdrop-blur md:p-8">
+        <div class="glass-shell-strong rounded-3xl border-cyan-500/20 p-6 md:p-8">
           <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-cyan-200"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M8 14h8M10 11h4"/></svg>3. VRAM Matrix + Hardware Match</h2>
           <div class="overflow-x-auto">
             <table class="w-full min-w-[620px] text-left text-sm">
@@ -211,7 +211,7 @@ const vramTitle = pickSeoTitle(
       </section>
     </div>
 
-    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+    <section class="glass-shell-light mt-8 rounded-3xl p-6 md:p-8">
       <h3 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>Explore Other Calculators</h3>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <a href="/calculator/nas-raid/" data-tool-link data-tool-name="NAS & RAID Storage Calculator" class="rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-300/20">NAS & RAID Capacity</a>
@@ -221,7 +221,7 @@ const vramTitle = pickSeoTitle(
       </div>
     </section>
 
-    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8" id="recentToolsSection">
+    <section class="glass-shell-light mt-8 rounded-3xl p-6 md:p-8" id="recentToolsSection">
       <div class="mb-4 flex items-center justify-between gap-3">
         <h3 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>Recently Visited Tools</h3>
         <button id="clearRecentTools" class="text-xs uppercase tracking-[0.12em] text-zinc-500 transition hover:text-zinc-300">Clear</button>

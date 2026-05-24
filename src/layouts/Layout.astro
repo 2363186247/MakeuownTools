@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import pageArt from '../../background/sunset.png';
 import services from '../data/services.json';
 import filaments from '../data/filaments.json';
 import satisfactoryData from '../data/satisfactory.json';
@@ -36,7 +37,7 @@ const {
   title,
   description,
   canonical,
-  bodyClass = 'min-h-screen text-zinc-100 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif]',
+  bodyClass = 'min-h-screen text-zinc-100 antialiased [font-family:Geist,ui-sans-serif,system-ui,sans-serif] bg-transparent',
   includeBackground = true
 } = Astro.props as Props;
 
@@ -273,8 +274,8 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
   <body class={bodyClass}>
     {includeBackground && (
       <>
-        <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_18%_12%,rgba(14,165,233,0.22),transparent_34%),radial-gradient(circle_at_84%_14%,rgba(244,114,182,0.2),transparent_36%),radial-gradient(circle_at_50%_88%,rgba(34,197,94,0.14),transparent_35%),linear-gradient(130deg,#05070f,#0f172a,#111827)]"></div>
-        <div class="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:30px_30px] [mask-image:radial-gradient(circle_at_center,black_42%,transparent_100%)]"></div>
+        <div class="page-backdrop" style={`--page-art: url(${pageArt.src})`}></div>
+        <div class="page-grid"></div>
       </>
     )}
 

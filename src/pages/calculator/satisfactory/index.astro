@@ -33,12 +33,12 @@ const satisfactoryHubTitle = pickSeoTitle(
   description="Plan Satisfactory factories by target item with machine counts, power demand, and full upstream ingredient chains."
 >
   <main class="mx-auto w-full max-w-7xl px-6 py-14 md:px-8 md:py-20">
-    <a href="/calculator/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+    <a href="/calculator/" class="glass-shell mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
       <span>←</span>
       <span>All Calculators</span>
     </a>
 
-    <section class="relative mb-10 overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-7 md:p-9">
+    <section class="glass-shell-strong relative mb-10 overflow-hidden rounded-3xl p-7 md:p-9">
       <div class="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-amber-400/20 blur-3xl"></div>
       <div class="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-orange-400/15 blur-3xl"></div>
 
@@ -55,15 +55,15 @@ const satisfactoryHubTitle = pickSeoTitle(
         </div>
 
         <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-          <div class="rounded-2xl border border-white/15 bg-black/30 p-4">
+          <div class="glass-shell rounded-2xl p-4">
             <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Items</p>
             <p class="mt-1 text-3xl font-semibold text-white">{items.length}</p>
           </div>
-          <div class="rounded-2xl border border-white/15 bg-black/30 p-4">
+          <div class="glass-shell rounded-2xl p-4">
             <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Categories</p>
             <p class="mt-1 text-3xl font-semibold text-white">{categoryEntries.length}</p>
           </div>
-          <div class="rounded-2xl border border-white/15 bg-black/30 p-4">
+          <div class="glass-shell rounded-2xl p-4">
             <p class="text-xs uppercase tracking-[0.16em] text-zinc-400">Tier Range</p>
             <p class="mt-1 text-3xl font-semibold text-white">0-{tierMax}</p>
           </div>
@@ -71,7 +71,7 @@ const satisfactoryHubTitle = pickSeoTitle(
       </div>
     </section>
 
-    <section class="mb-8 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <section class="glass-shell mb-8 rounded-2xl p-4">
       <p class="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-zinc-400"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14M5 12h14M5 17h14"/></svg>Category Distribution</p>
       <div class="flex flex-wrap gap-2">
         {categoryEntries.map(([name, count]) => (
@@ -84,7 +84,7 @@ const satisfactoryHubTitle = pickSeoTitle(
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {items.map(item => (
-        <a href={`/calculator/satisfactory/${item.id}/`} class="group p-5 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/[0.08] hover:border-amber-500/30 transition duration-300 relative overflow-hidden">
+        <a href={`/calculator/satisfactory/${item.id}/`} class="group glass-shell rounded-2xl p-5 transition duration-300 hover:border-amber-500/30 hover:bg-white/[0.08] relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/10 group-hover:to-orange-500/5 transition duration-500"></div>
           <div class="relative flex justify-between items-start mb-2">
             <h2 class="font-semibold text-zinc-100 text-lg">{item.name}</h2>
@@ -98,7 +98,7 @@ const satisfactoryHubTitle = pickSeoTitle(
       ))}
     </div>
 
-    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+    <section class="glass-shell mt-8 rounded-3xl p-6 md:p-8">
       <h3 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>Explore Other Calculators</h3>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <a href="/calculator/vram/" data-tool-link data-tool-name="LLM VRAM Calculator" class="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20">LLM VRAM Planning</a>
@@ -108,7 +108,7 @@ const satisfactoryHubTitle = pickSeoTitle(
       </div>
     </section>
 
-    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8" id="recentToolsSection">
+    <section class="glass-shell mt-8 rounded-3xl p-6 md:p-8" id="recentToolsSection">
       <div class="mb-4 flex items-center justify-between gap-3">
         <h3 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>Recently Visited Tools</h3>
         <button id="clearRecentTools" class="text-xs uppercase tracking-[0.12em] text-zinc-500 transition hover:text-zinc-300">Clear</button>

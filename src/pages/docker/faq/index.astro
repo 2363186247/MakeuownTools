@@ -66,12 +66,12 @@ const sampleStacks = services.apps
   </Fragment>
 
   <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
-    <a href="/docker/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
+    <a href="/docker/" class="glass-shell mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
       <span>&larr;</span>
       <span>Docker Hub</span>
     </a>
 
-    <header class="mb-8 rounded-3xl border border-white/15 bg-white/[0.03] p-6 md:p-8">
+    <header class="glass-shell-strong mb-8 rounded-3xl p-6 md:p-8">
       <p class="mb-3 inline-flex items-center rounded-full border border-cyan-400/35 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100">Cluster FAQ Page</p>
       <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">Docker Compose FAQ</h1>
       <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">
@@ -81,14 +81,14 @@ const sampleStacks = services.apps
 
     <section class="space-y-3">
       {faqItems.map((item) => (
-        <article class="rounded-2xl border border-white/10 bg-black/30 p-5">
+        <article class="glass-shell rounded-2xl p-5">
           <h2 class="text-sm font-semibold text-white md:text-base">{item.question}</h2>
           <p class="mt-2 text-sm leading-7 text-zinc-300">{item.answer}</p>
         </article>
       ))}
     </section>
 
-    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+    <section class="glass-shell mt-8 rounded-3xl p-6 md:p-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Sample Stack Routes</h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sampleStacks.map((item) => (
