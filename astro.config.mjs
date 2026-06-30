@@ -24,7 +24,11 @@ const CORE_STATIC_PATHS = new Set([
   '/docker/faq/',
   '/docker/reference/deployment-quick-reference/',
   '/docker/reference/proxy-capability-matrix/',
-  '/reverse-proxy/'
+  '/reverse-proxy/',
+  '/about/',
+  '/contact/',
+  '/privacy/',
+  '/affiliate-disclosure/'
 ]);
 
 const CORE_NAS_PAGES = new Set([

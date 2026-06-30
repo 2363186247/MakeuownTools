@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Contact Make Your Own Tools | Feedback and Corrections"
+  description="Contact Make Your Own Tools for calculator feedback, bug reports, corrections, and product recommendation questions."
+  canonical="/contact/"
+>
+  <main class="mx-auto w-full max-w-4xl px-6 py-12 md:px-8 md:py-16">
+    <a href="/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white/30 hover:bg-white/10">
+      <span>←</span>
+      <span>Home</span>
+    </a>
+
+    <article class="glass-shell-strong rounded-3xl p-6 md:p-9">
+      <p class="mb-4 inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100">
+        Feedback
+      </p>
+      <h1 class="text-4xl font-semibold tracking-tight text-white md:text-5xl">Contact</h1>
+      <p class="mt-5 text-base leading-8 text-zinc-300">
+        Questions, bug reports, correction requests, and feature ideas are welcome. The fastest public path is through the project repository.
+      </p>
+
+      <section class="mt-8 grid gap-4 md:grid-cols-2">
+        <a href="https://github.com/2363186247/MakeuownTools/issues" class="rounded-2xl border border-cyan-300/25 bg-cyan-300/10 p-5 transition hover:border-cyan-300/45 hover:bg-cyan-300/15">
+          <h2 class="text-lg font-semibold text-white">Open a GitHub Issue</h2>
+          <p class="mt-2 text-sm leading-7 text-zinc-300">Use this for calculator errors, broken links, deployment problems, and feature requests.</p>
+        </a>
+        <a href="https://github.com/2363186247/MakeuownTools" class="rounded-2xl border border-white/10 bg-black/25 p-5 transition hover:border-white/20 hover:bg-white/[0.04]">
+          <h2 class="text-lg font-semibold text-white">View the Repository</h2>
+          <p class="mt-2 text-sm leading-7 text-zinc-300">Review source code, data files, and implementation details for the published tools.</p>
+        </a>
+      </section>
+
+      <section class="mt-8 rounded-2xl border border-white/10 bg-black/25 p-5">
+        <h2 class="text-lg font-semibold text-white">What to Include</h2>
+        <ul class="mt-3 space-y-2 text-sm leading-7 text-zinc-300">
+          <li>Page URL where the issue appears.</li>
+          <li>Expected result and actual result.</li>
+          <li>Input values used in the calculator, if relevant.</li>
+          <li>Browser and device information for visual or interaction bugs.</li>
+        </ul>
+      </section>
+
+      <section class="mt-6 rounded-2xl border border-white/10 bg-black/25 p-5">
+        <h2 class="text-lg font-semibold text-white">Useful Feedback Types</h2>
+        <p class="mt-3 text-sm leading-7 text-zinc-300">
+          Calculator corrections are especially helpful when they include the expected formula, a trusted reference, or a real-world setup that the current tool does not model well. Product recommendation feedback is also useful when a suggested category, such as battery size, NAS drive count, or proxy deployment pattern, feels too broad or too narrow for the result.
+        </p>
+        <p class="mt-3 text-sm leading-7 text-zinc-300">
+          For privacy or affiliate disclosure questions, please mention the exact page and outbound link involved. That makes it easier to review whether the page copy, disclosure text, or recommendation placement should be adjusted before the next deployment.
+        </p>
+      </section>
+    </article>
+  </main>
+</Layout>

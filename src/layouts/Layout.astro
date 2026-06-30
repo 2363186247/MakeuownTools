@@ -241,6 +241,21 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
           : Astro.url.pathname.startsWith('/reverse-proxy/')
             ? relatedToolGroups.reverseProxy
             : relatedToolGroups.default;
+
+const siteRoot = new URL('/', Astro.site);
+const siteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Make Your Own Tools',
+  url: siteRoot.toString(),
+  description: 'Practical calculators and generators for off-grid solar, NAS RAID, Docker Compose, reverse proxy, LLM VRAM, and engineering planning.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Make Your Own Tools',
+    url: siteRoot.toString(),
+    sameAs: ['https://github.com/2363186247/MakeuownTools']
+  }
+};
 ---
 
 <html lang="en">
@@ -268,6 +283,7 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
     <meta property="twitter:title" content={seoTitle} />
     <meta property="twitter:description" content={seoDescription} />
     <meta property="twitter:image" content={socialImageUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(siteSchema)} />
     <style is:inline>
       :global(.floatingchat-container-wrap),
       :global(.floatingchat-container-wrap-mobi) {
@@ -342,6 +358,30 @@ const relatedToolsLinks = Astro.url.pathname.startsWith('/calculator/vram/')
         </div>
       </aside>
     )}
+
+    <footer class="mx-auto w-full max-w-7xl px-6 pb-10 pt-4 md:px-8">
+      <div class="border-t border-white/10 pt-6">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div class="max-w-2xl">
+            <a href="/" class="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-200">Make Your Own Tools</a>
+            <p class="mt-2 text-sm leading-6 text-zinc-400">
+              Independent calculators and generators for off-grid power, NAS storage, self-hosted deployment, and engineering planning.
+            </p>
+            <p class="mt-2 text-xs leading-5 text-zinc-500">
+              Some pages may include donation links or affiliate links that support the site at no extra cost to you.
+            </p>
+          </div>
+          <nav class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-zinc-400 sm:flex sm:flex-wrap sm:justify-end" aria-label="Site footer">
+            <a href="/about/" class="transition hover:text-white">About</a>
+            <a href="/contact/" class="transition hover:text-white">Contact</a>
+            <a href="/privacy/" class="transition hover:text-white">Privacy</a>
+            <a href="/affiliate-disclosure/" class="transition hover:text-white">Affiliate Disclosure</a>
+            <a href="/calculator/off-grid-solar/" class="transition hover:text-white">Solar Calculator</a>
+            <a href="/calculator/nas-raid/" class="transition hover:text-white">NAS RAID Calculator</a>
+          </nav>
+        </div>
+      </div>
+    </footer>
 
     <script is:inline>
       const kofiWidgetOptions = {

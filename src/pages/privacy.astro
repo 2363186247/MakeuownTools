@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Privacy Policy | Make Your Own Tools"
+  description="Privacy policy for Make Your Own Tools, covering analytics, local browser storage, external requests, donation widgets, and affiliate links."
+  canonical="/privacy/"
+>
+  <main class="mx-auto w-full max-w-4xl px-6 py-12 md:px-8 md:py-16">
+    <a href="/" class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white/30 hover:bg-white/10">
+      <span>←</span>
+      <span>Home</span>
+    </a>
+
+    <article class="glass-shell-strong rounded-3xl p-6 md:p-9">
+      <p class="mb-4 inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100">
+        Effective June 30, 2026
+      </p>
+      <h1 class="text-4xl font-semibold tracking-tight text-white md:text-5xl">Privacy Policy</h1>
+      <p class="mt-5 text-base leading-8 text-zinc-300">
+        Make Your Own Tools is designed to keep calculator usage lightweight and transparent. Most calculator inputs are processed directly in your browser.
+      </p>
+
+      <div class="mt-8 space-y-7 text-sm leading-7 text-zinc-300">
+        <section>
+          <h2 class="text-xl font-semibold text-white">Information Processed in Your Browser</h2>
+          <p class="mt-2">Calculator inputs, generated configuration files, recent selections, and optional preferences may be stored in local browser storage so the tools feel faster and more useful. This data is not sent to a Make Your Own Tools server.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-semibold text-white">External Services</h2>
+          <p class="mt-2">Some features may request data from third-party services. For example, the LLM VRAM calculator can fetch public model configuration data from Hugging Face when you ask it to. The site also loads a Ko-fi donation widget.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-semibold text-white">Analytics</h2>
+          <p class="mt-2">The site may use privacy-conscious analytics from the hosting or analytics provider to understand page views, referrers, device types, and performance. These signals help prioritize new calculators and fix broken pages.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-semibold text-white">Affiliate Links and Ads</h2>
+          <p class="mt-2">Some pages may include affiliate links, product recommendations, sponsorships, or ads. Affiliate partners may use their own cookies or tracking parameters after you click an outbound link.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-semibold text-white">Contact</h2>
+          <p class="mt-2">For privacy questions or correction requests, use the contact page and project repository links.</p>
+        </section>
+      </div>
+    </article>
+  </main>
+</Layout>

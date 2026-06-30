@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Play_Now-10B981?style=for-the-badge)](https://makeuowntools.dpdns.org)
 [![Astro](https://img.shields.io/badge/Built_with-Astro-FF5D01?style=for-the-badge&logo=astro)](https://astro.build)
 
-A blazing-fast, ad-free collection of production calculators and utilities, built for developers and hardcore gamers. Everything runs locally in your browser with zero latency—no API calls, no tracking, no nonsense.
+A blazing-fast collection of practical calculators and utilities for homelab, off-grid power, deployment planning, AI infrastructure, 3D printing, and factory games. Most calculations run locally in your browser, with transparent disclosure pages for privacy, donations, and future affiliate recommendations.
 
 👉 **[Try it live here: makeuowntools.dpdns.org](https://makeuowntools.dpdns.org)**
 
@@ -103,9 +103,10 @@ A blazing-fast, ad-free collection of production calculators and utilities, buil
 ## ⚡ Why Make Your Own Tools?
 
 ✅ **Zero Latency** – Results compute in milliseconds in your browser  
-✅ **No Sign-up Required** – No accounts, no emails, no spam  
+✅ **No Sign-up Required** – No accounts or email capture required for the core tools  
 ✅ **Production-Ready** – Not toys; real calculations for real deployments  
 ✅ **Open Source & Auditable** – Built with Astro, TypeScript, runs pure static  
+✅ **Transparent Monetization** – Donation and affiliate disclosures are published on-site  
 ✅ **Long-Tail SEO** – Each tool gets deep search coverage for specific problems  
 
 ---
@@ -126,5 +127,4 @@ MIT — Use, modify, and share freely.
 
 ---
 
-**Stuck on a calculation? Need faster deployment?** → [Deploy your own tools instance](https://github.com/you/make-your-own-tools)
-
+**Stuck on a calculation? Need faster deployment?** → [Open an issue or fork the project](https://github.com/2363186247/MakeuownTools)
