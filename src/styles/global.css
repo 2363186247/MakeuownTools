@@ -536,6 +536,7 @@
 	.solar-field select,
 	.solar-load-row input {
 		width: 100%;
+		color-scheme: light;
 		border: 1px solid rgba(15, 23, 42, 0.12);
 		border-radius: 12px;
 		background: #fff;
@@ -544,6 +545,15 @@
 		color: #0f172a;
 		outline: none;
 		transition: border-color 160ms ease, box-shadow 160ms ease;
+	}
+
+	.solar-field input[type='number']::-webkit-inner-spin-button,
+	.solar-field input[type='number']::-webkit-outer-spin-button,
+	.solar-load-row input[type='number']::-webkit-inner-spin-button,
+	.solar-load-row input[type='number']::-webkit-outer-spin-button {
+		background: #fff;
+		color: #0f172a;
+		opacity: 1;
 	}
 
 	.solar-field input:focus,
