@@ -1,0 +1,230 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'RV Solar Buying Checklist | Battery, Panels, MPPT, Inverter';
+const pageDescription = 'A practical RV solar buying checklist for choosing LiFePO4 batteries, solar panels, MPPT charge controllers, pure sine inverters, wiring, fuses, and mounting hardware.';
+
+const checklistGroups = [
+  {
+    title: 'Battery bank',
+    items: [
+      'Match nominal voltage across battery, inverter, MPPT controller, and DC loads.',
+      'Check LiFePO4 BMS continuous current against the inverter draw, not only Ah capacity.',
+      'Confirm low-temperature charging protection if the system will be used in cold climates.',
+      'Leave space for future parallel batteries if the RV layout allows it.'
+    ]
+  },
+  {
+    title: 'Solar panels',
+    items: [
+      'Measure roof space before buying panels; vents, racks, and shade zones reduce usable area.',
+      'Compare panel voltage and current against the MPPT controller input limits.',
+      'Prefer panel layouts that reduce partial-shade losses from AC units, fans, and roof gear.',
+      'Check mounting hardware, cable glands, and connector compatibility before checkout.'
+    ]
+  },
+  {
+    title: 'MPPT charge controller',
+    items: [
+      'Size controller current above the calculated array output with practical headroom.',
+      'Verify maximum PV input voltage for cold-weather open-circuit voltage.',
+      'Check whether the controller supports your battery chemistry and custom charge profile.',
+      'Plan where the controller will be mounted so cable runs stay short and serviceable.'
+    ]
+  },
+  {
+    title: 'Inverter and AC loads',
+    items: [
+      'Use pure sine wave for laptops, chargers, compressor appliances, and sensitive gear.',
+      'Check continuous wattage and surge rating separately; startup loads can be much higher.',
+      'Confirm DC input voltage matches the battery bank before buying.',
+      'Decide whether the RV needs hardwired AC distribution or only portable outlet use.'
+    ]
+  }
+];
+
+const commonMistakes = [
+  'Buying a large inverter without checking battery BMS current.',
+  'Sizing panels from nameplate watts without allowing for heat, angle, shade, and charging loss.',
+  'Forgetting fuses, breakers, disconnects, bus bars, lugs, and proper wire gauge in the budget.',
+  'Mixing 12V, 24V, and 48V hardware without a clear system architecture.',
+  'Choosing products from reviews alone instead of checking the actual spec sheet.'
+];
+
+const buyingSequence = [
+  'Estimate daily Wh with the off-grid solar calculator.',
+  'Pick system voltage based on load size and future expansion.',
+  'Choose battery capacity and confirm BMS current.',
+  'Choose panel wattage and verify roof fit.',
+  'Choose an MPPT controller that covers array voltage and current.',
+  'Choose inverter size from real AC loads and surge requirements.',
+  'Add protection, wire, mounting, connectors, and installation labor to the budget.'
+];
+
+const faqItems = [
+  {
+    question: 'Should I buy an RV solar kit or individual components?',
+    answer: 'A kit is easier for a small starter setup, but individual components are often better when you need a specific battery size, inverter class, roof layout, or future expansion path.'
+  },
+  {
+    question: 'What should I check before buying a LiFePO4 battery?',
+    answer: 'Check nominal voltage, usable capacity, BMS continuous current, low-temperature charging behavior, warranty terms, dimensions, terminal style, and whether parallel or series wiring is supported.'
+  },
+  {
+    question: 'How much should I oversize RV solar panels?',
+    answer: 'Many RV builds benefit from panel headroom because real-world output is reduced by heat, roof angle, cable loss, shade, and weather. Use the calculator baseline first, then add margin if roof space and budget allow.'
+  },
+  {
+    question: 'Can this checklist replace an electrical design?',
+    answer: 'No. It is a buying and planning checklist. Final fuse sizing, breaker selection, wire gauge, grounding, and AC distribution should be verified against code, product manuals, and qualified installation guidance.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'RV Solar Buying Checklist', item: new URL('/calculator/off-grid-solar/guide/rv-solar-buying-checklist/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Solar buyer guide</p>
+        <h1>RV Solar Buying Checklist</h1>
+        <span>
+          Use this checklist before buying batteries, panels, MPPT controllers, inverters, mounting hardware, fuses, breakers, and wiring for an RV or camper van solar build.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Estimate your system first</a>
+          <a href="/calculator/off-grid-solar/#recommendations" class="solar-button-secondary">Open buying tiers</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Buying sequence</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">The safest order to pick parts</h2>
+          <ol class="mt-5 grid gap-3 text-sm leading-6 text-white/78">
+            {buyingSequence.map((item, index) => (
+              <li class="rounded-2xl border border-white/12 bg-white/8 p-3">
+                <strong class="mr-2 text-amber-200">{index + 1}.</strong>{item}
+              </li>
+            ))}
+          </ol>
+        </aside>
+
+        <section class="grid gap-4 sm:grid-cols-2">
+          {checklistGroups.map((group) => (
+            <article class="solar-panel p-5">
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{group.title}</p>
+              <ul class="solar-check-list mt-4">
+                {group.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </section>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Common mistakes</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Problems that make RV solar builds expensive twice</h2>
+          <ul class="solar-check-list mt-5">
+            {commonMistakes.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">How to use this page</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Start with sizing, then compare products</h2>
+          <div class="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <p>
+              A good RV solar shopping list starts with energy demand, not a product bundle. Estimate daily Wh first, then choose battery Ah, panel wattage, MPPT current, and inverter class from the same voltage architecture.
+            </p>
+            <p>
+              The <a href="/calculator/off-grid-solar/" class="font-semibold text-amber-700 hover:text-slate-950">off-grid solar calculator</a> gives a practical baseline. This checklist helps you avoid mismatched components before opening search tabs or comparing reviews.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">RV solar buying questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#solar-checklist" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Review safety checks &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Size your RV solar system</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Build a load profile and generate battery, panel, MPPT, and inverter baselines.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Voltage</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Compare 12V, 24V, and 48V</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Check how voltage changes Ah, current pressure, and equipment choices.</span>
+        </a>
+        <a href="/affiliate-disclosure/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Disclosure</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">How this site may earn support</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Read the affiliate and support disclosure before future product links are monetized.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/" />
+    </section>
+  </main>
+</Layout>

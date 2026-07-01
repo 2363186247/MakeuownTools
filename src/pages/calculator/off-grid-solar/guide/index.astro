@@ -1,0 +1,249 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+
+const pageTitle = 'RV Solar Learning Center | Off-Grid Solar Sizing Guides';
+const pageDescription = 'A practical RV solar learning center for battery size, solar panel count, MPPT charge controller sizing, inverter watts, system voltage, wiring, fuses, and buying checklists.';
+
+const guideLinks = [
+  {
+    stage: 'Start here',
+    title: 'RV Solar Buying Checklist',
+    href: '/calculator/off-grid-solar/guide/rv-solar-buying-checklist/',
+    description: 'Use one checklist to compare batteries, panels, MPPT controllers, inverters, fuses, wiring, and mounting hardware before shopping.',
+    bestFor: 'First purchase pass'
+  },
+  {
+    stage: 'Architecture',
+    title: '12V vs 24V vs 48V for RV Solar',
+    href: '/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/',
+    description: 'Choose a system voltage by comparing current, wire sizing pressure, inverter compatibility, DC appliances, and expansion headroom.',
+    bestFor: 'Voltage decision'
+  },
+  {
+    stage: 'Storage',
+    title: 'LiFePO4 Battery Size for RV Solar',
+    href: '/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/',
+    description: 'Turn daily Wh, usable depth of discharge, battery voltage, BMS current, and autonomy days into a realistic battery bank target.',
+    bestFor: 'Battery bank sizing'
+  },
+  {
+    stage: 'Harvest',
+    title: 'How Many Solar Panels for a Camper Van',
+    href: '/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/',
+    description: 'Estimate panel count from daily energy demand, roof space, panel wattage, sun hours, shading, and real-world derating.',
+    bestFor: 'Panel count planning'
+  },
+  {
+    stage: 'Charging',
+    title: 'MPPT Charge Controller Sizing for RV Solar',
+    href: '/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/',
+    description: 'Pick controller current and PV input voltage without undersizing the charger or exceeding cold-weather array limits.',
+    bestFor: 'Controller shortlist'
+  },
+  {
+    stage: 'AC loads',
+    title: 'RV Solar Inverter Size Guide',
+    href: '/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/',
+    description: 'Choose pure sine inverter watts from continuous loads, startup surge, battery voltage, BMS current, and AC outlet plans.',
+    bestFor: 'Inverter class'
+  },
+  {
+    stage: 'Panel layout',
+    title: 'Portable vs Roof Solar Panels for RVs',
+    href: '/calculator/off-grid-solar/guide/portable-vs-roof-solar-panels-rv/',
+    description: 'Compare fixed roof arrays and portable panels for shade, driving charge time, campsite flexibility, wiring, and storage.',
+    bestFor: 'Mounting choice'
+  },
+  {
+    stage: 'Safety',
+    title: 'RV Solar Wiring and Fuse Checklist',
+    href: '/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/',
+    description: 'Plan fuses, breakers, disconnects, wire gauge, bus bars, cable routing, labeling, and service access before installation.',
+    bestFor: 'Install review'
+  }
+];
+
+const learningPath = [
+  'Estimate daily Wh from real loads.',
+  'Choose 12V, 24V, or 48V before buying major components.',
+  'Size the LiFePO4 battery bank and confirm BMS current.',
+  'Estimate roof or portable panel wattage with weather margin.',
+  'Match MPPT controller current and PV input voltage.',
+  'Choose inverter watts from continuous and surge loads.',
+  'Decide whether fixed roof panels, portable panels, or both fit the travel style.',
+  'Review wiring, fuse, breaker, disconnect, and service-access details.'
+];
+
+const faqItems = [
+  {
+    question: 'Which RV solar guide should I read first?',
+    answer: 'Start with the buying checklist if you are shopping soon. If the system architecture is still unclear, read the voltage guide first, then move through battery, panels, MPPT controller, inverter, and wiring.'
+  },
+  {
+    question: 'How does this learning center connect to the calculator?',
+    answer: 'The calculator gives a numeric baseline for daily Wh, battery Ah, panel watts, MPPT current, and inverter class. The guides explain the purchase decisions and safety checks behind those numbers.'
+  },
+  {
+    question: 'Can these guides replace a final electrical design?',
+    answer: 'No. They are planning guides. High-current DC systems still require proper wire sizing, overcurrent protection, product-manual review, and qualified installation guidance where appropriate.'
+  },
+  {
+    question: 'Why split RV solar into several pages?',
+    answer: 'Each buying decision has different constraints. Separating voltage, batteries, panels, controllers, inverters, and wiring makes it easier for users to audit one decision at a time.'
+  }
+];
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'RV Solar Learning Center', item: new URL('/calculator/off-grid-solar/guide/', Astro.site).toString() }
+  ]
+};
+
+const itemListJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'RV Solar Learning Center',
+  itemListElement: guideLinks.map((guide, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: guide.title,
+    url: new URL(guide.href, Astro.site).toString()
+  }))
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(itemListJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Solar learning center</p>
+        <h1>Plan an RV solar system one purchase decision at a time.</h1>
+        <span>
+          A focused guide hub for choosing battery capacity, panel wattage, MPPT controller size, inverter class, system voltage, wiring protection, and buying priorities before checkout.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Start with the calculator</a>
+          <a href="/calculator/off-grid-solar/#recommendations" class="solar-button-secondary">Open buying tiers</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Recommended reading order</p>
+          <h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">From load estimate to safer shopping list</h2>
+          <ol class="mt-5 grid gap-3 text-sm leading-6 text-white/78">
+            {learningPath.map((item, index) => (
+              <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/12 text-xs font-bold text-amber-100">{index + 1}</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ol>
+        </aside>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          {guideLinks.map((guide) => (
+            <a href={guide.href} class="solar-profile-card min-h-[240px]">
+              <div class="flex h-full flex-col justify-between gap-5">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{guide.stage}</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">{guide.title}</h2>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">{guide.description}</p>
+                </div>
+                <div class="flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
+                  <span class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{guide.bestFor}</span>
+                  <span class="text-sm font-semibold text-amber-700">Read guide &rarr;</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Cluster map</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">How the pages work together</h2>
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+              <p class="text-sm font-semibold text-slate-950">Calculator page</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Captures the sizing intent: daily Wh, autonomy days, voltage, sun hours, battery Ah, panel watts, MPPT amps, and inverter class.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+              <p class="text-sm font-semibold text-slate-950">Guide pages</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Convert the sizing result into shopping checks, architecture choices, safety reminders, and practical product filters.</p>
+            </div>
+          </div>
+          <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+            <a href="/calculator/off-grid-solar/" class="solar-button-primary">Use the sizing calculator</a>
+            <a href="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/" class="solar-button-secondary">Open the checklist</a>
+          </div>
+        </div>
+
+        <div class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Trust notes</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Built for cautious buyers</h2>
+          <ul class="solar-check-list mt-5">
+            <li>The pages use generic product categories and search paths until affiliate links are ready.</li>
+            <li>Each guide keeps safety-sensitive decisions visible instead of hiding them behind a single recommendation.</li>
+            <li>The hub gives search engines a clear topical relationship between the calculator and the supporting guides.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="mt-6">
+        <div class="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Solar guide hub questions</h2>
+          </div>
+          <p class="max-w-2xl text-sm leading-7 text-slate-600">
+            These answers clarify how visitors should use the content cluster before making a purchase decision.
+          </p>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </section>
+  </main>
+</Layout>

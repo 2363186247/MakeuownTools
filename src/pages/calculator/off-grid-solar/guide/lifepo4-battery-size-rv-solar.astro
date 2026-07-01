@@ -1,0 +1,227 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'LiFePO4 Battery Size for RV Solar | Ah and Voltage Guide';
+const pageDescription = 'Learn how to size a LiFePO4 battery bank for RV solar using daily Wh, voltage, usable depth of discharge, autonomy days, BMS current, and inverter load.';
+
+const formulaSteps = [
+  {
+    title: 'Start with daily Wh',
+    text: 'Multiply each appliance wattage by daily runtime. A 60W fridge running 24 hours contributes about 1440 Wh before adding the rest of the RV loads.'
+  },
+  {
+    title: 'Add autonomy days',
+    text: 'One day of autonomy is a light baseline. Two days gives more weather buffer, but increases battery cost, weight, and storage space.'
+  },
+  {
+    title: 'Adjust for usable DoD',
+    text: 'LiFePO4 can usually use more of its nominal capacity than AGM, but planning around usable capacity instead of brochure Ah keeps the build more realistic.'
+  },
+  {
+    title: 'Convert Wh to Ah',
+    text: 'Battery Ah is battery Wh divided by system voltage. The same energy demand needs more Ah at 12V and fewer Ah at 24V or 48V.'
+  }
+];
+
+const sizingExamples = [
+  { daily: '600 Wh/day', voltage: '12V', oneDay: '60-75Ah', twoDay: '120-150Ah', use: 'Weekend fan, lights, phone charging, small fridge' },
+  { daily: '1200 Wh/day', voltage: '24V', oneDay: '60-75Ah', twoDay: '120-150Ah', use: 'Fridge, laptop, lights, fans, short inverter use' },
+  { daily: '2000 Wh/day', voltage: '24V', oneDay: '100-150Ah', twoDay: '200-300Ah', use: 'Remote work RV with Starlink and regular AC loads' },
+  { daily: '3000 Wh/day', voltage: '48V', oneDay: '75-100Ah', twoDay: '150-200Ah', use: 'Large inverter loads, cabin-style RV or mobile office' }
+];
+
+const bmsChecks = [
+  'Compare inverter wattage against BMS continuous current, not only battery Ah.',
+  'For a 12V inverter, current rises fast; a 2000W load can demand well over 160A before losses.',
+  'Check whether the battery supports parallel wiring if you plan to expand later.',
+  'Confirm charge and discharge temperature limits, especially for winter RV use.',
+  'Match charger, alternator charger, MPPT controller, and inverter with the same battery voltage.',
+  'Leave room for fuses, bus bars, shutoffs, and service access around the battery bank.'
+];
+
+const mistakes = [
+  'Buying one large battery without checking if the BMS can run the inverter.',
+  'Comparing 12V and 24V batteries by Ah alone instead of Wh.',
+  'Forgetting that autonomy days double or triple the required stored energy.',
+  'Assuming every LiFePO4 battery has cold charging protection.',
+  'Planning battery capacity without first estimating realistic daily appliance runtime.'
+];
+
+const faqItems = [
+  {
+    question: 'How many Ah of LiFePO4 battery do I need for RV solar?',
+    answer: 'Start from daily Wh, multiply by autonomy days, divide by usable depth of discharge, then divide by system voltage. For many medium RV builds, the calculator will often land near 100Ah to 200Ah at 24V, depending on loads.'
+  },
+  {
+    question: 'Is 100Ah LiFePO4 enough for an RV?',
+    answer: 'It can be enough for a light 12V weekend setup, but it may be small for a fridge, Starlink, laptop work, or regular inverter loads. Daily Wh and autonomy days matter more than a generic Ah number.'
+  },
+  {
+    question: 'Should I buy one large battery or multiple smaller batteries?',
+    answer: 'One large battery can simplify wiring, while multiple smaller batteries can improve layout flexibility and expansion. Check parallel support, BMS current, cable balance, and available mounting space.'
+  },
+  {
+    question: 'Why does 24V need fewer Ah than 12V?',
+    answer: 'Ah changes with voltage. A 24V 100Ah bank stores roughly twice the energy of a 12V 100Ah bank, so Wh is the better comparison across voltage systems.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'LiFePO4 Battery Size for RV Solar', item: new URL('/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Battery sizing guide</p>
+        <h1>LiFePO4 Battery Size for RV Solar</h1>
+        <span>
+          Battery sizing is where RV solar shopping gets expensive quickly. Use daily Wh, voltage, usable capacity, autonomy days, and BMS current together before choosing a LiFePO4 battery.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Calculate battery Ah</a>
+          <a href="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/" class="solar-button-secondary">Compare voltages</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-4">
+        {formulaSteps.map((step) => (
+          <article class="solar-panel p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{step.title}</p>
+            <p class="mt-3 text-sm leading-7 text-slate-600">{step.text}</p>
+          </article>
+        ))}
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Example ranges</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Battery Ah depends on Wh, voltage, and autonomy</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="solar-data-table">
+              <thead>
+                <tr>
+                  <th>Daily load</th>
+                  <th>Voltage</th>
+                  <th>1 day</th>
+                  <th>2 days</th>
+                  <th>Typical use</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sizingExamples.map((row) => (
+                  <tr>
+                    <td>{row.daily}</td>
+                    <td>{row.voltage}</td>
+                    <td>{row.oneDay}</td>
+                    <td>{row.twoDay}</td>
+                    <td>{row.use}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Important</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Ah is not enough by itself</h2>
+          <p class="mt-3 text-sm leading-7 text-white/72">
+            A battery can have enough capacity and still be wrong for the build if the BMS cannot support inverter current. Always check continuous discharge current, surge behavior, low-temperature protection, and wiring limits.
+          </p>
+          <a href="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/" class="mt-5 inline-flex rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300">Open buying checklist</a>
+        </aside>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">BMS and installation checks</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Check these before buying batteries</h2>
+          <ul class="solar-check-list mt-5">
+            {bmsChecks.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Common mistakes</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Battery sizing mistakes to avoid</h2>
+          <ul class="solar-check-list mt-5">
+            {mistakes.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">LiFePO4 battery sizing questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#recommendations" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">See battery search links &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Voltage</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">12V vs 24V vs 48V</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Understand why the same Wh demand becomes different Ah at different voltages.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Controller</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">MPPT controller sizing</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Match panel wattage, battery voltage, and charge current before buying a controller.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Run your own load profile</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Calculate battery Ah from your appliances instead of guessing from generic kits.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/" />
+    </section>
+  </main>
+</Layout>

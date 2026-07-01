@@ -1,0 +1,287 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = '12V vs 24V vs 48V RV Solar | Voltage Guide';
+const pageDescription = 'Compare 12V, 24V, and 48V RV solar systems for battery banks, inverter loads, MPPT controllers, wiring current, expansion headroom, and buying decisions.';
+
+const voltageCards = [
+  {
+    voltage: '12V',
+    bestFor: 'Small vans, weekend campers, low AC loads',
+    strengths: [
+      'Most compatible with common RV DC accessories.',
+      'Simple starter choice for lights, fans, phone charging, and small fridges.',
+      'Easy to understand and easier to troubleshoot for small systems.'
+    ],
+    watch: [
+      'Current rises quickly as inverter loads grow.',
+      'Large inverters can stress battery BMS, fuses, and wire gauge.',
+      'Expansion can become awkward once daily energy use increases.'
+    ]
+  },
+  {
+    voltage: '24V',
+    bestFor: 'Most medium RV and vanlife solar builds',
+    strengths: [
+      'Cuts current roughly in half compared with 12V for the same wattage.',
+      'Works well for fridge, laptop, Starlink, lights, fans, and moderate inverter use.',
+      'Often the most practical balance between compatibility, cost, and expansion.'
+    ],
+    watch: [
+      'Some 12V appliances need a DC-DC converter.',
+      'Component compatibility must be checked before buying.',
+      'Battery wiring and charging profiles need a deliberate plan.'
+    ]
+  },
+  {
+    voltage: '48V',
+    bestFor: 'Large systems, high inverter loads, cabins, heavy remote work setups',
+    strengths: [
+      'Lowest current for larger inverter loads.',
+      'Better fit for high-watt appliances and longer cable runs.',
+      'Leaves more room for future expansion.'
+    ],
+    watch: [
+      'Less convenient for traditional RV 12V accessory ecosystems.',
+      'Higher-voltage DC design deserves more careful installation review.',
+      'Often overkill for small weekend systems.'
+    ]
+  }
+];
+
+const decisionRules = [
+  'Choose 12V when the build is small, mostly DC, and likely to stay under light inverter use.',
+  'Choose 24V when the system includes daily laptop work, Starlink, a fridge, moderate AC loads, or planned expansion.',
+  'Choose 48V when inverter loads become large enough that cable size, BMS current, and voltage drop dominate the design.',
+  'Do not pick voltage from battery price alone; check inverter input voltage, MPPT limits, DC appliance compatibility, and charger options together.'
+];
+
+const currentExamples = [
+  { load: '500W inverter load', current12: '42A', current24: '21A', current48: '10A' },
+  { load: '1000W inverter load', current12: '83A', current24: '42A', current48: '21A' },
+  { load: '2000W inverter load', current12: '167A', current24: '83A', current48: '42A' }
+];
+
+const buyingChecks = [
+  'Battery bank voltage must match inverter DC input voltage.',
+  'MPPT controller battery voltage support must match the battery bank.',
+  'PV input voltage and charge current must stay inside controller limits.',
+  'Battery BMS continuous current must cover the inverter load with headroom.',
+  'Fuses, breakers, bus bars, disconnects, and wire gauge must be sized for current.',
+  '12V appliances on 24V or 48V systems need a properly sized DC-DC converter.'
+];
+
+const faqItems = [
+  {
+    question: 'Is 24V better than 12V for RV solar?',
+    answer: 'For many medium RV builds, 24V is a better planning default because it reduces current while staying less complex than 48V. Small low-load campers can still be perfectly reasonable at 12V.'
+  },
+  {
+    question: 'When should an RV solar system use 48V?',
+    answer: '48V starts to make sense when inverter loads are large, cable runs are longer, or future expansion matters more than simple compatibility with 12V RV accessories.'
+  },
+  {
+    question: 'Does higher voltage reduce energy use?',
+    answer: 'Higher voltage does not change the appliance energy demand in Wh. It reduces current for the same wattage, which can reduce wiring pressure, voltage drop, and heat.'
+  },
+  {
+    question: 'Can I mix 12V appliances with a 24V or 48V battery bank?',
+    answer: 'Yes, but you generally need a properly sized DC-DC converter. Do not connect 12V appliances directly to a 24V or 48V battery bank.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: '12V vs 24V vs 48V RV Solar', item: new URL('/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Solar voltage guide</p>
+        <h1>12V vs 24V vs 48V for RV Solar</h1>
+        <span>
+          Voltage is one of the earliest choices in an RV solar build. It affects battery wiring, inverter input, MPPT controller selection, current, voltage drop, wire size, and future expansion.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Test your load profile</a>
+          <a href="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/" class="solar-button-secondary">Open buying checklist</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        {voltageCards.map((card) => (
+          <article class="solar-panel p-5 md:p-6">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{card.voltage} system</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{card.bestFor}</h2>
+            <div class="mt-5">
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Strengths</p>
+              <ul class="solar-check-list mt-3">
+                {card.strengths.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div class="mt-5">
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Watch-outs</p>
+              <ul class="solar-check-list mt-3">
+                {card.watch.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Current reality check</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Same watts, very different current</h2>
+          <p class="mt-3 text-sm leading-7 text-white/72">
+            The simple relationship is current = watts / volts. Real systems also need inverter loss and safety headroom, but the direction is clear: higher voltage reduces current.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full min-w-[520px] text-left text-sm">
+              <thead>
+                <tr class="border-b border-white/12 text-xs uppercase tracking-[0.12em] text-white/54">
+                  <th class="py-3">Load</th>
+                  <th class="py-3">12V</th>
+                  <th class="py-3">24V</th>
+                  <th class="py-3">48V</th>
+                </tr>
+              </thead>
+              <tbody class="text-white/82">
+                {currentExamples.map((row) => (
+                  <tr class="border-b border-white/8">
+                    <td class="py-3 font-medium text-white">{row.load}</td>
+                    <td class="py-3 font-mono">{row.current12}</td>
+                    <td class="py-3 font-mono text-amber-100">{row.current24}</td>
+                    <td class="py-3 font-mono">{row.current48}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </aside>
+
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Decision rules</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">A practical way to choose voltage</h2>
+          <ul class="solar-check-list mt-5">
+            {decisionRules.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+          <p class="mt-5 text-sm leading-7 text-slate-600">
+            If you are unsure, enter your appliances into the <a href="/calculator/off-grid-solar/" class="font-semibold text-amber-700 hover:text-slate-950">off-grid solar calculator</a>, then compare how the same Wh/day behaves at 12V, 24V, and 48V.
+          </p>
+        </article>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Buying compatibility</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Check these before choosing hardware</h2>
+          <ul class="solar-check-list mt-5">
+            {buyingChecks.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Recommended default</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">For many RV builds, start by evaluating 24V</h2>
+          <div class="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <p>
+              A 12V system is still a good fit for small builds, especially when most loads are native 12V DC. But once an RV setup includes a fridge, laptop charging, Starlink, regular inverter use, or future expansion, 24V often becomes the cleaner middle path.
+            </p>
+            <p>
+              A 48V system is worth considering when AC loads are large, cable runs are long, or the design starts to look more like a cabin or mobile office than a weekend camper.
+            </p>
+          </div>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href="/calculator/off-grid-solar/#recommendations" class="solar-button-primary">Compare buying tiers</a>
+            <a href="/calculator/off-grid-solar/12v-vs-24v-vs-48v-off-grid-solar-battery-calculator-24v-profile-2/" class="solar-button-secondary">Open voltage calculator</a>
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Voltage questions for RV solar buyers</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#calculator" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Run the calculator &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Size the system from real loads</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Estimate Wh/day, battery Ah, panel watts, MPPT current, and inverter baseline.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Checklist</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">RV Solar Buying Checklist</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Check batteries, panels, MPPT controllers, inverters, fuses, and wire planning.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/60w-1440m-plus-1000w-10m-12v-3sunh-1day-off-grid-solar-battery-calculator/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Scenario</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Fridge + microwave 12V example</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">See how a concrete load profile changes battery and panel sizing.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/" />
+    </section>
+  </main>
+</Layout>

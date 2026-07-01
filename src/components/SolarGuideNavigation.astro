@@ -1,0 +1,133 @@
+---
+type GuideStep = {
+  stage: string;
+  title: string;
+  href: string;
+  description: string;
+};
+
+type Props = {
+  currentHref: string;
+};
+
+const { currentHref } = Astro.props;
+
+const guideSteps: GuideStep[] = [
+  {
+    stage: 'Step 1',
+    title: 'RV Solar Buying Checklist',
+    href: '/calculator/off-grid-solar/guide/rv-solar-buying-checklist/',
+    description: 'Start with the full shopping and compatibility checklist.'
+  },
+  {
+    stage: 'Step 2',
+    title: '12V vs 24V vs 48V for RV Solar',
+    href: '/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/',
+    description: 'Choose system voltage before locking in major hardware.'
+  },
+  {
+    stage: 'Step 3',
+    title: 'LiFePO4 Battery Size for RV Solar',
+    href: '/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/',
+    description: 'Size storage from daily Wh, voltage, DoD, BMS current, and reserve days.'
+  },
+  {
+    stage: 'Step 4',
+    title: 'How Many Solar Panels for a Camper Van',
+    href: '/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/',
+    description: 'Translate daily energy demand into panel wattage and roof-fit checks.'
+  },
+  {
+    stage: 'Step 5',
+    title: 'MPPT Charge Controller Sizing for RV Solar',
+    href: '/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/',
+    description: 'Match controller current and PV input limits to the planned array.'
+  },
+  {
+    stage: 'Step 6',
+    title: 'RV Solar Inverter Size Guide',
+    href: '/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/',
+    description: 'Choose pure sine inverter watts from continuous loads and startup surge.'
+  },
+  {
+    stage: 'Step 7',
+    title: 'Portable vs Roof Solar Panels for RVs',
+    href: '/calculator/off-grid-solar/guide/portable-vs-roof-solar-panels-rv/',
+    description: 'Decide whether fixed roof, portable panels, or a hybrid setup fits the trip style.'
+  },
+  {
+    stage: 'Step 8',
+    title: 'RV Solar Wiring and Fuse Checklist',
+    href: '/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/',
+    description: 'Finish by reviewing fuses, breakers, wire gauge, disconnects, and service access.'
+  }
+];
+
+const currentIndex = guideSteps.findIndex((step) => step.href === currentHref);
+const currentStep = currentIndex >= 0 ? guideSteps[currentIndex] : undefined;
+const previousStep = currentIndex > 0 ? guideSteps[currentIndex - 1] : undefined;
+const nextStep = currentIndex >= 0 && currentIndex < guideSteps.length - 1 ? guideSteps[currentIndex + 1] : undefined;
+const progress = currentIndex >= 0 ? `${currentIndex + 1}/${guideSteps.length}` : `Guide path`;
+---
+
+<nav class="solar-panel mt-6 p-5 md:p-6" aria-label="RV solar guide navigation">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Solar learning path</p>
+      <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+        {currentStep ? `${currentStep.stage}: ${currentStep.title}` : 'Continue the RV solar guide cluster'}
+      </h2>
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+        Use this path to move from shopping checklist to voltage, battery, panels, controller, inverter, panel layout, and wiring safety without losing the system context.
+      </p>
+    </div>
+    <a href="/calculator/off-grid-solar/guide/" class="solar-button-secondary shrink-0">Back to Learning Center</a>
+  </div>
+
+  <div class="mt-5 h-2 overflow-hidden rounded-full bg-slate-200">
+    <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-500" style={`width: ${currentIndex >= 0 ? ((currentIndex + 1) / guideSteps.length) * 100 : 12.5}%`}></div>
+  </div>
+  <p class="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Progress {progress}</p>
+
+  <div class="mt-5 grid gap-4 lg:grid-cols-2">
+    {previousStep ? (
+      <a href={previousStep.href} class="solar-conversion-panel">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Previous guide</p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">{previousStep.title}</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">{previousStep.description}</p>
+        </div>
+        <span class="text-sm font-semibold text-amber-700">&larr; Read previous</span>
+      </a>
+    ) : (
+      <a href="/calculator/off-grid-solar/#calculator" class="solar-conversion-panel">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Before this guide</p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">Run the off-grid solar calculator</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">Build a real load profile first so the guide path starts from daily Wh instead of a generic kit size.</p>
+        </div>
+        <span class="text-sm font-semibold text-amber-700">Open calculator &rarr;</span>
+      </a>
+    )}
+
+    {nextStep ? (
+      <a href={nextStep.href} class="solar-conversion-panel">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Next guide</p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">{nextStep.title}</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">{nextStep.description}</p>
+        </div>
+        <span class="text-sm font-semibold text-amber-700">Read next &rarr;</span>
+      </a>
+    ) : (
+      <a href="/calculator/off-grid-solar/#recommendations" class="solar-conversion-panel">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">After the guide path</p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">Turn the plan into a buying shortlist</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">Once wiring and protection are reviewed, return to the three-tier buying list and compare component categories.</p>
+        </div>
+        <span class="text-sm font-semibold text-amber-700">Open buying tiers &rarr;</span>
+      </a>
+    )}
+  </div>
+</nav>

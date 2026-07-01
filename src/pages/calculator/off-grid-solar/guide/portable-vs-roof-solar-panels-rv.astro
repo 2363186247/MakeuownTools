@@ -1,0 +1,224 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'Portable vs Roof Solar Panels for RVs | Which Setup Fits?';
+const pageDescription = 'Compare portable solar panels and fixed roof solar panels for RVs by shade behavior, charging while driving, storage, setup time, wiring, theft risk, and panel expansion.';
+
+const comparisonRows = [
+  { factor: 'Charging while driving', roof: 'Excellent because panels are always mounted.', portable: 'Usually no, unless deployed at camp.' },
+  { factor: 'Shade flexibility', roof: 'Limited by where the RV is parked.', portable: 'Can be moved into sun while the RV stays shaded.' },
+  { factor: 'Setup time', roof: 'No daily setup after installation.', portable: 'Requires setup, aiming, cable routing, and storage.' },
+  { factor: 'Theft and weather', roof: 'Harder to steal and more weather-ready.', portable: 'Needs attention in wind, rain, and public campsites.' },
+  { factor: 'Expansion', roof: 'Limited by roof space and shading.', portable: 'Easy to supplement, but cable current and controller limits still matter.' }
+];
+
+const roofStrengths = [
+  'Charges whenever the RV is in sun, including travel days and quick stops.',
+  'Cleaner daily workflow because there is no repeated setup.',
+  'Better for full-time users who need predictable baseline charging.',
+  'Less storage hassle inside the van or RV.'
+];
+
+const portableStrengths = [
+  'Can be placed in sun while the vehicle stays cool in shade.',
+  'Useful for campsites with trees, awnings, or roof obstructions.',
+  'Easy way to add seasonal charging without rebuilding the roof array.',
+  'Can be angled toward the sun more easily than flat roof panels.'
+];
+
+const decisionRules = [
+  'Use roof panels as the baseline if you want charging to happen automatically.',
+  'Add portable panels if you often camp in shade or need winter angle flexibility.',
+  'Avoid relying only on portable panels if you dislike setup chores or move frequently.',
+  'Avoid relying only on roof panels if the roof has heavy shade from racks, fans, AC units, or gear boxes.',
+  'Check MPPT controller limits before adding portable panels to an existing roof array.'
+];
+
+const wiringChecks = [
+  'Portable panel connectors should be rated for outdoor use and repeated handling.',
+  'Long portable-panel cables create voltage drop; controller placement matters.',
+  'Combining roof and portable arrays may need separate controllers if voltage or orientation differs.',
+  'Portable panels still need fusing and safe cable routing where appropriate.',
+  'Do not mix panel strings casually if voltage, current, angle, or shade behavior differs significantly.'
+];
+
+const faqItems = [
+  {
+    question: 'Are portable solar panels better than roof panels for RVs?',
+    answer: 'Portable panels are better for shade flexibility, while roof panels are better for automatic charging. Many strong RV systems use roof panels for baseline charging and portable panels as a supplement.'
+  },
+  {
+    question: 'Can I combine portable and roof solar panels?',
+    answer: 'Yes, but check voltage, current, controller limits, cable length, and shading behavior. In many cases, separate MPPT controllers are cleaner when the arrays behave differently.'
+  },
+  {
+    question: 'Are roof solar panels worth it on a camper van?',
+    answer: 'They are usually worth it if you want low-effort daily charging. The main limitation is roof space and shade from vents, racks, air conditioners, and parking location.'
+  },
+  {
+    question: 'Do portable panels need an MPPT controller?',
+    answer: 'They need a charge controller unless they are part of an integrated system that already includes one. MPPT is usually more efficient and flexible than simple PWM control.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'Portable vs Roof Solar Panels for RVs', item: new URL('/calculator/off-grid-solar/guide/portable-vs-roof-solar-panels-rv/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/portable-vs-roof-solar-panels-rv/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Panel setup guide</p>
+        <h1>Portable vs Roof Solar Panels for RVs</h1>
+        <span>
+          Fixed roof panels and portable panels solve different problems. The best RV solar setup often depends on shade, travel style, setup tolerance, roof space, and whether charging should happen automatically.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/" class="solar-button-primary">Estimate panel watts</a>
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-secondary">Run the calculator</a>
+        </div>
+      </header>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Side-by-side comparison</p>
+        <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Roof panels are automatic; portable panels are flexible</h2>
+        <div class="mt-5 overflow-x-auto">
+          <table class="solar-data-table">
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Roof panels</th>
+                <th>Portable panels</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparisonRows.map((row) => (
+                <tr>
+                  <td>{row.factor}</td>
+                  <td>{row.roof}</td>
+                  <td>{row.portable}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Roof panel strengths</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Best for automatic baseline charging</h2>
+          <ul class="solar-check-list mt-5">
+            {roofStrengths.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Portable panel strengths</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Best for shade and seasonal flexibility</h2>
+          <ul class="solar-check-list mt-5">
+            {portableStrengths.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Practical recommendation</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Use roof panels for baseline, portable panels for edge cases</h2>
+          <p class="mt-3 text-sm leading-7 text-white/72">
+            If budget allows, a fixed roof array plus a smaller portable supplement is often easier to live with than either extreme. The roof handles normal charging; the portable panel helps when parking in shade.
+          </p>
+          <a href="/calculator/off-grid-solar/#recommendations" class="mt-5 inline-flex rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300">Compare buying tiers</a>
+        </aside>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Decision rules</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Choose based on how you camp</h2>
+          <ul class="solar-check-list mt-5">
+            {decisionRules.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Wiring checks</p>
+        <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Combining panel types needs careful controller planning</h2>
+        <ul class="solar-check-list mt-5">
+          {wiringChecks.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Portable and roof panel questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Check MPPT sizing &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Panel count</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">How many panels?</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Estimate array wattage before deciding roof-only or hybrid.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Safety</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Wiring and fuse checklist</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Portable panels still need safe wiring and controller planning.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Calculate array size</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Use real daily Wh and sun hours to set a target.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/portable-vs-roof-solar-panels-rv/" />
+    </section>
+  </main>
+</Layout>

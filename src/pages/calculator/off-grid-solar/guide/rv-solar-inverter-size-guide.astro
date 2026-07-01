@@ -1,0 +1,249 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'RV Solar Inverter Size Guide | Pure Sine Watts and Surge';
+const pageDescription = 'Choose the right RV solar inverter size by comparing continuous watts, surge loads, battery voltage, LiFePO4 BMS current, outlet plans, and safety headroom.';
+
+const sizingFactors = [
+  {
+    title: 'Continuous watts',
+    text: 'Add the AC loads that may run at the same time. A laptop charger and small appliance are very different from a microwave, induction cooktop, or air conditioner.'
+  },
+  {
+    title: 'Startup surge',
+    text: 'Compressors, pumps, and some appliances can draw much more power at startup than their running wattage. The inverter surge rating must cover that short burst.'
+  },
+  {
+    title: 'Battery voltage',
+    text: 'The inverter input voltage must match the battery bank. A 24V inverter cannot connect directly to a 12V battery bank.'
+  },
+  {
+    title: 'BMS current',
+    text: 'LiFePO4 battery BMS current can be the real limit. A large inverter can trip or overload a battery even when the Ah capacity looks adequate.'
+  }
+];
+
+const inverterExamples = [
+  { loads: 'Laptop, camera, small chargers', watts: '300-600W', system: '12V or 24V', note: 'Small pure sine inverter or power station class' },
+  { loads: 'Fridge electronics, laptop, blender', watts: '800-1200W', system: '12V or 24V', note: 'Check surge and battery current carefully' },
+  { loads: 'Microwave short bursts', watts: '1500-2000W', system: '24V often cleaner', note: '12V current becomes high quickly' },
+  { loads: 'Induction cooktop, heavy tools, mobile office', watts: '2000-3000W+', system: '24V or 48V', note: 'Needs serious wiring, BMS, and protection planning' }
+];
+
+const bmsCurrentExamples = [
+  { inverter: '1000W', current12: '83A before losses', current24: '42A before losses', current48: '21A before losses' },
+  { inverter: '2000W', current12: '167A before losses', current24: '83A before losses', current48: '42A before losses' },
+  { inverter: '3000W', current12: '250A before losses', current24: '125A before losses', current48: '63A before losses' }
+];
+
+const selectionChecks = [
+  'Use pure sine wave for laptops, chargers, compressor appliances, and sensitive electronics.',
+  'Check continuous wattage and surge wattage separately.',
+  'Match inverter DC input voltage to the battery bank.',
+  'Confirm battery BMS continuous discharge current can support the inverter load.',
+  'Plan fuses, shutoff, cable gauge, lugs, and ventilation around the inverter.',
+  'Decide whether you need a hardwired AC subpanel or only plug-in outlet use.'
+];
+
+const mistakes = [
+  'Buying the biggest inverter because it seems safer, then discovering the battery BMS cannot feed it.',
+  'Ignoring idle draw from a large inverter that stays on all day.',
+  'Running high-watt AC loads on a 12V system without understanding current and cable size.',
+  'Assuming surge rating is the same as continuous rating.',
+  'Forgetting that an inverter does not create energy; it only converts stored battery energy into AC.'
+];
+
+const faqItems = [
+  {
+    question: 'What size inverter do I need for RV solar?',
+    answer: 'Choose inverter size from the AC loads that may run at the same time, then check startup surge and battery BMS current. Many light RV builds use 600W to 1200W, while microwave or induction loads often push the design toward 1500W to 3000W.'
+  },
+  {
+    question: 'Is a 2000W inverter too big for a 12V RV system?',
+    answer: 'It can work, but current becomes high. A 2000W load at 12V can demand well over 160A before losses, so BMS current, fuses, and wire gauge must be planned carefully.'
+  },
+  {
+    question: 'Do I need a pure sine inverter?',
+    answer: 'For most RV solar builds, pure sine is the safer default because it is better for laptops, chargers, compressor appliances, and sensitive electronics.'
+  },
+  {
+    question: 'Does a bigger inverter mean more battery capacity?',
+    answer: 'Not directly. Inverter size is about peak AC power. Battery capacity is about stored energy. A large inverter can drain a small battery quickly or exceed the battery BMS current.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'RV Solar Inverter Size Guide', item: new URL('/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Inverter sizing guide</p>
+        <h1>RV Solar Inverter Size Guide</h1>
+        <span>
+          Inverter sizing is not just picking a watt number. The right pure sine inverter depends on AC loads, surge rating, battery voltage, BMS current, wiring, fusing, and how the outlets will be used.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Estimate inverter watts</a>
+          <a href="/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/" class="solar-button-secondary">Check battery current</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-4">
+        {sizingFactors.map((factor) => (
+          <article class="solar-panel p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{factor.title}</p>
+            <p class="mt-3 text-sm leading-7 text-slate-600">{factor.text}</p>
+          </article>
+        ))}
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Example inverter classes</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Start from the AC loads you actually run</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="solar-data-table">
+              <thead>
+                <tr>
+                  <th>AC loads</th>
+                  <th>Inverter class</th>
+                  <th>System fit</th>
+                  <th>Planning note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inverterExamples.map((row) => (
+                  <tr>
+                    <td>{row.loads}</td>
+                    <td>{row.watts}</td>
+                    <td>{row.system}</td>
+                    <td>{row.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Current check</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Large inverters demand large DC current</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full min-w-[520px] text-left text-sm">
+              <thead>
+                <tr class="border-b border-white/12 text-xs uppercase tracking-[0.12em] text-white/54">
+                  <th class="py-3">Inverter</th>
+                  <th class="py-3">12V</th>
+                  <th class="py-3">24V</th>
+                  <th class="py-3">48V</th>
+                </tr>
+              </thead>
+              <tbody class="text-white/82">
+                {bmsCurrentExamples.map((row) => (
+                  <tr class="border-b border-white/8">
+                    <td class="py-3 font-medium text-white">{row.inverter}</td>
+                    <td class="py-3 font-mono">{row.current12}</td>
+                    <td class="py-3 font-mono text-amber-100">{row.current24}</td>
+                    <td class="py-3 font-mono">{row.current48}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </aside>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Selection checks</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Check these before choosing an inverter</h2>
+          <ul class="solar-check-list mt-5">
+            {selectionChecks.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Common mistakes</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Inverter mistakes that create expensive rewiring</h2>
+          <ul class="solar-check-list mt-5">
+            {mistakes.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">RV inverter sizing questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#recommendations" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">See inverter search links &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Battery</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">LiFePO4 battery size</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Confirm stored energy and BMS current before buying an inverter.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Wiring</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Wiring and fuse checklist</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Large inverter loads need proper fusing, wire gauge, and disconnects.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Calculate from real loads</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Use your appliance list to estimate inverter baseline.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/" />
+    </section>
+  </main>
+</Layout>

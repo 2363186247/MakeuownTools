@@ -1,0 +1,226 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'How Many Solar Panels for a Camper Van | RV Solar Guide';
+const pageDescription = 'Estimate how many solar panels a camper van needs from daily Wh, panel wattage, roof space, peak sun hours, shading, mounting layout, and real-world derating.';
+
+const planningFactors = [
+  {
+    title: 'Daily Wh',
+    text: 'A fridge, lights, fan, laptop, and Starlink can turn a simple van into a 1000-2000 Wh/day system quickly. Panel count starts with energy use, not roof space.'
+  },
+  {
+    title: 'Peak sun hours',
+    text: 'Arizona summer and Pacific Northwest winter are not the same solar problem. Use conservative sun-hour assumptions if the van travels across seasons.'
+  },
+  {
+    title: 'Panel wattage',
+    text: 'Two 200W panels and four 100W panels can both make 400W, but the roof layout, shading behavior, mounting hardware, and wiring will differ.'
+  },
+  {
+    title: 'Real-world derating',
+    text: 'Heat, flat mounting, dust, roof shade, cable loss, and controller loss mean panels rarely produce nameplate wattage for long.'
+  }
+];
+
+const panelExamples = [
+  { daily: '600 Wh/day', sun: '4.5h', target: '200W class', panels: 'One 200W panel or two 100W panels', use: 'Small fridge, lights, phone charging' },
+  { daily: '1200 Wh/day', sun: '4.5h', target: '400W class', panels: 'Two 200W panels or four 100W panels', use: 'Fridge, fan, laptop, lights' },
+  { daily: '1800 Wh/day', sun: '4h', target: '700W class', panels: 'Three to four medium panels if roof space allows', use: 'Remote work, Starlink, regular charging' },
+  { daily: '2500 Wh/day', sun: '3.5h', target: '1000W+ class', panels: 'Large roof array plus portable or alternator charging', use: 'Heavy loads, cloudy travel, high autonomy needs' }
+];
+
+const roofChecks = [
+  'Measure roof length and width after subtracting fans, vents, AC units, racks, antennas, and roof boxes.',
+  'Leave service space for cleaning, cable glands, and mounting hardware.',
+  'Avoid layouts where one roof object shades every panel in the same series string.',
+  'Check panel dimensions before assuming total watts will fit.',
+  'Plan cable entry and wire routing before buying panels.',
+  'Decide whether portable panels will supplement roof panels in shaded campsites.'
+];
+
+const sizingRules = [
+  'If roof space is limited, reduce demand first: efficient fridge, LED lighting, shorter inverter runtime, and better insulation help more than squeezing panels.',
+  'If winter travel matters, size from the worst realistic season rather than the best month.',
+  'If shade is common, panel layout and wiring strategy can matter as much as total watts.',
+  'If daily use includes Starlink or laptop work, treat the van as a work system, not a weekend lighting kit.'
+];
+
+const faqItems = [
+  {
+    question: 'Is 200W solar enough for a camper van?',
+    answer: '200W can be enough for a light setup with efficient DC loads and good sun, but it is often small for a fridge plus laptop or Starlink use. Daily Wh and location matter more than a universal panel count.'
+  },
+  {
+    question: 'Is 400W solar enough for vanlife?',
+    answer: '400W is a common practical starting point for many vans with a fridge, lights, fan, and laptop charging. It may still need alternator charging or portable panels in cloudy regions.'
+  },
+  {
+    question: 'How do I calculate solar panel watts for a camper van?',
+    answer: 'Divide daily Wh by peak sun hours, then adjust upward for charging loss, heat, flat mounting, shade, and real-world panel derating. The off-grid solar calculator does this as a first-pass estimate.'
+  },
+  {
+    question: 'Should I use roof panels or portable panels?',
+    answer: 'Roof panels charge while driving and parked, while portable panels can be moved into sun when the van is shaded. Many builds use roof panels as the baseline and portable panels as a supplement.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'How Many Solar Panels for a Camper Van', item: new URL('/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Panel sizing guide</p>
+        <h1>How Many Solar Panels for a Camper Van?</h1>
+        <span>
+          Panel count depends on daily Wh, peak sun hours, roof space, panel wattage, shading, and real-world derating. A useful answer starts with loads, then checks what actually fits on the van.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Calculate panel watts</a>
+          <a href="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/" class="solar-button-secondary">Size the MPPT controller</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-4">
+        {planningFactors.map((factor) => (
+          <article class="solar-panel p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{factor.title}</p>
+            <p class="mt-3 text-sm leading-7 text-slate-600">{factor.text}</p>
+          </article>
+        ))}
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Example panel targets</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Typical ranges before roof-fit checks</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="solar-data-table">
+              <thead>
+                <tr>
+                  <th>Daily load</th>
+                  <th>Sun</th>
+                  <th>Target</th>
+                  <th>Panel count</th>
+                  <th>Typical use</th>
+                </tr>
+              </thead>
+              <tbody>
+                {panelExamples.map((row) => (
+                  <tr>
+                    <td>{row.daily}</td>
+                    <td>{row.sun}</td>
+                    <td>{row.target}</td>
+                    <td>{row.panels}</td>
+                    <td>{row.use}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Shortcut</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Panel watts = daily Wh / sun hours, then add derating</h2>
+          <p class="mt-3 text-sm leading-7 text-white/72">
+            Flat roof panels run hot, see partial shade, and rarely point perfectly at the sun. The calculator includes practical derating so the panel target is not based on perfect lab output.
+          </p>
+          <a href="/calculator/off-grid-solar/#recommendations" class="mt-5 inline-flex rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300">See panel search links</a>
+        </aside>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Roof-fit checks</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Watts only help if the panels fit</h2>
+          <ul class="solar-check-list mt-5">
+            {roofChecks.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Sizing rules</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Practical rules for camper van solar</h2>
+          <ul class="solar-check-list mt-5">
+            {sizingRules.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Camper van panel questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#calculator" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Estimate your array &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Controller</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">MPPT controller sizing</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Panel wattage determines controller amps and PV input checks.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Battery</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">LiFePO4 battery sizing</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Match stored energy with how much solar can recover each day.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Run your own panel estimate</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Use real loads and sun hours instead of guessing panel count.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/" />
+    </section>
+  </main>
+</Layout>

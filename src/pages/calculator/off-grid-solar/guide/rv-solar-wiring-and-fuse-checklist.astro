@@ -1,0 +1,247 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'RV Solar Wiring and Fuse Checklist | Off-Grid Safety Guide';
+const pageDescription = 'A practical RV solar wiring and fuse checklist for batteries, inverters, MPPT controllers, solar panels, bus bars, breakers, disconnects, cable routing, and service access.';
+
+const checklistGroups = [
+  {
+    title: 'Battery side',
+    items: [
+      'Install overcurrent protection close to the battery positive terminal.',
+      'Use bus bars rated above expected continuous and surge current.',
+      'Keep high-current battery cables short and mechanically protected.',
+      'Label shutoffs and leave room to service terminals safely.'
+    ]
+  },
+  {
+    title: 'Inverter side',
+    items: [
+      'Size inverter cables for DC current, not just AC watts.',
+      'Match fuse or breaker rating to cable ampacity and inverter manufacturer guidance.',
+      'Plan ventilation and avoid mounting the inverter in a sealed hot compartment.',
+      'Use proper lugs, crimping, strain relief, and abrasion protection.'
+    ]
+  },
+  {
+    title: 'Solar array side',
+    items: [
+      'Check panel Voc in cold weather against MPPT max PV input voltage.',
+      'Use outdoor-rated PV wire and connectors where exposed.',
+      'Plan roof cable entry with water sealing and service access.',
+      'Fuse parallel strings where required by the panel and controller design.'
+    ]
+  },
+  {
+    title: 'Controller side',
+    items: [
+      'Protect both PV and battery-side conductors as appropriate for the layout.',
+      'Mount the controller where it can dissipate heat.',
+      'Confirm battery chemistry settings before charging LiFePO4.',
+      'Keep controller-to-battery wiring short enough to avoid voltage drop problems.'
+    ]
+  }
+];
+
+const currentPressure = [
+  { load: '500W DC-side load', current12: '42A before losses', current24: '21A before losses', current48: '10A before losses' },
+  { load: '1500W inverter', current12: '125A before losses', current24: '63A before losses', current48: '31A before losses' },
+  { load: '3000W inverter', current12: '250A before losses', current24: '125A before losses', current48: '63A before losses' }
+];
+
+const installSequence = [
+  'Finalize system voltage and load estimate.',
+  'Place batteries, inverter, controller, and bus bars on a physical layout drawing.',
+  'Estimate current for each circuit and choose wire size from appropriate ampacity and voltage-drop references.',
+  'Choose fuse or breaker ratings to protect the wire, following device manuals and code guidance.',
+  'Plan disconnects so battery, PV, inverter, and load circuits can be isolated safely.',
+  'Label circuits, torque terminals correctly, and inspect cables after the first few travel days.'
+];
+
+const redFlags = [
+  'Fuse size is chosen to match the inverter rather than protect the cable.',
+  'Battery cables pass through metal or cabinetry without grommets or abrasion protection.',
+  'The inverter is upgraded but the original cable and fuse plan is left unchanged.',
+  'PV wires are routed through the roof without a proper gland or strain relief.',
+  'There is no practical way to disconnect the battery or solar array during service.',
+  'Different voltage systems are mixed without DC-DC conversion and clear labeling.'
+];
+
+const faqItems = [
+  {
+    question: 'Where should the main fuse go in an RV solar system?',
+    answer: 'The main battery fuse or breaker should be close to the battery positive terminal so the downstream cable is protected. Exact placement and rating should follow device manuals, wire ampacity, and applicable installation guidance.'
+  },
+  {
+    question: 'How do I choose wire size for an RV inverter?',
+    answer: 'Estimate DC current from inverter watts divided by battery voltage, add efficiency and safety margin, then choose wire size based on ampacity, length, voltage drop, temperature, and protection device rating.'
+  },
+  {
+    question: 'Do solar panels need fuses?',
+    answer: 'Single strings often do not need the same fusing as parallel strings, but requirements depend on panel ratings and array design. Parallel strings can backfeed each other, so check panel and controller documentation.'
+  },
+  {
+    question: 'Can this checklist replace an electrician or installer?',
+    answer: 'No. It is a planning checklist. High-current DC systems can be dangerous, and final wire, fuse, breaker, grounding, and AC distribution choices should be verified by qualified guidance.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'RV Solar Wiring and Fuse Checklist', item: new URL('/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Safety checklist</p>
+        <h1>RV Solar Wiring and Fuse Checklist</h1>
+        <span>
+          After sizing batteries, panels, MPPT controllers, and inverters, the wiring plan decides whether the system is serviceable and safe. Use this checklist before buying cables, fuses, breakers, bus bars, and disconnects.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Estimate system current</a>
+          <a href="/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/" class="solar-button-secondary">Check inverter sizing</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-4">
+        {checklistGroups.map((group) => (
+          <article class="solar-panel p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{group.title}</p>
+            <ul class="solar-check-list mt-4">
+              {group.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Current pressure</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Wire and fuse planning starts with current</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="solar-data-table">
+              <thead>
+                <tr>
+                  <th>Load</th>
+                  <th>12V</th>
+                  <th>24V</th>
+                  <th>48V</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentPressure.map((row) => (
+                  <tr>
+                    <td>{row.load}</td>
+                    <td>{row.current12}</td>
+                    <td>{row.current24}</td>
+                    <td>{row.current48}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Safety note</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Fuses protect wires, not wishful thinking</h2>
+          <p class="mt-3 text-sm leading-7 text-white/72">
+            A fuse or breaker should protect the conductor downstream of it. Oversized protection can allow a cable fault to become dangerous before the fuse opens.
+          </p>
+          <a href="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/" class="mt-5 inline-flex rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300">Review voltage choice</a>
+        </aside>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Install sequence</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">A safer order to plan the wiring</h2>
+          <ol class="solar-check-list mt-5">
+            {installSequence.map((item) => <li>{item}</li>)}
+          </ol>
+        </article>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Red flags</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Stop and review if you see these</h2>
+          <ul class="solar-check-list mt-5">
+            {redFlags.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">RV solar wiring and fuse questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#solar-checklist" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Main safety checklist &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Inverter</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">RV inverter size guide</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">High inverter loads drive wire, fuse, and battery-current requirements.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">MPPT</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Controller sizing</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">PV and battery-side wiring both need controller-aware planning.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/rv-solar-buying-checklist/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Checklist</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">RV solar buying checklist</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Review hardware categories before turning the design into a cart.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/" />
+    </section>
+  </main>
+</Layout>

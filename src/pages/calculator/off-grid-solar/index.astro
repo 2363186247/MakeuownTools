@@ -32,6 +32,65 @@ const buildProfiles = [
   }
 ];
 
+const solarGuideLinks = [
+  {
+    label: 'Buyer guide',
+    title: 'RV Solar Buying Checklist',
+    href: '/calculator/off-grid-solar/guide/rv-solar-buying-checklist/',
+    text: 'Check batteries, panels, MPPT controllers, inverters, fuses, wiring, and mounting hardware before opening product searches.',
+    cta: 'Open checklist'
+  },
+  {
+    label: 'Voltage guide',
+    title: '12V vs 24V vs 48V for RV Solar',
+    href: '/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/',
+    text: 'Compare current, wire sizing pressure, inverter compatibility, DC appliances, and expansion headroom before choosing a system voltage.',
+    cta: 'Open voltage guide'
+  },
+  {
+    label: 'Battery guide',
+    title: 'LiFePO4 Battery Size for RV Solar',
+    href: '/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/',
+    text: 'Turn daily Wh, voltage, usable DoD, BMS current, and autonomy days into a practical battery bank target.',
+    cta: 'Open battery guide'
+  },
+  {
+    label: 'Controller guide',
+    title: 'MPPT Charge Controller Sizing for RV Solar',
+    href: '/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/',
+    text: 'Choose MPPT current and PV input voltage without undersizing the controller or exceeding safe operating limits.',
+    cta: 'Open MPPT guide'
+  },
+  {
+    label: 'Panel guide',
+    title: 'How Many Solar Panels for a Camper Van',
+    href: '/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/',
+    text: 'Estimate panel count from Wh/day, roof space, panel wattage, sun hours, shading, and real-world derating.',
+    cta: 'Open panel guide'
+  },
+  {
+    label: 'Inverter guide',
+    title: 'RV Solar Inverter Size Guide',
+    href: '/calculator/off-grid-solar/guide/rv-solar-inverter-size-guide/',
+    text: 'Choose pure sine inverter watts from continuous loads, startup surge, battery voltage, BMS current, and AC outlet plans.',
+    cta: 'Open inverter guide'
+  },
+  {
+    label: 'Panel setup guide',
+    title: 'Portable vs Roof Solar Panels for RVs',
+    href: '/calculator/off-grid-solar/guide/portable-vs-roof-solar-panels-rv/',
+    text: 'Compare fixed roof arrays and portable panels for shade, driving charge time, campsite flexibility, wiring, and storage.',
+    cta: 'Open panel setup guide'
+  },
+  {
+    label: 'Safety guide',
+    title: 'RV Solar Wiring and Fuse Checklist',
+    href: '/calculator/off-grid-solar/guide/rv-solar-wiring-and-fuse-checklist/',
+    text: 'Plan fuses, breakers, disconnects, wire gauge, bus bars, cable routing, and service access before installation.',
+    cta: 'Open wiring guide'
+  }
+];
+
 const shoppingTiers = [
   {
     id: 'budget',
@@ -154,6 +213,13 @@ const faqJsonLd = {
               See product checklist
             </a>
           </div>
+          <a href="/calculator/off-grid-solar/guide/" class="mt-4 grid max-w-2xl gap-3 rounded-2xl border border-white/16 bg-white/10 p-4 text-left backdrop-blur transition hover:border-amber-200/40 hover:bg-white/14 sm:grid-cols-[1fr_auto] sm:items-center">
+            <span>
+              <span class="block text-xs font-semibold uppercase tracking-[0.14em] text-amber-100">Start the 8-step guide path</span>
+              <span class="mt-1 block text-sm leading-6 text-white/72">Move from load estimate to voltage, battery, panels, MPPT, inverter, panel layout, and wiring safety.</span>
+            </span>
+            <span class="text-sm font-semibold text-amber-100">Open guide path &rarr;</span>
+          </a>
         </div>
 
         <div class="grid gap-3 border-t border-white/14 pt-5 sm:grid-cols-3">
@@ -442,6 +508,30 @@ const faqJsonLd = {
           <p class="max-w-2xl text-sm leading-7 text-slate-600">
             These internal links keep visitors moving through real purchase-intent scenarios instead of landing on a single isolated tool.
           </p>
+        </div>
+
+        <a href="/calculator/off-grid-solar/guide/" class="solar-conversion-panel mb-6 lg:grid-cols-[1.1fr_auto] lg:items-center">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Learning center</p>
+            <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Read the complete RV solar guide cluster</h3>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Follow a structured path from load estimate to voltage, battery size, panel count, MPPT controller, inverter, roof-vs-portable panels, and wiring protection.
+            </p>
+          </div>
+          <span class="text-sm font-semibold text-amber-700">Open learning center &rarr;</span>
+        </a>
+
+        <div class="mb-6 grid gap-4 lg:grid-cols-2">
+          {solarGuideLinks.map((guide) => (
+            <a href={guide.href} class="solar-conversion-panel">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{guide.label}</p>
+                <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">{guide.title}</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600">{guide.text}</p>
+              </div>
+              <span class="text-sm font-semibold text-amber-700">{guide.cta} &rarr;</span>
+            </a>
+          ))}
         </div>
 
         <div class="grid gap-6 lg:grid-cols-3">

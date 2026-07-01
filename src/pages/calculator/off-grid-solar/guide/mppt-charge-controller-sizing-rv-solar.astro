@@ -1,0 +1,225 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SolarGuideNavigation from '../../../../components/SolarGuideNavigation.astro';
+
+const pageTitle = 'MPPT Charge Controller Sizing for RV Solar | Amps Guide';
+const pageDescription = 'Size an MPPT charge controller for RV solar by matching panel watts, battery voltage, controller amps, PV input voltage, cold-weather Voc, and LiFePO4 charging profile.';
+
+const sizingSteps = [
+  {
+    title: 'Estimate array watts',
+    text: 'Start with the solar panel watts from your load profile. A 500W array and a 1000W array put very different current pressure on the controller.'
+  },
+  {
+    title: 'Divide by battery voltage',
+    text: 'Controller output current is roughly panel watts divided by battery voltage, before adding headroom. Higher battery voltage means lower charge current for the same array wattage.'
+  },
+  {
+    title: 'Add current headroom',
+    text: 'A common planning shortcut is to add about 25% headroom, then round up to the next common controller size.'
+  },
+  {
+    title: 'Check PV input limits',
+    text: 'MPPT controllers also have maximum PV input voltage. Panel series wiring and cold weather open-circuit voltage must stay below that limit.'
+  }
+];
+
+const ampExamples = [
+  { array: '300W array', battery: '12V', estimate: '32A minimum', common: '40A MPPT' },
+  { array: '500W array', battery: '24V', estimate: '27A minimum', common: '30A or 40A MPPT' },
+  { array: '800W array', battery: '24V', estimate: '42A minimum', common: '50A MPPT' },
+  { array: '1200W array', battery: '48V', estimate: '32A minimum', common: '40A MPPT' }
+];
+
+const inputVoltageChecks = [
+  'Add panel Voc values when wiring panels in series.',
+  'Cold weather raises panel open-circuit voltage, so leave margin below controller max PV input.',
+  'Parallel wiring raises current instead of voltage, so connector and combiner ratings matter.',
+  'Confirm the controller supports the battery voltage automatically or by configuration.',
+  'Check LiFePO4 charge voltage settings instead of assuming the default lead-acid profile is correct.',
+  'Use appropriate fuses, breakers, disconnects, and wire gauge on both PV and battery sides.'
+];
+
+const redFlags = [
+  'Controller amp rating is lower than array watts divided by battery voltage plus headroom.',
+  'Panel series voltage can exceed controller max PV input on cold mornings.',
+  'Controller does not support the battery chemistry or voltage architecture.',
+  'PV connector, breaker, or combiner ratings are ignored when adding panels in parallel.',
+  'The system is expanded later but the original controller has no remaining headroom.'
+];
+
+const faqItems = [
+  {
+    question: 'How many amps should my RV solar charge controller be?',
+    answer: 'Estimate panel watts divided by battery voltage, add headroom, then round up to a common MPPT size. For example, 500W into a 24V battery is about 21A before headroom, so a 30A or 40A controller is a practical range.'
+  },
+  {
+    question: 'Can I oversize solar panels on an MPPT controller?',
+    answer: 'Some controllers allow limited panel overbuild, but you must stay within the manufacturer limits for PV input voltage, current, and power. Do not guess; check the datasheet.'
+  },
+  {
+    question: 'Is a 40A MPPT enough for RV solar?',
+    answer: 'It depends on array watts and battery voltage. A 40A controller can be plenty for many 24V RV arrays, but may be small for a large 12V array.'
+  },
+  {
+    question: 'What is more important: MPPT amps or PV input voltage?',
+    answer: 'Both matter. Amp rating controls battery-side charging output, while PV input voltage controls how panels can be wired in series without exceeding the controller limit.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
+  }))
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Off-Grid Solar Calculator', item: new URL('/calculator/off-grid-solar/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: 'MPPT Charge Controller Sizing for RV Solar', item: new URL('/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/', Astro.site).toString() }
+  ]
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+  </Fragment>
+
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>&larr;</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
+
+      <header class="solar-seo-hero">
+        <p>Controller sizing guide</p>
+        <h1>MPPT Charge Controller Sizing for RV Solar</h1>
+        <span>
+          An MPPT controller must match the solar array, battery voltage, LiFePO4 charge profile, PV input voltage, and future expansion plan. Undersizing it can quietly limit the whole system.
+        </span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Estimate panel watts</a>
+          <a href="/calculator/off-grid-solar/guide/lifepo4-battery-size-rv-solar/" class="solar-button-secondary">Size battery first</a>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-4">
+        {sizingSteps.map((step) => (
+          <article class="solar-panel p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{step.title}</p>
+            <p class="mt-3 text-sm leading-7 text-slate-600">{step.text}</p>
+          </article>
+        ))}
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Amp examples</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Panel watts and battery voltage set controller current</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="solar-data-table">
+              <thead>
+                <tr>
+                  <th>Array</th>
+                  <th>Battery</th>
+                  <th>With headroom</th>
+                  <th>Common class</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ampExamples.map((row) => (
+                  <tr>
+                    <td>{row.array}</td>
+                    <td>{row.battery}</td>
+                    <td>{row.estimate}</td>
+                    <td>{row.common}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <aside class="solar-result-panel p-5 text-white md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Quick formula</p>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Controller amps = panel watts / battery volts x headroom</h2>
+          <p class="mt-3 text-sm leading-7 text-white/72">
+            This formula estimates the battery-side output current. It does not replace the datasheet checks for maximum PV input voltage, short-circuit current, battery chemistry support, or temperature limits.
+          </p>
+          <a href="/calculator/off-grid-solar/#recommendations" class="mt-5 inline-flex rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300">See MPPT search links</a>
+        </aside>
+      </section>
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">PV input checks</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Do not size by amps alone</h2>
+          <ul class="solar-check-list mt-5">
+            {inputVoltageChecks.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Red flags</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Signs the controller is the wrong size</h2>
+          <ul class="solar-check-list mt-5">
+            {redFlags.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">MPPT sizing questions</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/#calculator" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Run calculator &rarr;</a>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-2">
+          {faqItems.map((item) => (
+            <details class="solar-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a href="/calculator/off-grid-solar/guide/how-many-solar-panels-for-camper-van/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Panels</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">How many panels?</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Estimate panel count before selecting a controller class.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/guide/12v-vs-24v-vs-48v-rv-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Voltage</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Choose 12V, 24V, or 48V</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Battery voltage changes MPPT current and wiring pressure.</span>
+        </a>
+        <a href="/calculator/off-grid-solar/" class="solar-profile-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Calculator</p>
+          <h2 class="mt-2 text-xl font-semibold text-slate-950">Generate a full baseline</h2>
+          <span class="mt-2 block text-sm leading-6 text-slate-600">Calculate battery, panels, controller, and inverter together.</span>
+        </a>
+      </section>
+
+      <SolarGuideNavigation currentHref="/calculator/off-grid-solar/guide/mppt-charge-controller-sizing-rv-solar/" />
+    </section>
+  </main>
+</Layout>
