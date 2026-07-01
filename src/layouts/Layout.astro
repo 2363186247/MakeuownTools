@@ -323,18 +323,18 @@ const siteSchema = {
     <slot />
 
     {isToolPath && popularSearchLinks.length > 0 && (
-      <aside class="mx-auto mt-10 w-full max-w-7xl px-6 md:px-8">
-        <div class="rounded-3xl border border-white/12 bg-white/[0.03] p-5 md:p-7">
+      <aside class="site-popular-search mx-auto mt-10 w-full max-w-7xl px-6 md:px-8">
+        <div class="site-popular-search-panel rounded-3xl border border-white/12 bg-white/[0.03] p-5 md:p-7">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-cyan-100">Popular Search Scenarios</h2>
-              <p class="mt-2 text-sm text-zinc-300">These anchor texts connect crawlers to the exact long-tail use cases people search for.</p>
+              <h2 class="site-popular-search-title text-sm font-semibold uppercase tracking-[0.14em] text-cyan-100">Popular Search Scenarios</h2>
+              <p class="site-popular-search-copy mt-2 text-sm text-zinc-300">These anchor texts connect crawlers to the exact long-tail use cases people search for.</p>
             </div>
-            <span class="text-xs uppercase tracking-[0.14em] text-zinc-500">Long-tail anchors</span>
+            <span class="site-popular-search-kicker text-xs uppercase tracking-[0.14em] text-zinc-500">Long-tail anchors</span>
           </div>
           <div class="mt-4 flex flex-wrap gap-2">
             {popularSearchLinks.map((link) => (
-              <a href={link.href} class="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-300/20 hover:text-white">
+              <a href={link.href} class="site-popular-search-link rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-300/20 hover:text-white">
                 {link.label}
               </a>
             ))}
@@ -344,13 +344,13 @@ const siteSchema = {
     )}
 
     {isToolPath && (
-      <aside class="mx-auto mt-12 w-full max-w-7xl px-6 pb-12 md:px-8">
-        <div class="rounded-3xl border border-white/12 bg-white/[0.03] p-5 md:p-7">
-          <h2 class="text-sm font-semibold uppercase tracking-[0.14em] text-cyan-100">Related Tools</h2>
-          <p class="mt-2 text-sm text-zinc-300">Explore more calculators to improve internal linking depth and help crawlers discover long-tail pages faster.</p>
+      <aside class="site-related-tools mx-auto mt-12 w-full max-w-7xl px-6 pb-12 md:px-8">
+        <div class="site-related-tools-panel rounded-3xl border border-white/12 bg-white/[0.03] p-5 md:p-7">
+          <h2 class="site-related-tools-title text-sm font-semibold uppercase tracking-[0.14em] text-cyan-100">Related Tools</h2>
+          <p class="site-related-tools-copy mt-2 text-sm text-zinc-300">Explore more calculators to improve internal linking depth and help crawlers discover long-tail pages faster.</p>
           <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {relatedToolsLinks.map((link) => (
-              <a href={link.href} class="rounded-xl border border-white/12 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
+              <a href={link.href} class="site-related-tools-link rounded-xl border border-white/12 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-cyan-300/40 hover:text-white">
                 {link.label}
               </a>
             ))}
@@ -359,7 +359,7 @@ const siteSchema = {
       </aside>
     )}
 
-    <footer class="mx-auto w-full max-w-7xl px-6 pb-10 pt-4 md:px-8">
+    <footer class="site-footer mx-auto w-full max-w-7xl px-6 pb-10 pt-4 md:px-8">
       <div class="border-t border-white/10 pt-6">
         <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div class="max-w-2xl">

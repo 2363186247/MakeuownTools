@@ -10,158 +10,497 @@ const solarHubTitle = pickSeoTitle(
   'Off-Grid Solar Calculator | Battery Ah, Panel Watts, 12V/24V/48V',
   'RV Solar and Battery Sizing Calculator | 12V 24V 48V Planner'
 );
+
+const buildProfiles = [
+  {
+    name: 'Weekend Van',
+    loads: 'Fridge, lights, laptop, fan',
+    range: '500-900 Wh/day',
+    href: '/calculator/off-grid-solar/60w-1440m-plus-40w-480m-plus-45w-480m-plus-40w-300m-12v-4sunh-1day-off-grid-solar-battery-calculator/'
+  },
+  {
+    name: 'Remote Work RV',
+    loads: 'Fridge, Starlink, laptop, lights',
+    range: '1.1-1.8 kWh/day',
+    href: '/calculator/off-grid-solar/off-grid-solar-starlink-rv-75w-480m-plus-90w-360m-plus-40w-300m-24v-4.8sunh-1day-off-grid-solar-battery-calculator/'
+  },
+  {
+    name: 'Microwave + Fridge',
+    loads: 'Compressor fridge and short high-watt loads',
+    range: '1.5-2.4 kWh/day',
+    href: '/calculator/off-grid-solar/60w-1440m-plus-1000w-10m-plus-40w-300m-24v-5sunh-1day-off-grid-solar-battery-calculator/'
+  }
+];
+
+const shoppingTiers = [
+  {
+    id: 'budget',
+    label: 'Budget',
+    title: 'Minimum Viable Kit',
+    description: 'For weekend trips, low daily loads, and buyers who want a small expandable baseline.',
+    bestFor: 'Light loads, short trips, tight budget',
+    accent: 'amber'
+  },
+  {
+    id: 'balanced',
+    label: 'Balanced',
+    title: 'Recommended Build',
+    description: 'The practical middle path: enough reserve for normal weather variation without overspending too early.',
+    bestFor: 'Most RV and vanlife setups',
+    accent: 'emerald',
+    featured: true
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    title: 'Weather Buffer Build',
+    description: 'For heavier appliances, remote work, cloudy regions, or people who prefer headroom over compactness.',
+    bestFor: 'High loads, cloudy days, growth room',
+    accent: 'slate'
+  }
+];
+
+const trustPillars = [
+  {
+    label: 'Transparent math',
+    title: 'Every estimate shows the sizing logic',
+    text: 'Battery Ah, panel watts, MPPT current, and inverter headroom are derived from your visible load profile instead of hidden presets.'
+  },
+  {
+    label: 'No brand bias',
+    title: 'Search links stay generic for now',
+    text: 'The buying paths use plain product-category searches, so users can compare brands, reviews, warranties, and local availability.'
+  },
+  {
+    label: 'Safety-first planning',
+    title: 'Spec checks are part of the flow',
+    text: 'Voltage, current, connector type, BMS limits, fuse sizing, and inverter surge rating are called out before a purchase decision.'
+  }
+];
+
+const safetyChecks = [
+  'Match battery voltage with inverter, MPPT controller, and DC appliances.',
+  'Confirm MPPT input voltage and charge current exceed the calculated solar array requirement.',
+  'Check LiFePO4 BMS continuous current against inverter draw and expected surge loads.',
+  'Use properly rated fuses, breakers, wire gauge, and disconnects for the final installation.',
+  'Verify panel dimensions, mounting hardware, roof shading, and connector compatibility before buying.',
+  'Treat the result as a planning baseline, then confirm the final design with a qualified installer when high currents are involved.'
+];
+
+const solarFaqs = [
+  {
+    question: 'Is this calculator a final electrical design?',
+    answer: 'No. It is a first-pass planning tool for sizing battery capacity, solar wattage, MPPT current, and inverter class. High-current DC systems still need proper fuse, wire, breaker, and installation review.'
+  },
+  {
+    question: 'Why does the calculator recommend more solar than the daily load suggests?',
+    answer: 'Real panels rarely produce their nameplate rating all day. The estimate includes charging efficiency and field derating so the shopping list has practical headroom.'
+  },
+  {
+    question: 'Why are the product links not affiliate links yet?',
+    answer: 'The current links are plain search links while the page is being validated. This keeps the page useful and unbiased before any affiliate program is added.'
+  },
+  {
+    question: 'Which tier should most RV users start with?',
+    answer: 'The Balanced tier is the default starting point because it preserves reasonable reserve without jumping straight to a large premium build.'
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: solarFaqs.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+};
 ---
 
 <Layout
   title={solarHubTitle}
   description="Size off-grid systems for RV and cabin loads: daily Wh, battery Ah, solar panel watts, and inverter baseline across 12V, 24V, and 48V."
+  canonical="/calculator/off-grid-solar/"
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
 >
-  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
-    <a href="/calculator/" class="glass-shell mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
-      <span>←</span>
-      <span>All Calculators</span>
-    </a>
+  <main>
+    <section class="relative isolate overflow-hidden bg-slate-950 text-white">
+      <div class="absolute inset-0 -z-10 bg-cover bg-center" style="background-image: linear-gradient(90deg, rgba(8, 13, 20, 0.94) 0%, rgba(8, 13, 20, 0.82) 34%, rgba(8, 13, 20, 0.38) 68%, rgba(8, 13, 20, 0.14) 100%), url('/images/solar-hero.png');"></div>
+      <div class="mx-auto grid min-h-[620px] w-full max-w-7xl content-end px-6 pb-8 pt-8 md:px-8 lg:min-h-[680px]">
+        <a href="/calculator/" class="mb-10 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur transition hover:bg-white/15">
+          <span>←</span>
+          <span>All Calculators</span>
+        </a>
 
-    <header class="glass-shell-strong mb-8 rounded-3xl p-6 md:p-8">
-      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">
-        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-        Off-Grid Power Planner
-      </p>
-      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-5xl">RV Off-Grid Solar & Battery Sizing Calculator</h1>
-      <p class="mt-4 max-w-3xl text-sm leading-7 text-zinc-300 md:text-base">
-        Enter appliance watts and daily usage to estimate required LiFePO4 battery Ah, solar panel wattage, and inverter sizing. Built for RV, vanlife, and camping off-grid setups.
-      </p>
-    </header>
-
-    <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-      <section class="glass-shell rounded-3xl p-6 md:p-8">
-        <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M5 9h14M7 16h10"/></svg>1. Appliance Load Profile</h2>
-        <p class="mb-4 text-xs text-zinc-500">Use real average draw values. Burst loads can be covered by inverter surge headroom.</p>
-
-        <div id="loadRows" class="space-y-3"></div>
-
-        <div class="mt-4 flex flex-wrap gap-2">
-          <button id="addRowBtn" class="rounded-xl border border-amber-200/35 bg-amber-100/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-amber-100 transition hover:bg-amber-100/20">+ Add Appliance</button>
-          <button id="presetRvBtn" class="rounded-xl border border-sky-200/35 bg-sky-100/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-sky-100 transition hover:bg-sky-100/20">Load RV Preset</button>
-          <button id="presetCampBtn" class="rounded-xl border border-emerald-200/35 bg-emerald-100/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-100 transition hover:bg-emerald-100/20">Load Camping Preset</button>
-        </div>
-      </section>
-
-      <section class="glass-shell rounded-3xl p-6 md:p-8">
-        <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>2. System Settings</h2>
-
-        <div class="grid gap-4 sm:grid-cols-2">
-          <label>
-            <span class="mb-1 block text-xs text-zinc-400">Battery Voltage</span>
-            <select id="voltageSelect" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50">
-              <option value="12">12V</option>
-              <option value="24">24V</option>
-              <option value="48">48V</option>
-            </select>
-          </label>
-
-          <label>
-            <span class="mb-1 block text-xs text-zinc-400">Peak Sun Hours</span>
-            <input id="sunHoursInput" type="number" min="1.5" max="10" step="0.1" value="4.5" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
-          </label>
-
-          <label>
-            <span class="mb-1 block text-xs text-zinc-400">Autonomy (Days)</span>
-            <input id="autonomyInput" type="number" min="1" max="4" step="1" value="1" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
-          </label>
-
-          <label>
-            <span class="mb-1 block text-xs text-zinc-400">Battery DoD</span>
-            <input id="dodInput" type="number" min="0.6" max="0.95" step="0.01" value="0.9" class="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
-          </label>
+        <div class="max-w-3xl pb-8">
+          <p class="mb-4 inline-flex items-center rounded-full border border-amber-200/40 bg-amber-200/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">
+            RV Solar Planner
+          </p>
+          <h1 class="max-w-3xl text-4xl font-semibold leading-[1.02] tracking-tight text-white md:text-6xl">
+            Size an off-grid solar system before you buy hardware.
+          </h1>
+          <p class="mt-5 max-w-2xl text-base leading-8 text-white/76 md:text-lg">
+            Estimate battery Ah, solar panel watts, MPPT current, and inverter headroom for RV, vanlife, camping, and cabin loads.
+          </p>
+          <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a href="#calculator" class="inline-flex items-center justify-center rounded-xl bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-950/20 transition hover:bg-amber-300">
+              Start sizing
+            </a>
+            <a href="#recommendations" class="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15">
+              See product checklist
+            </a>
+          </div>
         </div>
 
-        <p class="mt-4 text-xs text-zinc-500">Tip: leave defaults if uncertain. Values are tuned for LiFePO4 planning and conservative solar derating.</p>
+        <div class="grid gap-3 border-t border-white/14 pt-5 sm:grid-cols-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.14em] text-white/50">Best for</p>
+            <p class="mt-1 text-sm font-medium text-white">RV, vanlife, cabin backup</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-[0.14em] text-white/50">Outputs</p>
+            <p class="mt-1 text-sm font-medium text-white">Battery, panels, MPPT, inverter</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-[0.14em] text-white/50">Planning modes</p>
+            <p class="mt-1 text-sm font-medium text-white">12V, 24V, 48V systems</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="calculator" class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+      <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Solar sizing console</p>
+          <h2 class="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">Build a load profile</h2>
+        </div>
+        <p class="max-w-2xl text-sm leading-7 text-slate-600">
+          Use average draw and daily runtime. The calculator adds conservative charge loss and field derating so the result is useful for first-pass purchasing decisions.
+        </p>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <section class="solar-panel p-5 md:p-6">
+          <div class="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Step 1</p>
+              <h3 class="mt-1 text-xl font-semibold text-slate-950">Appliance load profile</h3>
+            </div>
+            <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Wh/day input</span>
+          </div>
+
+          <div id="loadRows" class="space-y-3"></div>
+
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button id="addRowBtn" class="solar-button-secondary" type="button">Add appliance</button>
+            <button id="presetRvBtn" class="solar-button-secondary" type="button">RV preset</button>
+            <button id="presetCampBtn" class="solar-button-secondary" type="button">Camping preset</button>
+          </div>
+        </section>
+
+        <section class="solar-panel p-5 md:p-6">
+          <div class="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Step 2</p>
+              <h3 class="mt-1 text-xl font-semibold text-slate-950">System assumptions</h3>
+            </div>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">LiFePO4 tuned</span>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="solar-field">
+              <span>Battery voltage</span>
+              <select id="voltageSelect">
+                <option value="12">12V</option>
+                <option value="24" selected>24V</option>
+                <option value="48">48V</option>
+              </select>
+            </label>
+
+            <label class="solar-field">
+              <span>Peak sun hours</span>
+              <input id="sunHoursInput" type="number" min="1.5" max="10" step="0.1" value="4.5" />
+            </label>
+
+            <label class="solar-field">
+              <span>Autonomy days</span>
+              <input id="autonomyInput" type="number" min="1" max="4" step="1" value="1" />
+            </label>
+
+            <label class="solar-field">
+              <span>Usable DoD</span>
+              <input id="dodInput" type="number" min="0.6" max="0.95" step="0.01" value="0.9" />
+            </label>
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-sm font-semibold text-amber-950">Planning assumptions</p>
+            <p class="mt-2 text-sm leading-6 text-amber-900/80">
+              Battery sizing includes reserve and usable depth-of-discharge. Solar sizing includes charge efficiency and real-world panel derating.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <section class="mt-6 grid gap-6">
+        <div class="solar-result-panel p-5 text-white md:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Step 3</p>
+              <h3 class="mt-1 text-2xl font-semibold tracking-tight">Sizing result</h3>
+            </div>
+            <span id="resultBadge" class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">Ready</span>
+          </div>
+
+          <p id="systemNarrative" class="mt-4 text-sm leading-7 text-white/72">
+            Add loads to generate a practical build range.
+          </p>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="solar-metric-card">
+              <p>Daily load</p>
+              <strong id="dailyWhOut">0 Wh</strong>
+            </article>
+            <article class="solar-metric-card">
+              <p>Battery bank</p>
+              <strong id="batteryAhOut">0 Ah</strong>
+            </article>
+            <article class="solar-metric-card">
+              <p>Solar array</p>
+              <strong id="solarWOut">0 W</strong>
+            </article>
+            <article class="solar-metric-card">
+              <p>Inverter baseline</p>
+              <strong id="inverterWOut">0 W</strong>
+            </article>
+          </div>
+        </div>
+
+        <section id="recommendations" class="solar-panel p-5 md:p-6">
+          <div class="mb-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Buying tiers</p>
+            <h3 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Three non-affiliate shopping paths</h3>
+            <p id="recommendationSummary" class="mt-3 text-sm leading-7 text-slate-600">
+              Recommendations update from the calculator result.
+            </p>
+          </div>
+
+          <div class="solar-buying-grid">
+            {shoppingTiers.map((tier) => (
+              <article class={`solar-tier-card ${tier.featured ? 'is-featured' : ''}`} data-tier={tier.id}>
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class={`solar-tier-eyebrow solar-tier-${tier.accent}`}>{tier.label}</p>
+                    <h4 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">{tier.title}</h4>
+                  </div>
+                  {tier.featured && <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Best fit</span>}
+                </div>
+                <p class="mt-3 text-sm leading-6 text-slate-600">{tier.description}</p>
+                <p class="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{tier.bestFor}</p>
+
+                <dl class="solar-tier-list">
+                  <div><dt>Battery</dt><dd id={`${tier.id}BatteryOut`}>-</dd></div>
+                  <div><dt>Panels</dt><dd id={`${tier.id}PanelOut`}>-</dd></div>
+                  <div><dt>MPPT</dt><dd id={`${tier.id}ControllerOut`}>-</dd></div>
+                  <div><dt>Inverter</dt><dd id={`${tier.id}InverterOut`}>-</dd></div>
+                </dl>
+
+                <div class="solar-tier-actions">
+                  <a id={`${tier.id}BatteryLink`} href="https://www.amazon.com/s?k=LiFePO4+battery" target="_blank" rel="nofollow noopener" class="solar-search-link">Battery search</a>
+                  <a id={`${tier.id}PanelLink`} href="https://www.amazon.com/s?k=solar+panel+kit" target="_blank" rel="nofollow noopener" class="solar-search-link">Panel search</a>
+                  <a id={`${tier.id}ControllerLink`} href="https://www.amazon.com/s?k=MPPT+solar+charge+controller" target="_blank" rel="nofollow noopener" class="solar-search-link">MPPT search</a>
+                  <a id={`${tier.id}InverterLink`} href="https://www.amazon.com/s?k=pure+sine+inverter" target="_blank" rel="nofollow noopener" class="solar-search-link">Inverter search</a>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <p class="solar-non-affiliate-note">
+            These are plain search links without affiliate tags. Use them as comparison starting points, then verify voltage, current, connector, warranty, and safety specs before buying.
+          </p>
+
+          <div class="solar-conversion-panel mt-5">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Ready to compare parts?</p>
+              <h4 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">Save the balanced build before opening shopping tabs.</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                Copy the current recommendation, then use the tier links as research starting points. This keeps the calculator useful even before affiliate links are enabled.
+              </p>
+              <p id="copyStatus" class="mt-3 text-sm font-semibold text-emerald-700" aria-live="polite"></p>
+            </div>
+            <div class="solar-conversion-actions">
+              <button id="copyBalancedBtn" type="button" class="solar-button-primary">Copy balanced list</button>
+              <a href="#solar-checklist" class="solar-button-secondary">Review safety checks</a>
+            </div>
+          </div>
+        </section>
       </section>
-    </div>
+    </section>
 
-    <section class="glass-shell-strong mt-6 rounded-3xl border-amber-300/20 p-6 md:p-8">
-      <h2 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-amber-100"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M8 14h8M10 11h4"/></svg>3. Sizing Output</h2>
-      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <article class="glass-shell rounded-2xl p-4">
-          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Daily Load</p>
-          <p id="dailyWhOut" class="mt-1 font-mono text-2xl text-white">0 Wh</p>
-        </article>
-        <article class="glass-shell rounded-2xl p-4">
-          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Battery Bank</p>
-          <p id="batteryAhOut" class="mt-1 font-mono text-2xl text-cyan-100">0 Ah</p>
-        </article>
-        <article class="glass-shell rounded-2xl p-4">
-          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Solar Array</p>
-          <p id="solarWOut" class="mt-1 font-mono text-2xl text-emerald-100">0 W</p>
-        </article>
-        <article class="glass-shell rounded-2xl p-4">
-          <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Inverter Baseline</p>
-          <p id="inverterWOut" class="mt-1 font-mono text-2xl text-amber-100">0 W</p>
-        </article>
+    <section class="solar-band">
+      <div class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+        <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Build profiles</p>
+            <h2 class="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Start from a real scenario</h2>
+          </div>
+          <p class="max-w-2xl text-sm leading-7 text-slate-600">
+            These pages target common RV and off-grid search intents while keeping the calculator close to real appliance patterns.
+          </p>
+        </div>
+
+        <div class="grid gap-4 lg:grid-cols-3">
+          {buildProfiles.map((profile) => (
+            <a href={profile.href} class="solar-profile-card group">
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{profile.range}</p>
+              <h3 class="mt-3 text-xl font-semibold text-slate-950">{profile.name}</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-600">{profile.loads}</p>
+              <p class="mt-5 text-sm font-semibold text-slate-950">Open profile <span class="transition group-hover:translate-x-0.5">→</span></p>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
 
-    <section class="glass-shell mt-6 rounded-3xl p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Popular Long-Tail Solar Calculators</h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <a href="/calculator/off-grid-solar/60w-1440m-plus-1000w-10m-12v-4sunh-1day-off-grid-solar-battery-calculator/" class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:text-white">60W Fridge + 1000W Microwave · 12V</a>
-        <a href="/calculator/off-grid-solar/60w-1440m-plus-1000w-10m-plus-40w-300m-24v-5sunh-1day-off-grid-solar-battery-calculator/" class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:text-white">Fridge + Microwave + Lights · 24V</a>
-        <a href="/calculator/off-grid-solar/60w-1440m-plus-75w-480m-plus-90w-360m-plus-40w-300m-48v-4sunh-2day-off-grid-solar-battery-calculator/" class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:text-white">Fridge + Starlink + Laptop · 48V</a>
+    <section class="solar-band solar-band-strong">
+      <div class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+        <div class="mb-6 max-w-3xl">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Trust layer</p>
+          <h2 class="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">Planning guidance users can audit before they buy</h2>
+          <p class="mt-3 text-sm leading-7 text-slate-600">
+            This section explains how the recommendation is produced, where the limits are, and what must be checked before turning a shopping list into a real installation.
+          </p>
+        </div>
+
+        <div class="grid gap-4 lg:grid-cols-3">
+          {trustPillars.map((pillar) => (
+            <article class="solar-trust-card">
+              <p>{pillar.label}</p>
+              <h3>{pillar.title}</h3>
+              <span>{pillar.text}</span>
+            </article>
+          ))}
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+          <section class="solar-panel p-5 md:p-6">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Method</p>
+            <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">How the estimate works</h3>
+            <div class="solar-method-grid mt-5">
+              <div><strong>Daily load</strong><span>Appliance watts multiplied by daily runtime.</span></div>
+              <div><strong>Battery</strong><span>Daily Wh, autonomy days, usable DoD, reserve, and voltage.</span></div>
+              <div><strong>Solar</strong><span>Daily Wh divided by sun hours, then adjusted for charging and panel derating.</span></div>
+              <div><strong>Inverter</strong><span>Highest single load plus headroom for startup and short bursts.</span></div>
+            </div>
+          </section>
+
+          <section id="solar-checklist" class="solar-panel p-5 md:p-6">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pre-buy checklist</p>
+            <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Check these before purchasing hardware</h3>
+            <ul class="solar-check-list mt-5">
+              {safetyChecks.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+
+        <section class="mt-6">
+          <div class="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+              <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Quick answers for cautious buyers</h3>
+            </div>
+            <p class="max-w-2xl text-sm leading-7 text-slate-600">
+              These answers also support search snippets and make the page feel less like a bare calculator.
+            </p>
+          </div>
+          <div class="grid gap-3 lg:grid-cols-2">
+            {solarFaqs.map((item) => (
+              <details class="solar-faq-item">
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
       </div>
     </section>
 
-    <section class="glass-shell mt-6 rounded-3xl p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Regional Sunlight Matrix Pages</h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {regionKeywords.map((item) => (
-          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            {item.keywordLabel} · {item.voltage}V · {item.sunHours}h sun
-          </a>
-        ))}
+    <section class="solar-band">
+      <div class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
+        <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Solar content paths</p>
+            <h2 class="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Explore related sizing pages</h2>
+          </div>
+          <p class="max-w-2xl text-sm leading-7 text-slate-600">
+            These internal links keep visitors moving through real purchase-intent scenarios instead of landing on a single isolated tool.
+          </p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+          <section class="solar-panel p-5 md:p-6">
+            <h3 class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Regional sunlight matrix</h3>
+            <div class="grid gap-3">
+              {regionKeywords.map((item) => (
+                <a href={`/calculator/off-grid-solar/${item.slug}/`} class="solar-link-tile">
+                  {item.keywordLabel} · {item.voltage}V · {item.sunHours}h sun
+                </a>
+              ))}
+            </div>
+          </section>
+
+          <section class="solar-panel p-5 md:p-6">
+            <h3 class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Battery chemistry pages</h3>
+            <div class="grid gap-3">
+              {chemistryKeywords.map((item) => (
+                <a href={`/calculator/off-grid-solar/${item.slug}/`} class="solar-link-tile">
+                  {item.keywordLabel} · {item.voltage}V sizing
+                </a>
+              ))}
+            </div>
+          </section>
+
+          <section class="solar-panel p-5 md:p-6">
+            <h3 class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Brand-tuned load profiles</h3>
+            <div class="grid gap-3">
+              {brandKeywords.map((item) => (
+                <a href={`/calculator/off-grid-solar/${item.slug}/`} class="solar-link-tile">
+                  {item.keywordLabel} · {item.voltage}V
+                </a>
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </section>
 
-    <section class="glass-shell mt-6 rounded-3xl p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Battery Chemistry Pages</h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {chemistryKeywords.map((item) => (
-          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            {item.keywordLabel} · {item.voltage}V sizing
-          </a>
-        ))}
+    <section class="solar-band">
+      <div class="mx-auto grid w-full max-w-7xl gap-6 px-6 py-10 md:px-8 md:py-12 lg:grid-cols-[1fr_1.1fr]">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Related calculators</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Plan the rest of the system</h2>
+          <p class="mt-3 text-sm leading-7 text-slate-600">
+            Solar sizing usually connects to storage, deployment, and hardware planning. Keep the decision flow moving without returning to search.
+          </p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <a href="/calculator/nas-raid/" data-tool-link data-tool-name="NAS & RAID Storage Calculator" class="solar-link-tile">NAS & RAID Capacity</a>
+          <a href="/calculator/vram/" data-tool-link data-tool-name="LLM VRAM Calculator" class="solar-link-tile">LLM VRAM Planning</a>
+          <a href="/docker/" data-tool-link data-tool-name="Docker Compose Generator" class="solar-link-tile">Docker Compose Generator</a>
+          <a href="/reverse-proxy/" data-tool-link data-tool-name="Reverse Proxy Config Generator" class="solar-link-tile">Reverse Proxy Generator</a>
+        </div>
       </div>
-    </section>
-
-    <section class="mt-6 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Brand-Tuned Load Profiles</h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {brandKeywords.map((item) => (
-          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            {item.keywordLabel} · {item.voltage}V
-          </a>
-        ))}
-      </div>
-    </section>
-
-    <section class="glass-shell mt-6 rounded-3xl p-6 md:p-8">
-      <h3 class="mb-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16"/><path d="M12 4v16"/></svg>Explore Other Calculators</h3>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <a href="/calculator/vram/" data-tool-link data-tool-name="LLM VRAM Calculator" class="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-300/20">LLM VRAM Planning</a>
-        <a href="/calculator/nas-raid/" data-tool-link data-tool-name="NAS & RAID Storage Calculator" class="rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-300/20">NAS & RAID Capacity</a>
-        <a href="/calculator/3d-printing/" data-tool-link data-tool-name="3D Printing Filament Navigator" class="rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-3 text-sm font-medium text-emerald-100 transition hover:bg-emerald-300/20">3D Printing Profiles</a>
-        <a href="/calculator/satisfactory/" data-tool-link data-tool-name="Satisfactory Factory Reverse Planner" class="rounded-xl border border-orange-300/25 bg-orange-300/10 px-4 py-3 text-sm font-medium text-orange-100 transition hover:bg-orange-300/20">Satisfactory Planner</a>
-      </div>
-    </section>
-
-    <section class="glass-shell mt-6 rounded-3xl p-6 md:p-8" id="recentToolsSection">
-      <div class="mb-4 flex items-center justify-between gap-3">
-        <h3 class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-amber-200" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>Recently Visited Tools</h3>
-        <button id="clearRecentTools" class="text-xs uppercase tracking-[0.12em] text-zinc-500 transition hover:text-zinc-300">Clear</button>
-      </div>
-      <div id="recentToolsList" class="flex flex-wrap gap-2"></div>
     </section>
   </main>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
 
   <script>
     type LoadRow = { name: string; watts: number; hours: number };
@@ -170,6 +509,7 @@ const solarHubTitle = pickSeoTitle(
     const addRowBtn = document.getElementById('addRowBtn');
     const presetRvBtn = document.getElementById('presetRvBtn');
     const presetCampBtn = document.getElementById('presetCampBtn');
+    const copyBalancedBtn = document.getElementById('copyBalancedBtn');
 
     const voltageSelect = document.getElementById('voltageSelect');
     const sunHoursInput = document.getElementById('sunHoursInput');
@@ -180,12 +520,17 @@ const solarHubTitle = pickSeoTitle(
     const batteryAhOut = document.getElementById('batteryAhOut');
     const solarWOut = document.getElementById('solarWOut');
     const inverterWOut = document.getElementById('inverterWOut');
+    const resultBadge = document.getElementById('resultBadge');
+    const systemNarrative = document.getElementById('systemNarrative');
+    const recommendationSummary = document.getElementById('recommendationSummary');
+    const copyStatus = document.getElementById('copyStatus');
 
     if (
       !(loadRows instanceof HTMLElement) ||
       !(addRowBtn instanceof HTMLButtonElement) ||
       !(presetRvBtn instanceof HTMLButtonElement) ||
       !(presetCampBtn instanceof HTMLButtonElement) ||
+      !(copyBalancedBtn instanceof HTMLButtonElement) ||
       !(voltageSelect instanceof HTMLSelectElement) ||
       !(sunHoursInput instanceof HTMLInputElement) ||
       !(autonomyInput instanceof HTMLInputElement) ||
@@ -193,7 +538,11 @@ const solarHubTitle = pickSeoTitle(
       !(dailyWhOut instanceof HTMLElement) ||
       !(batteryAhOut instanceof HTMLElement) ||
       !(solarWOut instanceof HTMLElement) ||
-      !(inverterWOut instanceof HTMLElement)
+      !(inverterWOut instanceof HTMLElement) ||
+      !(resultBadge instanceof HTMLElement) ||
+      !(systemNarrative instanceof HTMLElement) ||
+      !(recommendationSummary instanceof HTMLElement) ||
+      !(copyStatus instanceof HTMLElement)
     ) {
       throw new Error('Off-grid solar calculator UI is missing required elements.');
     }
@@ -202,27 +551,114 @@ const solarHubTitle = pickSeoTitle(
     const addRowBtnEl = addRowBtn as HTMLButtonElement;
     const presetRvBtnEl = presetRvBtn as HTMLButtonElement;
     const presetCampBtnEl = presetCampBtn as HTMLButtonElement;
+    const copyBalancedBtnEl = copyBalancedBtn as HTMLButtonElement;
     const voltageSelectEl = voltageSelect as HTMLSelectElement;
     const sunHoursInputEl = sunHoursInput as HTMLInputElement;
     const autonomyInputEl = autonomyInput as HTMLInputElement;
     const dodInputEl = dodInput as HTMLInputElement;
-    const dailyWhOutEl = dailyWhOut as HTMLElement;
-    const batteryAhOutEl = batteryAhOut as HTMLElement;
-    const solarWOutEl = solarWOut as HTMLElement;
-    const inverterWOutEl = inverterWOut as HTMLElement;
+    const tierIds = ['budget', 'balanced', 'premium'] as const;
+    let balancedCopyText = '';
+    type TierId = typeof tierIds[number];
+    type TierElements = {
+      batteryOut: HTMLElement;
+      panelOut: HTMLElement;
+      controllerOut: HTMLElement;
+      inverterOut: HTMLElement;
+      batteryLink: HTMLAnchorElement;
+      panelLink: HTMLAnchorElement;
+      controllerLink: HTMLAnchorElement;
+      inverterLink: HTMLAnchorElement;
+    };
+
+    function requireElement<T extends HTMLElement>(id: string, ctor: { new (...args: any[]): T }): T {
+      const node = document.getElementById(id);
+      if (!(node instanceof ctor)) throw new Error(`Missing Solar tier element: ${id}`);
+      return node;
+    }
+
+    const tierElements = Object.fromEntries(tierIds.map((id) => [
+      id,
+      {
+        batteryOut: requireElement(`${id}BatteryOut`, HTMLElement),
+        panelOut: requireElement(`${id}PanelOut`, HTMLElement),
+        controllerOut: requireElement(`${id}ControllerOut`, HTMLElement),
+        inverterOut: requireElement(`${id}InverterOut`, HTMLElement),
+        batteryLink: requireElement(`${id}BatteryLink`, HTMLAnchorElement),
+        panelLink: requireElement(`${id}PanelLink`, HTMLAnchorElement),
+        controllerLink: requireElement(`${id}ControllerLink`, HTMLAnchorElement),
+        inverterLink: requireElement(`${id}InverterLink`, HTMLAnchorElement)
+      }
+    ])) as Record<TierId, TierElements>;
 
     let rows: LoadRow[] = [
       { name: 'Fridge', watts: 60, hours: 24 },
-      { name: 'Microwave', watts: 1000, hours: 10 / 60 }
+      { name: 'Microwave', watts: 1000, hours: 10 / 60 },
+      { name: 'LED lights', watts: 40, hours: 5 }
     ];
+
+    function escapeHtml(value: string): string {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function roundUp(value: number, step: number): number {
+      return Math.ceil(value / step) * step;
+    }
+
+    function buildAmazonSearch(query: string): string {
+      return `https://www.amazon.com/s?k=${encodeURIComponent(query)}`;
+    }
+
+    function controllerFor(panelWatts: number, voltage: number): number {
+      return roundUp((panelWatts / voltage) * 1.25, 10);
+    }
+
+    function writeTier(
+      id: TierId,
+      label: string,
+      voltage: number,
+      batteryAh: number,
+      panelWatts: number,
+      controllerAmps: number,
+      inverterWatts: number
+    ): void {
+      const els = tierElements[id];
+      els.batteryOut.textContent = `${batteryAh}Ah LiFePO4 @ ${voltage}V`;
+      els.panelOut.textContent = `${panelWatts}W solar panel class`;
+      els.controllerOut.textContent = `${controllerAmps}A MPPT minimum`;
+      els.inverterOut.textContent = `${inverterWatts}W pure sine`;
+
+      els.batteryLink.href = buildAmazonSearch(`${voltage}V ${batteryAh}Ah LiFePO4 battery`);
+      els.panelLink.href = buildAmazonSearch(`${panelWatts}W solar panel kit RV`);
+      els.controllerLink.href = buildAmazonSearch(`${controllerAmps}A MPPT solar charge controller ${voltage}V`);
+      els.inverterLink.href = buildAmazonSearch(`${inverterWatts}W pure sine inverter ${voltage}V`);
+
+      els.batteryLink.setAttribute('aria-label', `${label}: search ${batteryAh}Ah LiFePO4 battery`);
+      els.panelLink.setAttribute('aria-label', `${label}: search ${panelWatts}W solar panels`);
+      els.controllerLink.setAttribute('aria-label', `${label}: search ${controllerAmps}A MPPT controller`);
+      els.inverterLink.setAttribute('aria-label', `${label}: search ${inverterWatts}W pure sine inverter`);
+    }
 
     function renderRows(): void {
       loadRowsEl.innerHTML = rows.map((row, index) => `
-        <div class="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-3 md:grid-cols-[1fr_120px_120px_56px]">
-          <input data-k="name" data-i="${index}" type="text" value="${row.name}" class="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
-          <input data-k="watts" data-i="${index}" type="number" min="0" step="1" value="${row.watts}" class="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
-          <input data-k="hours" data-i="${index}" type="number" min="0" step="0.1" value="${row.hours.toFixed(2)}" class="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50" />
-          <button data-k="del" data-i="${index}" class="rounded-lg border border-red-300/30 bg-red-300/10 px-2 py-2 text-xs font-semibold text-red-100">Del</button>
+        <div class="solar-load-row">
+          <label>
+            <span>Appliance</span>
+            <input data-k="name" data-i="${index}" type="text" value="${escapeHtml(row.name)}" />
+          </label>
+          <label>
+            <span>Watts</span>
+            <input data-k="watts" data-i="${index}" type="number" min="0" step="1" value="${row.watts}" />
+          </label>
+          <label>
+            <span>Hours/day</span>
+            <input data-k="hours" data-i="${index}" type="number" min="0" step="0.1" value="${row.hours.toFixed(2)}" />
+          </label>
+          <button data-k="del" data-i="${index}" type="button" aria-label="Remove ${escapeHtml(row.name)}">Remove</button>
         </div>
       `).join('');
     }
@@ -233,7 +669,7 @@ const solarHubTitle = pickSeoTitle(
     }
 
     function compute(): void {
-      const voltage = Math.max(12, readNum(voltageSelectEl.value, 12));
+      const voltage = Math.max(12, readNum(voltageSelectEl.value, 24));
       const sunHours = Math.max(1.5, readNum(sunHoursInputEl.value, 4.5));
       const autonomy = Math.max(1, readNum(autonomyInputEl.value, 1));
       const dod = Math.min(0.95, Math.max(0.6, readNum(dodInputEl.value, 0.9)));
@@ -244,11 +680,40 @@ const solarHubTitle = pickSeoTitle(
       const batteryAh = effectiveBatteryWh / voltage;
       const solarW = whDaily / sunHours / (0.92 * 0.75);
       const inverter = Math.max(...rows.map((row) => row.watts), 300) * 1.25;
+      const batteryRound = roundUp(Math.max(50, batteryAh), 50);
+      const panelRound = roundUp(Math.max(100, solarW), 100);
+      const controllerAmps = controllerFor(panelRound, voltage);
+      const inverterRound = roundUp(Math.max(500, inverter), 500);
+      const budgetBattery = roundUp(Math.max(50, batteryRound * 0.75), 50);
+      const budgetPanel = roundUp(Math.max(100, panelRound * 0.75), 100);
+      const budgetController = controllerFor(budgetPanel, voltage);
+      const budgetInverter = roundUp(Math.max(500, inverterRound * 0.75), 500);
+      const premiumBattery = roundUp(Math.max(100, batteryRound * 1.4), 50);
+      const premiumPanel = roundUp(Math.max(200, panelRound * 1.45), 100);
+      const premiumController = controllerFor(premiumPanel, voltage);
+      const premiumInverter = roundUp(Math.max(1000, inverterRound * 1.35), 500);
 
-      dailyWhOutEl.textContent = `${whDaily.toFixed(0)} Wh`;
-      batteryAhOutEl.textContent = `${batteryAh.toFixed(1)} Ah @ ${voltage}V`;
-      solarWOutEl.textContent = `${solarW.toFixed(0)} W`;
-      inverterWOutEl.textContent = `${inverter.toFixed(0)} W`;
+      dailyWhOut.textContent = `${whDaily.toFixed(0)} Wh`;
+      batteryAhOut.textContent = `${batteryAh.toFixed(1)} Ah @ ${voltage}V`;
+      solarWOut.textContent = `${solarW.toFixed(0)} W`;
+      inverterWOut.textContent = `${inverter.toFixed(0)} W`;
+
+      writeTier('budget', 'Budget build', voltage, budgetBattery, budgetPanel, budgetController, budgetInverter);
+      writeTier('balanced', 'Balanced build', voltage, batteryRound, panelRound, controllerAmps, inverterRound);
+      writeTier('premium', 'Premium build', voltage, premiumBattery, premiumPanel, premiumController, premiumInverter);
+
+      resultBadge.textContent = whDaily >= 1200 ? 'High daily load' : whDaily >= 700 ? 'Medium daily load' : 'Light daily load';
+      systemNarrative.textContent = `A practical starting point is around ${batteryRound}Ah LiFePO4 at ${voltage}V, ${panelRound}W of panel capacity, a ${controllerAmps}A MPPT controller, and a ${inverterRound}W pure sine inverter.`;
+      recommendationSummary.textContent = `Balanced build: ${batteryRound}Ah battery, ${panelRound}W panels, ${controllerAmps}A MPPT, and ${inverterRound}W inverter. Budget trims headroom; Premium adds cloudy-day buffer.`;
+      balancedCopyText = [
+        'Off-grid solar balanced build',
+        `Daily load: ${whDaily.toFixed(0)} Wh/day`,
+        `Battery: ${batteryRound}Ah LiFePO4 @ ${voltage}V`,
+        `Solar panels: ${panelRound}W class`,
+        `MPPT controller: ${controllerAmps}A minimum`,
+        `Inverter: ${inverterRound}W pure sine`,
+        `Assumptions: ${sunHours} peak sun hours, ${autonomy} autonomy day(s), ${(dod * 100).toFixed(0)}% usable DoD`
+      ].join('\n');
     }
 
     function setPreset(type: 'rv' | 'camp'): void {
@@ -256,13 +721,15 @@ const solarHubTitle = pickSeoTitle(
         rows = [
           { name: 'Fridge', watts: 60, hours: 24 },
           { name: 'Microwave', watts: 1000, hours: 10 / 60 },
-          { name: 'LED Lights', watts: 40, hours: 5 }
+          { name: 'LED lights', watts: 40, hours: 5 },
+          { name: 'Laptop charging', watts: 90, hours: 3 }
         ];
       } else {
         rows = [
           { name: 'CPAP', watts: 40, hours: 8 },
-          { name: 'Vent Fan', watts: 45, hours: 8 },
-          { name: 'Starlink', watts: 75, hours: 6 }
+          { name: 'Vent fan', watts: 45, hours: 8 },
+          { name: 'Starlink', watts: 75, hours: 6 },
+          { name: 'Phone and camera charging', watts: 35, hours: 3 }
         ];
       }
       renderRows();
@@ -296,13 +763,21 @@ const solarHubTitle = pickSeoTitle(
     });
 
     addRowBtnEl.addEventListener('click', () => {
-      rows.push({ name: 'New Load', watts: 100, hours: 1 });
+      rows.push({ name: 'New load', watts: 100, hours: 1 });
       renderRows();
       compute();
     });
 
     presetRvBtnEl.addEventListener('click', () => setPreset('rv'));
     presetCampBtnEl.addEventListener('click', () => setPreset('camp'));
+    copyBalancedBtnEl.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(balancedCopyText);
+        copyStatus.textContent = 'Balanced build copied. Open the search links and compare specs before buying.';
+      } catch {
+        copyStatus.textContent = balancedCopyText;
+      }
+    });
 
     [voltageSelectEl, sunHoursInputEl, autonomyInputEl, dodInputEl].forEach((el) => {
       el.addEventListener('input', compute);
@@ -310,58 +785,5 @@ const solarHubTitle = pickSeoTitle(
 
     renderRows();
     compute();
-  </script>
-
-  <script>
-    (() => {
-      const RECENT_KEY = 'recent_calculator_tools';
-      const recentToolsList = document.getElementById('recentToolsList');
-      const clearRecentTools = document.getElementById('clearRecentTools');
-      if (!(recentToolsList instanceof HTMLElement) || !(clearRecentTools instanceof HTMLButtonElement)) return;
-
-      type RecentTool = { name: string; href: string };
-
-      const getRecent = (): RecentTool[] => {
-        try {
-          const parsed = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]');
-          if (!Array.isArray(parsed)) return [];
-          return parsed.filter((item) => item && typeof item.name === 'string' && typeof item.href === 'string').slice(0, 8);
-        } catch {
-          return [];
-        }
-      };
-
-      const setRecent = (items: RecentTool[]) => {
-        localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, 8)));
-      };
-
-      const renderRecent = () => {
-        const items = getRecent();
-        if (!items.length) {
-          recentToolsList.innerHTML = '<p class="text-sm text-zinc-500">No tools visited yet. Use the links above to build quick history.</p>';
-          return;
-        }
-        recentToolsList.innerHTML = items.map((item) => (`
-          <a href="${item.href}" class="rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:text-white">${item.name}</a>
-        `)).join('');
-      };
-
-      document.querySelectorAll<HTMLAnchorElement>('a[data-tool-link]').forEach((link) => {
-        link.addEventListener('click', () => {
-          const name = link.dataset.toolName?.trim() || link.textContent?.trim() || 'Calculator Tool';
-          const href = link.getAttribute('href') || '/calculator/';
-          const next = getRecent().filter((item) => item.href !== href);
-          next.unshift({ name, href });
-          setRecent(next);
-        });
-      });
-
-      clearRecentTools.addEventListener('click', () => {
-        localStorage.removeItem(RECENT_KEY);
-        renderRecent();
-      });
-
-      renderRecent();
-    })();
   </script>
 </Layout>

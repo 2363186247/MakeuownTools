@@ -41,6 +41,14 @@ function fmt(v: number, d = 2): string {
   return v.toFixed(d);
 }
 
+function roundUp(value: number, step: number): number {
+  return Math.ceil(value / step) * step;
+}
+
+function buildAmazonSearch(query: string): string {
+  return `https://www.amazon.com/s?k=${encodeURIComponent(query)}`;
+}
+
 let scenarioCalc: ReturnType<typeof estimateOffGridSystem> | null = null;
 let voltageRows: Array<{ voltage: SolarVoltage; calc: ReturnType<typeof estimateOffGridSystem> }> = [];
 let faqItems: Array<{ question: string; answer: string }> = [];
@@ -229,164 +237,220 @@ const faqJsonLd = {
     }
   }))
 };
+
+const scenarioShopping = scenarioLikeEntry && scenarioCalc
+  ? {
+      batteryAh: roundUp(Math.max(50, scenarioCalc.batteryAh), 50),
+      panelW: roundUp(Math.max(100, scenarioCalc.panelW), 100),
+      controllerA: roundUp((roundUp(Math.max(100, scenarioCalc.panelW), 100) / scenarioLikeEntry.voltage) * 1.25, 10),
+      inverterW: roundUp(Math.max(500, scenarioCalc.recommendedInverterW), 500),
+      voltage: scenarioLikeEntry.voltage
+    }
+  : null;
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonical={canonicalUrl}
+  includeBackground={false}
+  bodyClass="solar-page min-h-screen bg-[#f6f2ea] text-slate-950 antialiased [font-family:Inter,ui-sans-serif,system-ui,sans-serif]"
+>
   <Fragment slot="head">
-    <link rel="canonical" href={canonicalUrl} />
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
   </Fragment>
 
-  <main class="mx-auto w-full max-w-7xl px-6 py-10 md:px-8 md:py-14">
-    <div class="glass-shell p-6 rounded-3xl">
-    <a href="/calculator/off-grid-solar/" class="glass-shell mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:bg-white/10">
-      <span>←</span>
-      <span>Off-Grid Solar Calculator</span>
-    </a>
+  <main class="solar-band">
+    <section class="mx-auto w-full max-w-7xl px-6 py-8 md:px-8 md:py-12">
+      <a href="/calculator/off-grid-solar/" class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-amber-300 hover:text-slate-950">
+        <span>←</span>
+        <span>Off-Grid Solar Calculator</span>
+      </a>
 
-    <header class="glass-shell-strong mb-8 rounded-3xl p-6 md:p-8">
-      <p class="mb-3 inline-flex items-center rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">Solar pSEO Landing</p>
-      <h1 class="text-3xl font-semibold tracking-tight text-white md:text-4xl">{pageTitle}</h1>
-      <p class="mt-4 max-w-4xl text-sm leading-7 text-zinc-300 md:text-base">{pageDescription}</p>
-    </header>
+      <header class="solar-seo-hero">
+        <p>Solar planning page</p>
+        <h1>{pageTitle}</h1>
+        <span>{pageDescription}</span>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href="/calculator/off-grid-solar/#calculator" class="solar-button-primary">Customize this system</a>
+          <a href="/calculator/off-grid-solar/#recommendations" class="solar-button-secondary">See buying tiers</a>
+        </div>
+      </header>
 
-    {scenarioLikeEntry && scenarioCalc && (
-      <section class="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-        <article class="rounded-3xl border border-amber-300/20 bg-gradient-to-br from-amber-300/10 to-orange-500/8 p-6 md:p-7">
-          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-100">Sizing Snapshot</h2>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Daily Energy</p>
-              <p class="mt-1 font-mono text-2xl text-white">{fmt(scenarioCalc.whDaily, 0)} Wh</p>
+      {scenarioLikeEntry && scenarioCalc && (
+        <section class="mt-6 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <article class="solar-result-panel p-5 text-white md:p-6">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Sizing snapshot</p>
+            <h2 class="mt-1 text-2xl font-semibold tracking-tight">Recommended baseline for this load profile</h2>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <article class="solar-metric-card">
+                <p>Daily energy</p>
+                <strong>{fmt(scenarioCalc.whDaily, 0)} Wh</strong>
+              </article>
+              <article class="solar-metric-card">
+                <p>Battery bank</p>
+                <strong>{fmt(scenarioCalc.batteryAh, 1)} Ah</strong>
+              </article>
+              <article class="solar-metric-card">
+                <p>Solar array</p>
+                <strong>{fmt(scenarioCalc.panelW, 0)} W</strong>
+              </article>
+              <article class="solar-metric-card">
+                <p>Inverter baseline</p>
+                <strong>{fmt(scenarioCalc.recommendedInverterW, 0)} W</strong>
+              </article>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Battery Bank</p>
-              <p class="mt-1 font-mono text-2xl text-cyan-100">{fmt(scenarioCalc.batteryAh, 1)} Ah</p>
+          </article>
+
+          <article class="solar-panel p-5 md:p-6">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Load breakdown</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">What this estimate is based on</h2>
+            <div class="mt-5 overflow-x-auto">
+              <table class="solar-data-table">
+                <thead>
+                  <tr>
+                    <th>Appliance</th>
+                    <th>Power</th>
+                    <th>Daily runtime</th>
+                    <th>Wh/day</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scenarioLikeEntry.appliances.map((a) => (
+                    <tr>
+                      <td>{a.name}</td>
+                      <td>{a.powerW} W</td>
+                      <td>{fmt(a.hoursPerDay, 2)} h</td>
+                      <td>{fmt(a.powerW * a.hoursPerDay, 0)} Wh</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Solar Array</p>
-              <p class="mt-1 font-mono text-xl text-emerald-100">{fmt(scenarioCalc.panelW, 0)} W</p>
+          </article>
+        </section>
+      )}
+
+      {scenarioShopping && (
+        <section class="mt-6 solar-panel p-5 md:p-6">
+          <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Non-affiliate buying baseline</p>
+              <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Use these as comparison searches</h2>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <p class="text-xs uppercase tracking-[0.12em] text-zinc-400">Inverter Baseline</p>
-              <p class="mt-1 font-mono text-xl text-amber-100">{fmt(scenarioCalc.recommendedInverterW, 0)} W</p>
-            </div>
+            <p class="max-w-2xl text-sm leading-7 text-slate-600">
+              These are plain search links with no affiliate tag. Verify voltage, current, BMS limits, surge rating, fuses, and wiring before purchase.
+            </p>
           </div>
-          <a href="/calculator/off-grid-solar/" class="mt-5 inline-flex items-center gap-2 rounded-xl border border-amber-200/35 bg-amber-100/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-100/20">
-            Open Interactive Off-Grid Calculator
-            <span>→</span>
-          </a>
-        </article>
+          <div class="solar-tier-actions">
+            <a href={buildAmazonSearch(`${scenarioShopping.voltage}V ${scenarioShopping.batteryAh}Ah LiFePO4 battery`)} target="_blank" rel="nofollow noopener" class="solar-search-link">Battery: {scenarioShopping.batteryAh}Ah</a>
+            <a href={buildAmazonSearch(`${scenarioShopping.panelW}W solar panel kit RV`)} target="_blank" rel="nofollow noopener" class="solar-search-link">Panels: {scenarioShopping.panelW}W</a>
+            <a href={buildAmazonSearch(`${scenarioShopping.controllerA}A MPPT solar charge controller ${scenarioShopping.voltage}V`)} target="_blank" rel="nofollow noopener" class="solar-search-link">MPPT: {scenarioShopping.controllerA}A</a>
+            <a href={buildAmazonSearch(`${scenarioShopping.inverterW}W pure sine inverter ${scenarioShopping.voltage}V`)} target="_blank" rel="nofollow noopener" class="solar-search-link">Inverter: {scenarioShopping.inverterW}W</a>
+          </div>
+        </section>
+      )}
 
-        <article class="rounded-3xl border border-white/10 bg-black/35 p-6 md:p-7">
-          <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Load Breakdown</h2>
-          <div class="overflow-x-auto">
-            <table class="w-full min-w-[560px] text-left text-sm">
+      {keywordEntry && keywordGuide && (
+        <section class="mt-6 solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{keywordGuide.title}</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{keywordEntry.highlight}</h2>
+          <div class="mt-5 grid gap-3 md:grid-cols-3">
+            {keywordGuide.lines.map((line) => (
+              <article class="solar-trust-card"><span>{line}</span></article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {entry.type === 'comparison' && (
+        <section class="mt-6 solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Voltage architecture comparison</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Compare battery Ah, solar watts, and inverter baseline</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="solar-data-table">
               <thead>
-                <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
-                  <th class="py-3">Appliance</th>
-                  <th class="py-3">Power</th>
-                  <th class="py-3">Daily Runtime</th>
-                  <th class="py-3">Wh/Day</th>
+                <tr>
+                  <th>Voltage</th>
+                  <th>Battery Ah</th>
+                  <th>Solar W</th>
+                  <th>Inverter W</th>
                 </tr>
               </thead>
-              <tbody class="text-zinc-200">
-                {(entry as SolarScenarioEntry).appliances.map((a) => (
-                  <tr class="border-b border-white/5">
-                    <td class="py-3 font-medium text-white">{a.name}</td>
-                    <td class="py-3 font-mono">{a.powerW} W</td>
-                    <td class="py-3 font-mono">{fmt(a.hoursPerDay, 2)} h</td>
-                    <td class="py-3 font-mono text-cyan-200">{fmt(a.powerW * a.hoursPerDay, 0)} Wh</td>
+              <tbody>
+                {voltageRows.map((row) => (
+                  <tr>
+                    <td>{row.voltage}V</td>
+                    <td>{fmt(row.calc.batteryAh, 1)} Ah</td>
+                    <td>{fmt(row.calc.panelW, 0)} W</td>
+                    <td>{fmt(row.calc.recommendedInverterW, 0)} W</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        </section>
+      )}
+
+      <section class="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Trust notes</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Before turning this into a cart</h2>
+          <ul class="solar-check-list mt-5">
+            <li>Use this page for first-pass planning, then validate real appliance duty cycles.</li>
+            <li>Confirm MPPT input voltage, controller current, BMS current, fuse sizing, and wire gauge.</li>
+            <li>Open the full calculator to test cloudy weather, autonomy days, and alternate system voltages.</li>
+          </ul>
+        </article>
+
+        <article class="solar-panel p-5 md:p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">FAQ</p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Quick buyer questions</h2>
+          <div class="mt-5 grid gap-3">
+            {faqItems.map((item) => (
+              <details class="solar-faq-item">
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
         </article>
       </section>
-    )}
 
-    {keywordEntry && keywordGuide && (
-      <section class="mt-8 rounded-3xl border border-white/10 bg-black/30 p-6 md:p-8">
-        <h2 class="mb-2 text-sm font-semibold uppercase tracking-widest text-zinc-300">{keywordGuide.title}</h2>
-        <p class="mb-4 text-sm text-amber-100">{keywordEntry.highlight}</p>
-        <div class="grid gap-3 md:grid-cols-3">
-          {keywordGuide.lines.map((line) => (
-            <article class="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-zinc-300">{line}</article>
+      <section class="mt-6 solar-panel p-5 md:p-6">
+        <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Related long-tail solar calculators</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Keep comparing realistic setups</h2>
+          </div>
+          <a href="/calculator/off-grid-solar/" class="text-sm font-semibold text-amber-700 transition hover:text-slate-950">Open main calculator →</a>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {related.map((item) => (
+            <a href={`/calculator/off-grid-solar/${item.slug}/`} class="solar-link-tile">
+              {item.type === 'keyword'
+                ? `${item.keywordLabel} · ${item.voltage}V · ${item.sunHours}h sun`
+                : item.type === 'scenario'
+                  ? `${item.voltage}V · ${item.sunHours}h sun · ${item.autonomyDays} day`
+                  : `${item.compareBy === 'sun-hours' ? 'Sun-hours compare' : 'Voltage compare'} · ${item.appliances.length} loads`}
+            </a>
           ))}
         </div>
       </section>
-    )}
 
-    {entry.type === 'comparison' && (
-      <section class="rounded-3xl border border-white/10 bg-black/35 p-6 md:p-7">
-        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Voltage Architecture Comparison</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full min-w-[640px] text-left text-sm">
-            <thead>
-              <tr class="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
-                <th class="py-3">Voltage</th>
-                <th class="py-3">Battery Ah</th>
-                <th class="py-3">Solar W</th>
-                <th class="py-3">Inverter W</th>
-              </tr>
-            </thead>
-            <tbody class="text-zinc-200">
-              {voltageRows.map((row) => (
-                <tr class="border-b border-white/5">
-                  <td class="py-3 font-medium text-white">{row.voltage}V</td>
-                  <td class="py-3 font-mono text-cyan-200">{fmt(row.calc.batteryAh, 1)} Ah</td>
-                  <td class="py-3 font-mono text-emerald-200">{fmt(row.calc.panelW, 0)} W</td>
-                  <td class="py-3 font-mono text-amber-200">{fmt(row.calc.recommendedInverterW, 0)} W</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )}
-
-    <section class="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Related Long-Tail Solar Calculators</h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {related.map((item) => (
-          <a href={`/calculator/off-grid-solar/${item.slug}/`} class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            {item.type === 'keyword'
-              ? `${item.keywordLabel} · ${item.voltage}V · ${item.sunHours}h sun`
-              : item.type === 'scenario'
-                ? `${item.voltage}V · ${item.sunHours}h sun · ${item.autonomyDays} day`
-                : `${item.compareBy === 'sun-hours' ? 'Sun-Hours Compare' : 'Voltage Compare'} · ${item.appliances.length} loads`}
+      {(prevSolarEntry && nextSolarEntry) && (
+        <section class="mt-6 grid gap-3 sm:grid-cols-2">
+          <a href={`/calculator/off-grid-solar/${prevSolarEntry.slug}/`} class="solar-profile-card">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Previous</p>
+            <h2 class="mt-2 text-lg font-semibold text-slate-950">{prevSolarEntry.title}</h2>
           </a>
-        ))}
-      </div>
+          <a href={`/calculator/off-grid-solar/${nextSolarEntry.slug}/`} class="solar-profile-card">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Next</p>
+            <h2 class="mt-2 text-lg font-semibold text-slate-950">{nextSolarEntry.title}</h2>
+          </a>
+        </section>
+      )}
     </section>
-
-    {(prevSolarEntry && nextSolarEntry) && (
-      <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
-        <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">Sequential Long-Tail Navigation</h2>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <a href={`/calculator/off-grid-solar/${prevSolarEntry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            ← Previous: {prevSolarEntry.title}
-          </a>
-          <a href={`/calculator/off-grid-solar/${nextSolarEntry.slug}/`} class="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:border-amber-300/40 hover:text-white">
-            Next: {nextSolarEntry.title} →
-          </a>
-        </div>
-      </section>
-    )}
-
-    <section class="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 md:p-8">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-300">FAQ</h2>
-      <div class="space-y-3">
-        {faqItems.map((item) => (
-          <article class="rounded-2xl border border-white/10 bg-black/30 p-4">
-            <h3 class="text-sm font-semibold text-white">{item.question}</h3>
-            <p class="mt-2 text-sm leading-7 text-zinc-300">{item.answer}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-    </div>
   </main>
 </Layout>
